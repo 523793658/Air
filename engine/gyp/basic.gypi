@@ -20,11 +20,13 @@
 				"../basic/include/PreDeclare.h",
 				"../basic/include/ResIdentifier.h",
 				"../basic/include/Math.hpp",
+				"../basic/include/Util.h",
 				"../basic/src/Thread.cpp",
 				"../basic/src/CPP11.cpp",
 				"../basic/src/Config.cpp",
 				"../basic/src/Basic.cpp",
 				"../basic/src/ResIdentifier.cpp",
+				"../basic/src/Util.cpp",
 			],
 			"conditions":[
 				[

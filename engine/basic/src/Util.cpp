@@ -20,3 +20,10 @@
 #include <boost/boost/assert.hpp>
 
 #include "Util.h"
+
+
+
+std::string& convert(std::string& strDest, std::string const & strSrc);
+std::string& convert(std::string& strDest, std::wstring const & wstrSrc);
+std::wstring& convert(std::wstring & wstrDest, std::string const & strSrc);
+std::wstring& convert(std::wstring& wstrDst, std::wstring const & wstrSrc);

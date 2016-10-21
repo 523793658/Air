@@ -21,6 +21,9 @@ namespace Air
 		return MakeUniquePtrHelper<T>(std::is_array<T>(), std::forward<Args>(args)...);
 	}
 
-
+	std::string& convert(std::string& strDest, std::string const & strSrc);
+	std::string& convert(std::string& strDest, std::wstring const & wstrSrc);
+	std::wstring& convert(std::wstring & wstrDest, std::string const & strSrc);
+	std::wstring& convert(std::wstring& wstrDst, std::wstring const & wstrSrc);
 }
 #endif
