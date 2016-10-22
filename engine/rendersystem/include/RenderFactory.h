@@ -2,12 +2,12 @@
 #define _RenderFactory_H_
 #pragma once
 
-#include "PreDeclare.h"
-namespace AIR
+namespace Air
 {
 	class AIR_CORE_API RenderFactory
 	{
-
+	public:
+		virtual ~RenderFactory();
 	};
 }
 

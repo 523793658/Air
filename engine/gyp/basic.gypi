@@ -7,6 +7,7 @@
 			"type": "static_library",
 			"include_dirs":[
 				"../basic/include",
+				"../../external/boost",
 			],
 			"includes":[
 				"../../tools/gyp/common.gypi",
@@ -21,12 +22,16 @@
 				"../basic/include/ResIdentifier.h",
 				"../basic/include/Math.hpp",
 				"../basic/include/Util.h",
+				"../basic/include/Vector.hpp",
+				"../basic/include/Timer.hpp",
 				"../basic/src/Thread.cpp",
 				"../basic/src/CPP11.cpp",
 				"../basic/src/Config.cpp",
 				"../basic/src/Basic.cpp",
 				"../basic/src/ResIdentifier.cpp",
 				"../basic/src/Util.cpp",
+				"../basic/src/Vector.cpp",
+				"../basic/src/Timer.cpp",
 			],
 			"conditions":[
 				[

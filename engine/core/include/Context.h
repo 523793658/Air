@@ -1,8 +1,9 @@
 #ifndef _Context_H_
 #define _Context_H_
-#include "PreDeclare.h"
+#include "core/include/PreDeclare.h"
 #include <string>
-#include "RenderSettings.h"
+#include <boost/assert.hpp>
+#include "rendersystem/include/RenderSettings.hpp"
 
 #include "DllLoader.h"
 
@@ -35,6 +36,8 @@ namespace Air
 
 		void loadRenderFactory(std::string const &rf_name);
 		void loadSceneManager(std::string const & sm_name);
+
+		void setAppInstance(App3DFramework& app);
 	private: 
 		void destoryAll();
 	private:

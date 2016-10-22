@@ -6,10 +6,13 @@ namespace Air
 	struct ConfextCfg;
 	class Context;
 
+
+	class SceneManager;
 	class RenderFactory;
 
 	class App3DFramework;
-	class SceneManager;
+	class Window;
+	typedef std::shared_ptr<Window> WindowPtr;
 }
 
 

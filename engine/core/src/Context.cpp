@@ -1,11 +1,11 @@
 #include "Engine.h"
-
-
+#include "basic/include/Util.h"
+#include "basic/include/Math.hpp"
+#include "rendersystem/include/RenderFactory.h"
+#include "core/include/SceneManager.hpp"
 #include "ResLoader.h"
 
 #include <memory>
-#include "Util.h"
-#include "RenderFactory.h"
 
 #ifdef AIR_PLATFORM_WINDOWS
 #include <windows.h>
@@ -17,6 +17,8 @@
 #endif
 
 #include <mutex>
+
+
 #include "Context.h"
 
 namespace
@@ -89,10 +91,14 @@ namespace Air
 		ResIdentifierPtr file = ResLoader::getInstance().open(cfg_file);
 		if (file)
 		{
-			XMLDocument cfg_doc;
+			//XMLDocument cfg_doc;
 		}
 	}
 
+	void Context::setAppInstance(App3DFramework& app)
+	{
+		mApp = &app;
+	}
 
 }
 

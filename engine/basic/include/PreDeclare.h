@@ -30,6 +30,24 @@ namespace Air
 	class bad_join;
 
 
+	class half;
+	template<typename T, int N>
+	class Vector_T;
+	typedef Vector_T<int32_t, 1> int1;
+	typedef Vector_T<int32_t, 2> int2;
+	typedef Vector_T<int32_t, 3> int3;
+	typedef Vector_T<int32_t, 4> int4;
+
+	typedef Vector_T<uint32_t, 1> uint1;
+	typedef Vector_T<uint32_t, 2> uint2;
+	typedef Vector_T<uint32_t, 3> uint3;
+	typedef Vector_T<uint32_t, 4> uint4;
+
+	typedef Vector_T<float, 1> float1;
+	typedef Vector_T<float, 2> float2;
+	typedef Vector_T<float, 3> float3;
+	typedef Vector_T<float, 4> float4;
+
 }
 
 
