@@ -1,6 +1,7 @@
 #include "Engine.h"
 #include "basic/include/Util.h"
 #include "basic/include/Math.hpp"
+#include "basic/include/Log.hpp"
 #include "rendersystem/include/RenderFactory.h"
 #include "core/include/SceneManager.hpp"
 #include "ResLoader.h"
@@ -21,6 +22,8 @@
 
 #include "Context.h"
 
+#define AIR_DLL_PREFIX DLL_PREFIX KFL_STRINGIZE(AIR_NAME)
+
 namespace
 {
 	std::mutex singleton_mutex;
@@ -33,7 +36,12 @@ namespace Air
 
 	Context::Context()
 	{
-		
+		mCfg.mGraphicsCfg.full_screen = false;
+		mCfg.mGraphicsCfg.height = 900;
+		mCfg.mGraphicsCfg.hide_win = false;
+		mCfg.mGraphicsCfg.left = 100;
+		mCfg.mGraphicsCfg.top = 100;
+		mCfg.mGraphicsCfg.width = 1440;
 	}
 
 	Context::~Context()
@@ -88,18 +96,63 @@ namespace Air
 		std::string rfName = "D3D11";
 		std::string smName;
 
-		ResIdentifierPtr file = ResLoader::getInstance().open(cfg_file);
-		if (file)
-		{
-			//XMLDocument cfg_doc;
-		}
+		//ResIdentifierPtr file = ResLoader::getInstance().open(cfg_file);
+		//if (file)
+		//{
+		//	//XMLDocument cfg_doc;
+		//}
 	}
+
+	void Context::setConfig(ContextCfg const & cfg)
+	{
+		mCfg = cfg;
+		
+	}
+
+	ContextCfg const& Context::getConfig() const
+	{
+		return mCfg;
+	}
+
 
 	void Context::setAppInstance(App3DFramework& app)
 	{
 		mApp = &app;
 	}
 
+	void Context::loadRenderFactory(std::string const &rf_name)
+	{
+		mRenderFactory.reset();
+		mRenderLoader.free();
+		std::string render_path = ResLoader::getInstance().locate("Render");
+		std::string fn = AIR_DLL_PREFIX"_RenderEngine_" + rf_name + DLL_SUFFIX;
+		std::string path = render_path + "/" + fn;
+		mRenderLoader.load(ResLoader::getInstance().locate(path));
+		makeRenderFactoryFunc mrf = (makeRenderFactoryFunc)mRenderLoader.getProcAddress("makeRenderFactory");
+		if (mrf != nullptr)
+		{
+			mrf(mRenderFactory);
+		}
+		else
+		{
+			logError("Loading %s failed", path.c_str());
+			mRenderLoader.free();
+		}
+	}
+
+
+	RenderFactory& Context::getRenderFactoryInstance()
+	{
+		if (!mRenderFactory)
+		{
+			std::lock_guard<std::mutex> lock(singleton_mutex);
+			if (!mRenderFactory)
+			{
+				this->loadRenderFactory(mCfg.render_factory_name);
+			}
+		}
+		return *mRenderFactory;
+	}
 }
 
 

@@ -30,10 +30,10 @@ namespace Air
 		virtual ~App3DFramework();
 
 		void create();
-		void destroy();
+		/*void destroy();
 		void suspend();
 		void resume();
-		void refresh();
+		void refresh();*/
 
 		std::string const & getName() const
 		{
@@ -52,41 +52,38 @@ namespace Air
 			return true;
 		}
 
-		Camera const & getActiveCamera() const;
-
-		Camera& getActiveCamera();
-
-		uint32_t getTotalNumFrams() const;
-
-		float getFps() const;
-
-		float getAppTime() const;
-
-		float getFrameTime() const;
+// 		Camera const & getActiveCamera() const;
+// 
+// 		Camera& getActiveCamera();
+// 
+// 		uint32_t getTotalNumFrams() const;
+// 
+// 		float getFps() const;
+// 
+// 		float getAppTime() const;
+// 
+// 		float getFrameTime() const;
+// 		void quit();
 
 		void run();
-		void quit();
 
-		virtual void onResize(uint32_t width, uint32_t height);
+		//virtual void onResize(uint32_t width, uint32_t height);
 
 	protected:
-		void LookAt(float3 const & eye, float3 const & lookAt);
+		/*void LookAt(float3 const & eye, float3 const & lookAt);
 		void LookAt(float3 const & eye, float3 const & lookAt, float3 const & up);
-		void Proj(float nearPlane, float farPlane);
+		void Proj(float nearPlane, float farPlane);*/
 
 	protected:
-		uint32_t Update(uint32_t pass);
-		void UpdateStats();
+		//uint32_t Update(uint32_t pass);
+		//void UpdateStats();
 
 	private:
 		virtual void onCreate()
 		{
 
 		}
-		virtual void onDestroy()
-		{
-
-		}
+		virtual void onDestroy();
 		virtual void onSuspend()
 		{
 
@@ -96,8 +93,8 @@ namespace Air
 
 		}
 
-		virtual void doUpdateOverlay() = 0;
-		virtual uint32_t doUpdate(uint32_t pass) = 0;
+		//virtual void doUpdateOverlay() = 0;
+		//virtual uint32_t doUpdate(uint32_t pass) = 0;
 
 	protected:
 		std::string mName;

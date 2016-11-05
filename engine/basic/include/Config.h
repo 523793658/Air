@@ -9,6 +9,9 @@
 #define AIR_DEBUG
 #endif
 
+#define KFL_STRINGIZE(X) KFL_DO_STRINGIZE(X)
+#define KFL_DO_STRINGIZE(X) #X
+
 #if defined(_MSC_VER)
 #	define AIR_COMPILER_MSVC
 #	define AIR_COMPLIER_NAME	vc
@@ -112,4 +115,65 @@
 #	define KLAYGE_PLATFORM_WINDOWS_DESKTOP
 #	endif
 #endif
+
+
+#if defined(AIR_COMPILER_MSVC)
+	#if defined(_M_X64)
+		#define AIR_CPU_X64
+		#define AIR_COMPILER_TARGET x64
+	#elif defined(_M_IX86)
+		#define AIR_CPU_X86
+		#define AIR_COMPILER_TARGET	X86
+	#elif defined(_M_ARM)
+		#define AIR_CPU_ARM
+		#define AIR_COMPILER_TARGET	arm
+	#else
+		#error "Unknown CPU type. In vc, x86, x64 and arm are supported."
+	#endif
+#endif
+
+#ifdef AIR_CPU_X64
+	#define AIR_SSE_SUPPORT
+	#define AIR_SSE2_SUPPORT
+	#define AIR_X64_SUPPORT
+	#if defined(AIR_COMPILER_MSVC)
+		#ifdef __AVX__
+			#define AIR_AVX_SUPPORT
+		#endif
+		#ifdef __AVX2__
+			#define AIR_AVX2_SUPPORT
+		#endif
+	#endif
+#elif defined AIR_CPU_X86
+	#if defined(KLAYGE_COMPILER_MSVC)
+		#if 600 == _M_IX86
+			#define KLAYGE_MMX_SUPPORT
+		#endif
+
+		#if 1 == _M_IX86_FP
+			#define KLAYGE_SSE_SUPPORT
+		#elif 2 == _M_IX86_FP
+			#define KLAYGE_SSE_SUPPORT
+			#define KLAYGE_SSE2_SUPPORT
+			#ifdef __AVX__
+				#define KLAYGE_AVX_SUPPORT
+			#endif
+			#ifdef __AVX2__
+				#define KLAYGE_AVX2_SUPPORT
+			#endif
+		#endif
+	#endif
+#elif defined AIR_CPU_ARM
+	#if defined(KLAYGE_COMPILER_MSVC)
+		#define KLAYGE_NEON_SUPPORT
+	#elif defined(KLAYGE_COMPILER_GCC) || defined(KLAYGE_COMPILER_CLANG)
+		#ifdef __ARM_NEON__
+			#define KLAYGE_NEON_SUPPORT
+		#endif
+	#endif
+#elif 
+	defined AIR_CPU_ARM64
+#endif
+
+
 #endif

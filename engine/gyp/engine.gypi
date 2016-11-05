@@ -5,7 +5,7 @@
 		{
 			"target_name": "engine",
 			"dependencies": [
-				"basic",
+				'basic',
 			],
 			"type": "shared_library",
 			"include_dirs":[
@@ -22,22 +22,34 @@
 				"../core/include/Engine.h",
 
 				"../core/include/PreDeclare.h",
-				"../core/include/DllLoader.h",
 				"../core/include/ResLoader.h",
 				"../core/include/Camera.hpp",
 				"../core/include/SceneManager.hpp",
 				"../core/src/Engine.cpp",
 				"../core/src/Context.cpp",
 				"../core/src/ElementFormat.cpp",
-				"../core/src/DllLoader.cpp",
 				"../core/src/ResLoader.cpp",
 				"../core/src/Camera.cpp",
 				"../core/src/SceneManager.cpp",
 				
 				"../rendersystem/include/RenderFactory.h",
+				"../rendersystem/include/RenderEngine.hpp",
 				"../rendersystem/include/RenderSettings.hpp",
+				"../rendersystem/include/RenderDeviceCaps.hpp",
+				"../rendersystem/include/FrameBuffer.hpp",
+				"../rendersystem/include/Viewport.hpp",
+				"../rendersystem/include/RenderView.hpp",
+				"../rendersystem/include/Texture.hpp",
+				"../rendersystem/include/RenderLayout.hpp",
+				
 				"../rendersystem/src/RenderSettings.cpp",
 				"../rendersystem/src/RenderFactory.cpp",
+				"../rendersystem/src/FrameBuffer.cpp",
+				"../rendersystem/src/RenderEngine.cpp",
+				"../rendersystem/src/Viewport.cpp",
+				"../rendersystem/src/RenderView.cpp",
+				"../rendersystem/src/Texture.cpp",
+				"../rendersystem/src/RenderLayout.cpp",
 				
 				"../app/include/Window.hpp",
 				"../app/include/App3D.hpp",
@@ -63,6 +75,11 @@
 							"msbuild_settings":{
 									"ClCompile":{
 										'RuntimeLibrary': 'MultiThreadedDebugDLL',
+									},
+									'Link': {
+										'GenerateDebugInformation': 'true',
+										'AdditionalDependencies':[
+										],
 									},
 								},
 							},

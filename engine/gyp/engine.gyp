@@ -7,6 +7,7 @@
 				"engine",
 				"basic",
 				"SampleCreateWindow",
+				"RenderEngineD3D11",
 			],
 		}
 	],
@@ -15,6 +16,7 @@
 		'basic.gypi',
 		'engine.gypi',
 		'sample.gypi',
+		'render_engine_d3d11.gypi',
 	],
 	
 }

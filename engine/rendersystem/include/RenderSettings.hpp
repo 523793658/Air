@@ -19,6 +19,8 @@ namespace Air
 		uint32_t mSampleQuality;
 		uint32_t mSyncInterval;
 		uint32_t mMotionFrames;
+		StereoMethod mStereoMethod;
+		float mStereoSeparation;
 		bool mHdr;
 		std::vector<std::pair<std::string, std::string>> options;
 	};

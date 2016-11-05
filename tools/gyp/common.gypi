@@ -41,8 +41,6 @@
 
 						'ImageHasSafeExceptionHandlers': 'false',						#映像具有安全异常处理程序
 						'AdditionalDependencies': [										#附加依赖项
-							'd3d11.lib',
-							'D3Dcompiler.lib',
 							'kernel32.lib',
 							'gdi32.lib',
 							'winspool.lib',
@@ -57,6 +55,7 @@
 							'odbccp32.lib',
 							'DelayImp.lib',
 							'winmm.lib',
+							'wsock32.lib',
 						],
 					},
 				},
@@ -67,14 +66,12 @@
 								'BasicRuntimeChecks': 'EnableFastChecks',					#基本运行时检查（/RTC1）
 								'DebugInformationFormat': 'EditAndContinue', 				# editAndContiue (/ZI)
 								'Optimization': 'Disabled',           						# optimizeDisabled (/Od)
-								'PreprocessorDefinitions': ['_DEBUG'],						#预处理器定义
-								#'RuntimeTypeInfo': 'false',      							# /GR-
+								'RuntimeTypeInfo': 'false',      							# /GR-
+								'RuntimeLibrary': 'MultiThreadedDebugDLL',
 								'IntrinsicFunctions': 'false'								#启用内部函数（否）
 							},
 							'Link': {
 								'GenerateDebugInformation': 'true',
-								'OutputFile':
-								'$(OutDir)bin\\$(Configuration)\\$(TargetName)_d$(TargetExt)',	#输出文件
 								'AdditionalDependencies':[
 								],
 								
@@ -85,21 +82,43 @@
 							'GenerateManifest': 'false',
 						},
 					},
+					'Debug_x64': {
+						'msbuild_settings': {
+							'ClCompile': {
+								'BasicRuntimeChecks': 'EnableFastChecks',					#基本运行时检查（/RTC1）
+								'DebugInformationFormat': 'EditAndContinue', 				# editAndContiue (/ZI)
+								'Optimization': 'Disabled',           						# optimizeDisabled (/Od)
+								'RuntimeTypeInfo': 'false',      							# /GR-
+								'RuntimeLibrary': 'MultiThreadedDebugDLL',
+								'IntrinsicFunctions': 'false'								#启用内部函数（否）
+							},
+							'Link': {
+								'GenerateDebugInformation': 'true',
+								'AdditionalDependencies':[
+								],
+								'AdditionalLibraryDirectories':[
+								],
+							},
+						},
+						'msbuild_configuration_attributes': {
+							'LinkIncremental': 'true',
+							'GenerateManifest': 'false',
+						},
+						'msvs_configuration_platform': 'x64',
+					},
 					'Release': {
 						'msbuild_settings': {
 							'ClCompile': {
 								'DebugInformationFormat': 'ProgramDatabase',      			# programDatabase (/Zi)
 								'Optimization': 'MaxSpeed',                					# optimizeDisabled (/O2)
 								'WholeProgramOptimization': 'true', 						#/GL
-							 	'PreprocessorDefinitions': ['NDEBUG'],
-								#'RuntimeTypeInfo': 'false',         						# /GR-
+								'RuntimeTypeInfo': 'false',      							# /GR-
+								'RuntimeLibrary': 'MultiThreadedDLL',    						# /GR-
 								'IntrinsicFunctions': 'true'								#启用内部函数（是）
 							},
 							'Link': {
 								#'LinkIncremental': 'false',
 								#'GenerateManifest': 'true',
-								'OutputFile':
-								'$(OutDir)bin\\$(Configuration)\\$(TargetName)$(TargetExt)',	#输出文件
 								'AdditionalDependencies':[
 								],
 								'GenerateDebugInformation': 'true',		
@@ -109,6 +128,30 @@
 							'LinkIncremental': 'false',										#不启用增量链接
 							'GenerateManifest': 'false',									#不生成manifest
 						},
+					},
+					'Release_x64': {
+						'msbuild_settings': {
+							'ClCompile': {
+								'DebugInformationFormat': 'ProgramDatabase',      			# programDatabase (/Zi)
+								'Optimization': 'MaxSpeed',                					# optimizeDisabled (/O2)
+								'WholeProgramOptimization': 'true', 						#/GL
+								'RuntimeTypeInfo': 'false',      							# /GR-
+								'RuntimeLibrary': 'MultiThreadedDLL',    						# /GR-
+								'IntrinsicFunctions': 'true'								#启用内部函数（是）
+							},
+							'Link': {
+								#'LinkIncremental': 'false',
+								#'GenerateManifest': 'true',
+								'AdditionalDependencies':[
+								],
+								'GenerateDebugInformation': 'true',		
+							},
+						},
+						'msbuild_configuration_attributes': {
+							'LinkIncremental': 'false',										#不启用增量链接
+							'GenerateManifest': 'false',									#不生成manifest
+						},
+						'msvs_configuration_platform': 'x64',
 					},
 				},
 			},

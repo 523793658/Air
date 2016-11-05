@@ -2,7 +2,7 @@
 #define _Basic_ResIdentifier_H_
 #pragma once
 
-#include <PreDeclare.h>
+#include <basic/include/PreDeclare.h>
 #include <istream>
 #include <vector>
 #include <string>

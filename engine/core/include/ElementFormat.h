@@ -284,6 +284,21 @@ namespace Air
 		// BC7 compression element format. Standard RGB (gamma = 2.2).
 		EF_BC7_SRGB = MakeElementFormat1<EC_BC, 7, ECT_UNorm_SRGB>::value
 	};
+
+
+	enum StereoMethod
+	{
+		STM_None,
+		STM_ColorAnaglyph_RedCyan,
+		STM_ColorAnaglyph_YellowBlue,
+		STM_ColorAnaglyph_GreenRed,
+		STM_LCDShutter,
+		STM_HorizontalInterlacing,
+		STM_VerticalInterlacing,
+		STM_Horizontal,
+		STM_Vertical,
+		STM_OculusVR
+	};
 }
 
 

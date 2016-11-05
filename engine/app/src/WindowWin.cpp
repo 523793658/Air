@@ -95,7 +95,7 @@ namespace Air
 		{
 			style = WS_OVERLAPPEDWINDOW;
 		}
-		RECT rc = { 0, 0, settings.width, settings.hide_win };
+		RECT rc = { 0, 0, settings.width, settings.height };
 		::AdjustWindowRect(&rc, style, false);
 		mWnd = ::CreateWindowW(mName.c_str(), mName.c_str(), style, settings.left, settings.top, rc.right - rc.left, rc.bottom - rc.top, 0, 0, hInst, nullptr
 			);

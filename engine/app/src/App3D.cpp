@@ -17,7 +17,7 @@ namespace Air
 	{
 		Context::getInstance().setAppInstance(*this);
 		ContextCfg cfg = Context::getInstance().getConfig();
-		this->makeWindow(mName, cfg.mGraphicsCfg);
+		mMainWnd = this->makeWindow(mName, cfg.mGraphicsCfg);
 #ifndef AIR_PLATFORM_WINDOWS_RUNTIME
 		cfg.mGraphicsCfg.left = mMainWnd->getLeft();
 		cfg.mGraphicsCfg.top = mMainWnd->getTop();
@@ -43,7 +43,7 @@ namespace Air
 	}
 	App3DFramework::~App3DFramework()
 	{
-		this->destroy();
+		//this->destroy();
 	}
 
 #ifdef AIR_PLATFORM_WINDOWS_RUNTIME
@@ -52,7 +52,7 @@ namespace Air
 	{
 #endif
 		ContextCfg cfg = Context::getInstance().getConfig();
-
+		Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance().createRenderWindow(mName, cfg.mGraphicsCfg);
 
 	}
 
@@ -66,4 +66,39 @@ namespace Air
 		return MakeSharedPtr<Window>(name, settings, native_wmd);
 	}
 
+	void App3DFramework::run()
+	{
+		bool gotMsg;
+		MSG msg;
+		::PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE);
+		while(WM_QUIT != msg.message)
+		{
+			if (mMainWnd->getActive())
+			{
+				gotMsg = (::PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE) != 0);
+			}
+			else
+			{
+				gotMsg = (::GetMessage(&msg, nullptr, 0, 0) != 0);
+			}
+			if (gotMsg)
+			{
+				::TranslateMessage(&msg);
+				::DispatchMessage(&msg);
+			}
+			else
+			{
+				//¸üÐÂäÖÈ¾
+			}
+
+
+			this->onDestroy();
+		}
+	}
+
+
+	void App3DFramework::onDestroy()
+	{
+
+	}
 }

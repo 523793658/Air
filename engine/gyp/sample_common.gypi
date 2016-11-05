@@ -3,8 +3,10 @@
 		'source_path': '../sample',
 	},
 	'include_dirs': [
+		"../../external/boost",
+		"../core/include",
+		"../sample/include",
 		"../",
-		"../sample/include"
 	],
 	'includes': [
 		'../../tools/gyp/common.gypi',

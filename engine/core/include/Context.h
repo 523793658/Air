@@ -5,7 +5,7 @@
 #include <boost/assert.hpp>
 #include "rendersystem/include/RenderSettings.hpp"
 
-#include "DllLoader.h"
+#include "basic/include/DllLoader.h"
 
 namespace Air
 {
@@ -28,6 +28,9 @@ namespace Air
 
 		static Context& getInstance();
 		static void destroy();
+
+		RenderFactory& getRenderFactoryInstance();
+
 		void loadCfg(std::string const & cfg_file);
 		void saveCfg(std::string const & cfg_file);
 

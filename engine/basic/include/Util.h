@@ -1,5 +1,13 @@
 #ifndef _UTIL_H_
 #define _UTIL_H_
+#ifdef AIR_DEBUG
+#define AIR_DBG_SUFFIX "_d"
+#else
+#define AIR_DBG_SUFFIX ""
+#endif
+
+#define AIR_OUTPUT_SUFFIX "_" KFL_STRINGIZE(AIR_COMPLIER_NAME) KFL_STRINGIZE(AIR_COMPILER_VERSION) AIR_DBG_SUFFIX
+
 namespace Air
 {
 

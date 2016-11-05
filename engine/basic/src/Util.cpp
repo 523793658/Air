@@ -1,5 +1,5 @@
-#include "Basic.h"
-#include "ResIdentifier.h"
+#include "basic/include/Basic.h"
+#include "basic/include/ResIdentifier.h"
 
 #ifdef AIR_PLATFORM_WINDOWS
 	#include <windows.h>
@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <boost/assert.hpp>
 
-#include "Util.h"
+#include "basic/include/Util.h"
 
 namespace Air 
 {
