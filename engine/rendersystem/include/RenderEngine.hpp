@@ -77,6 +77,7 @@ namespace Air
 
 		std::string mNativeShaderPlatformName;
 
+
 	};
 
 
