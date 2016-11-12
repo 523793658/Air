@@ -304,7 +304,7 @@ namespace Air
 	inline ElementChannel
 		getChannel(ElementFormat ef)
 	{
-		return static_cast<ElementChannel>((static_cast<uint64_t>(ef) >> (4 * c) & 0xf);
+		return static_cast<ElementChannel>((static_cast<uint64_t>(ef) >> (4 * c)) & 0xf);
 	}
 
 	inline bool isDepthFormat(ElementFormat format)

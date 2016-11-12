@@ -1,6 +1,10 @@
 #ifndef Air_D3D11_Render_Engine_H_
 #define Air_D3D11_Render_Engine_H_
 #pragma once
+
+#include <set>
+#include <map>
+
 #include "rendersystem/include/RenderEngine.hpp"
 
 #include "render_engine_d3d11/include/D3D11AdapterList.hpp"
@@ -60,7 +64,16 @@ namespace Air
 
 
 		bool isFullScreen() const;
-		void setFullScreen(bool fs) const;
+		void setFullScreen(bool fs);
+
+	private:
+		bool isVertexFormatSupport(ElementFormat elem_fmt);
+		bool isTextureFormatSupport(ElementFormat elem_fmt);
+		bool isRenderTargetFormatSupport(ElementFormat elem_fmt, uint32_t sample_count, uint32_t sample_quality);
+		void doCreateRenderWindow(std::string const & name, RenderSettings const & settings);
+		D3D11AdapterPtr const & getActiveAdapter() const;
+
+		void resetRenderStates();
 
 	private:
 		typedef HRESULT(WINAPI *CreateDXGIFactory1Func)(REFIID riid, void** ppFactory);
@@ -94,6 +107,10 @@ namespace Air
 
 		D3D11AdapterList mAdapterList;
 
+		std::set<ElementFormat> mVertexFormats;
+		std::set<ElementFormat> mTextureFormats;
+		std::map<ElementFormat, std::vector<std::pair<uint32_t, uint32_t>>> mRendertargetFormats;
+
 	private:
 		HMODULE mModDXGI;
 		HMODULE mModD3D11;
@@ -106,6 +123,12 @@ namespace Air
 
 		double mInvTimestampFreq;
 
+		char const * mVSProfile;
+		char const * mPSProfile;
+		char const * mGSProfile;
+		char const * mCSProfile;
+		char const * mHSProfile;
+		char const * mDSProfile;
 	};
 }
 

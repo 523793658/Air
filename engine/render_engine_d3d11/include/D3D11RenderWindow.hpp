@@ -4,7 +4,7 @@
 
 namespace Air
 {
-	class D3D11RenderWindow
+	class D3D11RenderWindow : public D3D11FrameBuffer
 	{
 	public:
 		D3D11RenderWindow();
@@ -13,8 +13,12 @@ namespace Air
 		bool isFullScreen() const;
 
 		void setFullScreen(bool fs);
+
+
 	};
 
+
+	typedef std::shared_ptr<D3D11RenderWindow>	D3D11RenderWindowPtr;
 
 }
 

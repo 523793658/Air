@@ -206,11 +206,10 @@ namespace Air
 	{
 		return checked_cast<D3D11RenderWindow*>(mScreenFrameBuffer.get())->isFullScreen();
 	}
-	void D3D11RenderEngine::setFullScreen(bool fs) const
+	void D3D11RenderEngine::setFullScreen(bool fs)
 	{
 		checked_cast<D3D11RenderWindow*>(mScreenFrameBuffer.get())->setFullScreen(fs);
 	}
-
 
 	void D3D11RenderEngine::detectD3D11Runtime(ID3D11Device* device, ID3D11DeviceContext* imm_ctx)
 	{
@@ -569,18 +568,18 @@ namespace Air
 					}
 
 					UINT s1;
-					d3d_device_->CheckFormatSupport(depth_fmt, &s1);
+					mD3D11Device->CheckFormatSupport(depth_fmt, &s1);
 					if (s1 != 0)
 					{
 						if (s1 & D3D11_FORMAT_SUPPORT_IA_VERTEX_BUFFER)
 						{
-							vertex_format_.insert(fmts[i].first);
+							mVertexFormats.insert(fmts[i].first);
 						}
 						if (s1 & (D3D11_FORMAT_SUPPORT_TEXTURE1D | D3D11_FORMAT_SUPPORT_TEXTURE2D
 							| D3D11_FORMAT_SUPPORT_TEXTURE3D | D3D11_FORMAT_SUPPORT_TEXTURECUBE
 							| D3D11_FORMAT_SUPPORT_SHADER_LOAD | D3D11_FORMAT_SUPPORT_SHADER_SAMPLE))
 						{
-							texture_format_.insert(fmts[i].first);
+							mTextureFormats.insert(fmts[i].first);
 						}
 					}
 				}
@@ -588,13 +587,13 @@ namespace Air
 				{
 					if (s & D3D11_FORMAT_SUPPORT_IA_VERTEX_BUFFER)
 					{
-						vertex_format_.insert(fmts[i].first);
+						mVertexFormats.insert(fmts[i].first);
 					}
 					if ((s & (D3D11_FORMAT_SUPPORT_TEXTURE1D | D3D11_FORMAT_SUPPORT_TEXTURE2D
 						| D3D11_FORMAT_SUPPORT_TEXTURE3D | D3D11_FORMAT_SUPPORT_TEXTURECUBE))
 						&& (s & D3D11_FORMAT_SUPPORT_SHADER_SAMPLE))
 					{
-						texture_format_.insert(fmts[i].first);
+						mTextureFormats.insert(fmts[i].first);
 					}
 				}
 
@@ -605,11 +604,11 @@ namespace Air
 					UINT quality;
 					while (count <= D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT)
 					{
-						if (SUCCEEDED(d3d_device_->CheckMultisampleQualityLevels(fmts[i].second, count, &quality)))
+						if (SUCCEEDED(mD3D11Device->CheckMultisampleQualityLevels(fmts[i].second, count, &quality)))
 						{
 							if (quality > 0)
 							{
-								rendertarget_format_[fmts[i].first].emplace_back(count, quality);
+								mRendertargetFormats[fmts[i].first].emplace_back(count, quality);
 								count <<= 1;
 							}
 							else
@@ -626,17 +625,107 @@ namespace Air
 			}
 		}
 
-		caps_.vertex_format_support = std::bind<bool>(&D3D11RenderEngine::VertexFormatSupport, this,
+		mCaps.vertexFormatSupport = std::bind<bool>(&D3D11RenderEngine::isVertexFormatSupport, this,
 			std::placeholders::_1);
-		caps_.texture_format_support = std::bind<bool>(&D3D11RenderEngine::TextureFormatSupport, this,
+		mCaps.textureFormatSupport = std::bind<bool>(&D3D11RenderEngine::isTextureFormatSupport, this,
 			std::placeholders::_1);
-		caps_.rendertarget_format_support = std::bind<bool>(&D3D11RenderEngine::RenderTargetFormatSupport, this,
+		mCaps.rendertargetFormatSupport = std::bind<bool>(&D3D11RenderEngine::isRenderTargetFormatSupport, this,
 			std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 
-		caps_.depth_texture_support = (caps_.texture_format_support(EF_D24S8) || caps_.texture_format_support(EF_D16));
-		caps_.fp_color_support = ((caps_.texture_format_support(EF_B10G11R11F) && caps_.rendertarget_format_support(EF_B10G11R11F, 1, 0))
-			|| (caps_.texture_format_support(EF_ABGR16F) && caps_.rendertarget_format_support(EF_ABGR16F, 1, 0)));
-		caps_.pack_to_rgba_required = !(caps_.texture_format_support(EF_R16F) && caps_.rendertarget_format_support(EF_R16F, 1, 0)
-			&& caps_.texture_format_support(EF_R32F) && caps_.rendertarget_format_support(EF_R32F, 1, 0));
+		mCaps.mDepthTextureSupport = (mCaps.textureFormatSupport(EF_D24S8) || mCaps.textureFormatSupport(EF_D16));
+		mCaps.mFPColorSupport = ((mCaps.textureFormatSupport(EF_B10G11R11F) && mCaps.rendertargetFormatSupport(EF_B10G11R11F, 1, 0))
+			|| (mCaps.textureFormatSupport(EF_ABGR16F) && mCaps.rendertargetFormatSupport(EF_ABGR16F, 1, 0)));
+		mCaps.mPackToRGBARequired = !(mCaps.textureFormatSupport(EF_R16F) && mCaps.rendertargetFormatSupport(EF_R16F, 1, 0)
+			&& mCaps.textureFormatSupport(EF_R32F) && mCaps.rendertargetFormatSupport(EF_R32F, 1, 0));
+	}
+
+	bool D3D11RenderEngine::isVertexFormatSupport(ElementFormat elem_fmt)
+	{
+		return mVertexFormats.find(elem_fmt) != mVertexFormats.end();
+	}
+	bool D3D11RenderEngine::isTextureFormatSupport(ElementFormat elem_fmt)
+	{
+		return mTextureFormats.find(elem_fmt) != mTextureFormats.end();
+	}
+	bool D3D11RenderEngine::isRenderTargetFormatSupport(ElementFormat elem_fmt, uint32_t sample_count, uint32_t sample_quality)
+	{
+		auto iter = mRendertargetFormats.find(elem_fmt);
+		if (iter != mRendertargetFormats.end())
+		{
+			for (auto const & p : iter->second)
+			{
+				if ((sample_count == p.first) && (sample_quality == p.second))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	D3D11AdapterPtr const & D3D11RenderEngine::getActiveAdapter() const
+	{
+		return mAdapterList.getAdapter(mAdapterList.getCurrentAdapterIndex());
+	}
+
+	void D3D11RenderEngine::doCreateRenderWindow(std::string const & name, RenderSettings const & settings)
+	{
+		mMotionFrames = settings.mMotionFrames;
+		D3D11RenderWindowPtr win = MakeSharedPtr<D3D11RenderWindow>(this->getActiveAdapter(), name, settings);
+		switch (mD3DFeatureLevel)
+		{
+		case D3D_FEATURE_LEVEL_9_3:
+			mNativeShaderPlatformName = "d3d_9_3";
+			mVSProfile = "vs_4_0_level_9_3";
+			mPSProfile = "ps_4_0_level_9_3";
+			mGSProfile = "";
+			mCSProfile = "";
+			mHSProfile = "";
+			mDSProfile = "";
+			break;
+		case D3D_FEATURE_LEVEL_10_0:
+			mNativeShaderPlatformName = "d3d_10_0";
+			mVSProfile = "vs_4_0";
+			mPSProfile = "ps_4_0";
+			mGSProfile = "gs_4_0";
+			mCSProfile = "cs_4_0";
+			mHSProfile = "";
+			mDSProfile = "";
+			break;
+		case D3D_FEATURE_LEVEL_10_1:
+			mNativeShaderPlatformName = "d3d_10_1";
+			mVSProfile = "vs_4_1";
+			mPSProfile = "ps_4_1";
+			mGSProfile = "gs_4_1";
+			mCSProfile = "cs_4_1";
+			mHSProfile = "";
+			mDSProfile = "";
+			break;
+		case D3D_FEATURE_LEVEL_11_0:
+		case D3D_FEATURE_LEVEL_11_1:
+		case D3D_FEATURE_LEVEL_12_0:
+		case D3D_FEATURE_LEVEL_12_1:
+			mNativeShaderPlatformName = "d3d_11_0";
+			mVSProfile = "vs_5_0";
+			mPSProfile = "ps_5_0";
+			mGSProfile = "gs_5_0";
+			mCSProfile = "cs_5_0";
+			mHSProfile = "hs_5_0";
+			mDSProfile = "ds_5_0";
+			break;
+		default:
+			mNativeShaderPlatformName = "d3d_9_1";
+			mVSProfile = "vs_4_0_level_9_1";
+			mPSProfile = "ps_4_0_level_9_1";
+			mGSProfile = "";
+			mCSProfile = "";
+			mHSProfile = "";
+			mDSProfile = "";
+			break;
+		}
+		this->resetRenderStates();
+		this->bindFrameBuffer(win);
+
+		this(STM_LCDShutter)
 	}
 }

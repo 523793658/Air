@@ -71,8 +71,11 @@ namespace Air
 		uint32_t mNumVerticesJustRendered;
 		uint32_t mNumDrawsJustCalled;
 		uint32_t mNumDispatchesJustCalled;
+		uint32_t mMotionFrames;
 
 		RenderLayoutPtr mPPRenderLayout;
+
+		std::string mNativeShaderPlatformName;
 
 	};
 
