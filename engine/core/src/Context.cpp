@@ -4,6 +4,7 @@
 #include "basic/include/Log.hpp"
 #include "rendersystem/include/RenderFactory.h"
 #include "core/include/SceneManager.hpp"
+#include "basic/include/Thread.h"
 #include "ResLoader.h"
 
 #include <memory>
@@ -35,13 +36,17 @@ namespace Air
 	typedef void(*makeRenderFactoryFunc)(std::unique_ptr<RenderFactory>& ptr);
 
 	Context::Context()
+		: mApp(nullptr)
 	{
+		//∫Û–¯∂¡≈‰÷√
 		mCfg.mGraphicsCfg.full_screen = false;
 		mCfg.mGraphicsCfg.height = 900;
 		mCfg.mGraphicsCfg.hide_win = false;
 		mCfg.mGraphicsCfg.left = 100;
 		mCfg.mGraphicsCfg.top = 100;
 		mCfg.mGraphicsCfg.width = 1440;
+
+		mGTPInstance = MakeUniquePtr<thread_pool>(1, 16);
 	}
 
 	Context::~Context()

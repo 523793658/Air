@@ -50,7 +50,7 @@ namespace Air
 		va_end(args);
 	}
 
-	void LogError(char const * fmt, ...)
+	void logError(char const * fmt, ...)
 	{
 		va_list args;
 		va_start(args, fmt);

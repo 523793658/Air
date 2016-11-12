@@ -1,5 +1,5 @@
-#ifndef _CoreCfg_H_
-#define _CoreCfg_H_
+#ifndef _Engine_H_
+#define _Engine_H_
 #pragma once
 
 #include <basic\include\Basic.h>
@@ -19,7 +19,6 @@
 
 #include "PreDeclare.h"
 #include "Context.h"
-
-
+#include "basic/include/Util.h"
 
 #endif

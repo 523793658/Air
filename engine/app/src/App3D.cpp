@@ -4,8 +4,12 @@
 #include <basic/include/Util.h>
 
 
+
 #include "app/include/Window.hpp"
 #include "Camera.hpp"
+
+#include "rendersystem/include/RenderFactory.h"
+
 #include "app/include/App3D.hpp"
 
 

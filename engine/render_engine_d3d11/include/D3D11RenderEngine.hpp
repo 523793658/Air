@@ -3,6 +3,10 @@
 #pragma once
 #include "rendersystem/include/RenderEngine.hpp"
 
+#include "render_engine_d3d11/include/D3D11AdapterList.hpp"
+
+#include "render_engine_d3d11/include/D3D11Typedefs.hpp"
+
 namespace Air
 {
 	class D3D11RenderEngine : public RenderEngine
@@ -45,11 +49,62 @@ namespace Air
 
 		void setD3DDevice(ID3D11Device* device, ID3D11DeviceContext* context, D3D_FEATURE_LEVEL feature_level);
 
+		void detectD3D11Runtime(ID3D11Device* device, ID3D11DeviceContext* imm_ctx);
+
+		void fillRenderDeviceCaps();
+
+
 		void forceFlush();
+
+		void destroy();
 
 
 		bool isFullScreen() const;
 		void setFullScreen(bool fs) const;
+
+	private:
+		typedef HRESULT(WINAPI *CreateDXGIFactory1Func)(REFIID riid, void** ppFactory);
+		typedef HRESULT(WINAPI *D3D11CreateDeviceFunc)(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE DriverType, HMODULE Software, UINT Flags, D3D_FEATURE_LEVEL const * pFeatureLevels, UINT FeatureLevels, UINT SDKVersion, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext);
+
+		CreateDXGIFactory1Func mDynamicCreateDXGIFactory1;
+		D3D11CreateDeviceFunc mDynamicD3D11CreateDevice;
+
+		IDXGIFactory1Ptr mGIFactory1;
+		IDXGIFactory2Ptr mGIFactory2;
+		IDXGIFactory3Ptr mGIFactory3;
+		IDXGIFactory4Ptr mGIFactory4;
+		IDXGIFactory5Ptr mGIFactory5;
+		uint8_t mDXGISubVersion;
+
+		ID3D11DeviceContextPtr mD3DIMMContext;
+		ID3D11DeviceContext1Ptr mD3DIMMContext1;
+		ID3D11DeviceContext2Ptr mD3DIMMContext2;
+		ID3D11DeviceContext3Ptr mD3DIMMContext3;
+
+
+		ID3D11DevicePtr mD3D11Device;
+		ID3D11Device1Ptr mD3D11Device1;
+		ID3D11Device2Ptr mD3D11Device2;
+		ID3D11Device3Ptr mD3D11Device3;
+
+		uint8_t mD3D11RuntimeSubVer;
+
+
+		D3D_FEATURE_LEVEL mD3DFeatureLevel;
+
+		D3D11AdapterList mAdapterList;
+
+	private:
+		HMODULE mModDXGI;
+		HMODULE mModD3D11;
+
+
+		uint32_t mNativeShaderVersion;
+		uint32_t mNativeShaderFourcc;
+
+		ID3D11QueryPtr mTimestampDisJointQuery;
+
+		double mInvTimestampFreq;
 
 	};
 }

@@ -24,9 +24,19 @@
 				"../render_engine_d3d11/include/D3D11RenderEngine.hpp",
 				"../render_engine_d3d11/include/D3D11Typedefs.hpp",
 				"../render_engine_d3d11/include/D3D11RenderLayout.hpp",
+				"../render_engine_d3d11/include/D3D11AdapterList.hpp",
+				"../render_engine_d3d11/include/D3D11Adapter.hpp",
+				"../render_engine_d3d11/include/D3D11VideoMode.hpp",
+				"../render_engine_d3d11/include/D3D11RenderWindow.hpp",
+				
+				
 				"../render_engine_d3d11/src/D3D11RenderFactory.cpp",
 				"../render_engine_d3d11/src/D3D11RenderEngine.cpp",
 				"../render_engine_d3d11/src/D3D11RenderLayout.cpp",
+				"../render_engine_d3d11/src/D3D11AdapterList.cpp",
+				"../render_engine_d3d11/src/D3D11Adapter.cpp",
+				"../render_engine_d3d11/src/D3D11VideoMode.cpp",
+				"../render_engine_d3d11/src/D3D11RenderWindow.cpp",
 			],
 			"conditions":[
 				[

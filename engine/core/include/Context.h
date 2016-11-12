@@ -4,6 +4,7 @@
 #include <string>
 #include <boost/assert.hpp>
 #include "rendersystem/include/RenderSettings.hpp"
+#include "basic/include/Thread.h"
 
 #include "basic/include/DllLoader.h"
 
@@ -41,6 +42,11 @@ namespace Air
 		void loadSceneManager(std::string const & sm_name);
 
 		void setAppInstance(App3DFramework& app);
+
+		thread_pool& getThreadPool()
+		{
+			return *mGTPInstance;
+		}
 	private: 
 		void destoryAll();
 	private:
@@ -54,7 +60,7 @@ namespace Air
 		DllLoader mRenderLoader;
 
 		//Ïß³Ì³Ø
-		//std::unique_ptr<
+		std::unique_ptr<thread_pool> mGTPInstance;
 	};
 }
 

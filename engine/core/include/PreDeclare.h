@@ -16,7 +16,8 @@ namespace Air
 	class Window;
 	typedef std::shared_ptr<Window> WindowPtr;
 
-
+	class ResLoadingDesc;
+	typedef std::shared_ptr<ResLoadingDesc> ResLoadingDescPtr;
 	class Camera;
 	typedef std::shared_ptr<Camera> CameraPtr;
 	class FrameBuffer;
@@ -24,6 +25,11 @@ namespace Air
 	class RenderLayout;
 	typedef std::shared_ptr<RenderLayout> RenderLayoutPtr;
 	class RenderEngine;
+	class GraphicsBuffer;
+	typedef std::shared_ptr<GraphicsBuffer> GraphicsBufferPtr;
+	class RenderView;
+	typedef std::shared_ptr<RenderView> RenderViewPtr;
+
 
 
 
@@ -33,6 +39,8 @@ namespace Air
 	template<typename T>
 	class Color_T;
 	typedef Color_T<float> Color;
+
+
 
 }
 

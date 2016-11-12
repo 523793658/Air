@@ -22,8 +22,215 @@ namespace std
 #endif
 #include "ResLoader.h"
 
+namespace
+{
+	std::mutex singleton_mutex;
+}
+
 namespace Air
 {
+	std::unique_ptr<ResLoader> ResLoader::mInstance;
+
+	ResLoader::ResLoader()
+		:mQuit(false)
+	{
+#if defined AIR_PLATFORM_WINDOWS
+#if defined AIR_PLATFORM_WINDOWS_DESKTOP
+		char buf[MAX_PATH];
+		::GetModuleFileNameA(nullptr, buf, sizeof(buf));
+		mExePath = buf;
+		mExePath = mExePath.substr(0, mExePath.rfind("\\"));
+#else
+#endif
+#endif
+		mPaths.push_back("");
+#if defined AIR_PLATFORM_WINDOWS_RUNTIME
+		this->addPath("Assets/");
+#else
+		this->addPath("");
+#if defined AIR_PLATFORM_WINDOWS_DESKTOP
+		::GetCurrentDirectoryA(sizeof(buf), buf);
+		char* colon = std::find(buf, buf + sizeof(buf), ':');
+		BOOST_ASSERT(colon != buf + sizeof(buf));
+		colon[1] = '/';
+		colon[2] = '\0';
+		this->addPath(buf);
+#endif
+#if defined(AIR_PLATFORM_WINDOWS_DESKTOP)
+		this->addPath("../");
+		this->addPath("../../media/RenderFX/");
+		this->addPath("../../media/Models");
+		this->addPath("../../media/Textures/2D/");
+		this->addPath("../../media/Textures/3D/");
+		this->addPath("../../media/Textures/Cube/");
+		this->addPath("../../media/Textures/Juda/");
+		this->addPath("../../media/Fonts/");
+		this->addPath("../../media/PostProcessors/");
+
+#endif
+#endif
+		mLoadingThread = MakeUniquePtr<joiner<void >> (Context::getInstance().getThreadPool()(
+			std::bind(&ResLoader::loadingThreadFunc, this)));
+	}
+
+	void ResLoader::destroy()
+	{
+		mInstance.reset();
+	}
+
+	void ResLoader::loadingThreadFunc()
+	{
+		while (!mQuit)
+		{
+			std::pair<ResLoadingDescPtr, std::shared_ptr<volatile LoadingStatus>> res_pair;
+			while (mLoadingResQueue.pop(res_pair))
+			{
+				if (LS_Loading == *res_pair.second)
+				{
+					res_pair.first->subThreadStage();
+					*res_pair.second = LS_Complete;
+				}
+			}
+			Sleep(10);
+		}
+	}
+
+	void ResLoader::suspend()
+	{
+
+	}
+	void ResLoader::resume()
+	{
+
+	}
+
+	std::string ResLoader::getAbsPath(std::string const & path)
+	{
+		using namespace std::experimental;
+		filesystem::path new_path(path);
+#ifdef AIR_TS_LIBRARY_FILESYSTEM_V2_SUPPORT
+		if(!new_path.is_complete())
+#else
+		if (!new_path.is_absolute())
+#endif
+		{
+			filesystem::path full_path = filesystem::path(mExePath) / new_path;
+			if (!filesystem::exists(full_path))
+			{
+#ifndef AIR_PLATFORM_ANDROID
+#ifdef AIR_TS_LIBRARY_FILESYSTEM_V2_SUPPORT
+				full_path = filesystem::current_path<filesystem::path>() / new_path;
+#else
+				try
+				{
+					full_path = filesystem::current_path() / new_path;
+				}
+				catch (...)
+				{
+					full_path = new_path;
+				}
+#endif
+				if (!filesystem::exists(full_path))
+				{
+					return "";
+				}
+#else
+				return ""
+#endif
+			}
+			new_path = full_path;
+		}
+		std::string ret = new_path.string();
+#if defined AIR_PLATFORM_WINDOWS
+		std::replace(ret.begin(), ret.end(), '\\', '/');
+#endif
+		return ret;
+	}
+
+
+	std::string ResLoader::getRealPath(std::string const & path)
+	{
+		std::string abs_path = this->getAbsPath(path);
+		if (!abs_path.empty() && (abs_path[abs_path.length() - 1] != '/'))
+		{
+			abs_path.push_back('/');
+		}
+		return abs_path;
+	}
+
+	void ResLoader::addPath(std::string const & path)
+	{
+		std::lock_guard<std::mutex> lock(pathsMutex);
+		std::string real_path = this->getRealPath(path);
+		if (!real_path.empty())
+		{
+			mPaths.push_back(real_path);
+		}
+	}
+	void ResLoader::delPath(std::string const & path)
+	{
+		std::lock_guard<std::mutex> lock(pathsMutex);
+		std::string real_path = this->getRealPath(path);
+		if (!real_path.empty())
+		{
+			auto iter = std::find(mPaths.begin(), mPaths.end(), real_path);
+			if (iter != mPaths.end())
+			{
+				mPaths.erase(iter);
+			}
+		}
+	}
+
+	ResIdentifierPtr ResLoader::open(std::string const & name)
+	{
+		using namespace std::experimental;
+		{
+			std::lock_guard<std::mutex> lock(pathsMutex);
+			for (auto const & path : mPaths)
+			{
+				std::string res_name(path + name);
+#if defined AIR_PLATFORM_WINDOWS
+				std::replace(res_name.begin(), res_name.end(), '\\', '/');
+#endif
+				filesystem::path res_path(res_name);
+				if (filesystem::exists(res_path))
+				{
+#ifdef AIR_TS_LIBRARY_FILESYSTEM_V3_SUPPORT
+					uint64_t timestamp = filesystem::last_write_time(res_path).time_since_epoch().count();
+#else
+					uint64_t timestamp = filesystem::last_write_time(res_path);
+#endif
+					return MakeSharedPtr<ResIdentifier>(name, timestamp, MakeSharedPtr<std::ifstream>(res_name.c_str(), std::ios_base::binary));
+				}
+				else
+				{
+					//不存在则看压缩包中释放存在
+					/*std::string password;
+					std::string internal_name;
+					ResIdentifierPtr pkt_file = LocatePkt(name, res_name, password, internal_name);
+					if (pkt_file && *pkt_file)
+					{
+						std::shared_ptr<std::iostream> packet_file = MakeSharedPtr<std::stringstream>();
+						
+					}*/
+				}
+			}
+		}
+		return ResIdentifierPtr();
+	}
+
+
+	ResLoader::~ResLoader()
+	{
+		mQuit = true;
+		(*mLoadingThread)();
+	}
+
+
+
+	
+
+
 	ResIdentifierPtr ResLoader::LocatePkt(std::string const & name, std::string const & res_name, std::string& password, std::string& internal_name)
 	{
 		using namespace std::experimental;
@@ -51,6 +258,7 @@ namespace Air
 				res = MakeSharedPtr<ResIdentifier>(name, timestamp, MakeSharedPtr<std::ifstream>(pkt_name.c_str(), std::ios_base::binary));
 			}
 		}
+		return res;
 	}
 
 
@@ -84,5 +292,18 @@ namespace Air
 			}
 		}
 		return "";
+	}
+
+	ResLoader& ResLoader::getInstance()
+	{
+		if (!mInstance)
+		{
+			std::lock_guard<std::mutex> lock(singleton_mutex);
+			if (!mInstance)
+			{
+				mInstance = MakeUniquePtr<ResLoader>();
+			}
+		}
+		return *mInstance;
 	}
 }

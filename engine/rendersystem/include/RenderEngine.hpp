@@ -45,18 +45,32 @@ namespace Air
 
 		RenderDeviceCaps const & getDeviceCaps() const;
 
+		void bindFrameBuffer(FrameBufferPtr const &fb);
+		FrameBufferPtr const & getDefaultFrameBuffer() const;
+
 	private:
 		virtual void checkConfig(RenderSettings& settings);
 		virtual void doCreateRenderWindow(std::string const & name, RenderSettings const & settings) = 0;
+		virtual void doBindFrameBuffer(FrameBufferPtr const & fb) = 0;
+		virtual void doSuspend() = 0;
+		virtual void doResume() = 0;
 
-
-	private:
+	protected:
 		FrameBufferPtr mCurrenFrameBuffer;
 		FrameBufferPtr mScreenFrameBuffer;
-		
+		FrameBufferPtr mDefaultFrameBuffers[4];
 
 		float mStereoSeparation;
 		RenderDeviceCaps mCaps;
+
+		float mDefaultRenderWidthScale;
+		float mDefaultRenderHeightScale;
+		int mFBStage;
+
+		uint32_t mNumPrimitivesJustRendered;
+		uint32_t mNumVerticesJustRendered;
+		uint32_t mNumDrawsJustCalled;
+		uint32_t mNumDispatchesJustCalled;
 
 		RenderLayoutPtr mPPRenderLayout;
 

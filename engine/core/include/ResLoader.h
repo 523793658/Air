@@ -15,6 +15,8 @@
 #pragma clang diagnostic ignored
 #endif
 
+#include <boost/lockfree/spsc_queue.hpp>
+
 #if defined(AIR_COMPILER_MSVC)
 #pragma warning(pop)
 #elif defined(AIR_COMPILER_CLANG)
@@ -31,7 +33,7 @@ namespace Air
 	public:
 		virtual ~ResLoadingDesc(){}
 		virtual uint64_t getType() const = 0;
-		virtual bool stateLess() const = 0;
+		virtual bool getStateLess() const = 0;
 		//virtual std::shared_ptr<void> createResource();
 
 		virtual void subThreadStage() = 0;
@@ -60,9 +62,14 @@ namespace Air
 		void addPath(std::string const & path);
 		void delPath(std::string const & path);
 
+		std::string getAbsPath(std::string const & path);
+
 		ResIdentifierPtr open(std::string const & name);
 		std::string locate(std::string const & name);
 		ResIdentifierPtr LocatePkt(std::string const & name, std::string const & res_name, std::string& password, std::string& internal_name);
+	private:
+		std::string getRealPath(std::string const & path);
+		void loadingThreadFunc();
 	private:
 		static std::unique_ptr<ResLoader> mInstance;
 
@@ -80,7 +87,10 @@ namespace Air
 		std::mutex loadedMutex;
 		std::mutex loadingMutex;
 
+		boost::lockfree::spsc_queue<std::pair<ResLoadingDescPtr, std::shared_ptr<volatile LoadingStatus>>, boost::lockfree::capacity<1024>> mLoadingResQueue;
 
+		std::unique_ptr<joiner<void>> mLoadingThread;
+		volatile bool mQuit;
 	};
 }
 

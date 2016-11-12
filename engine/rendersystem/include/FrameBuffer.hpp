@@ -45,8 +45,27 @@ namespace Air
 
 		void setViewport(ViewportPtr const & viewport);
 
-		void attach(uint32_t att, RenderView)
+		void attach(uint32_t att, RenderViewPtr renderview);
+		void detach(uint32_t att);
+		RenderViewPtr Attached(uint32_t att) const;
 
+		virtual void onBind();
+		virtual void onUnbind();
+
+		bool isDirty() const
+		{
+			return mViewsDirty;
+		}
+
+	private:
+		bool mViewsDirty;
+		uint32_t mLeft;
+		uint32_t mTop;
+		uint32_t mWidth;
+		uint32_t mHeight;
+		ViewportPtr mViewport;
+		std::vector<RenderViewPtr> mColorViews;
+		RenderViewPtr mDepthStencilView;
 	};
 
 

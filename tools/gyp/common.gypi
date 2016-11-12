@@ -27,11 +27,10 @@
 						'TreatWChar_tAsBuiltInType': 'true',  							#将WChar_t视为内置类型
 						'WarningLevel': 'Level4',										#警告等级
 						'ProgramDataBaseFileName': '$(OutDir)pdb\\$(Configuration)\\$(TargetName).pdb', #程序数据库文件名
-						'PreprocessorDefinitions': ['WIN32','_USING_V110_SDK71_'],      #预处理器定义
+						'PreprocessorDefinitions': [],      #预处理器定义
 						#'ExceptionHandling': '/EHsc',
 					},
 					'Link': {
-						'MinimumRequiredVersion':'5.01',								#用来支持XP
 						'SubSystem': 'Console',											#控制台
 						'ImportLibrary' : '$(IntDir)..\\lib\\$(TargetName).lib', 		#到入库
 						#'LinkIncremental': 'true',

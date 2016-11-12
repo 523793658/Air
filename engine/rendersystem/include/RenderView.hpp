@@ -4,6 +4,7 @@
 
 #include "PreDeclare.h"
 #include "ElementFormat.h"
+#include "basic/include/Math.hpp"
 
 namespace Air
 {
@@ -73,8 +74,8 @@ namespace Air
 		{
 			return mFormat;
 		}
-		virtual void clear(float4 const & val) = 0;
-		virtual void clear(uint4 const & val) = 0;
+		virtual void clear(Float4 const & val) = 0;
+		virtual void clear(Uint4 const & val) = 0;
 		virtual void discard() = 0;
 		virtual void onAttached(FrameBuffer& fb, uint32_t att) = 0;
 		virtual void onDetached(FrameBuffer& fb, uint32_t att) = 0;

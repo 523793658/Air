@@ -63,6 +63,7 @@ struct RenderDeviceCaps
 	bool mIstbdr : 1;
 	bool mHWInstancingSupport : 1;
 	bool mInstanceIdSupport : 1;
+	bool mStreamOuputSupport : 1;
 	bool mAlphaToCoverageSupport : 1;
 	bool mPrimitiveRestartSupport : 1;
 	bool mMultithreadRenderingSupport : 1;

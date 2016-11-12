@@ -10,6 +10,7 @@
 			"type": "shared_library",
 			"include_dirs":[
 				"../../external/boost",
+				"../../external/FlameMath",
 				"../core/include",
 				"../",
 			],
@@ -41,6 +42,7 @@
 				"../rendersystem/include/RenderView.hpp",
 				"../rendersystem/include/Texture.hpp",
 				"../rendersystem/include/RenderLayout.hpp",
+				"../rendersystem/include/Mesh.hpp",
 				
 				"../rendersystem/src/RenderSettings.cpp",
 				"../rendersystem/src/RenderFactory.cpp",
@@ -50,6 +52,7 @@
 				"../rendersystem/src/RenderView.cpp",
 				"../rendersystem/src/Texture.cpp",
 				"../rendersystem/src/RenderLayout.cpp",
+				"../rendersystem/src/Mesh.cpp",
 				
 				"../app/include/Window.hpp",
 				"../app/include/App3D.hpp",

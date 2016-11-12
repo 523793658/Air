@@ -175,5 +175,5 @@
 	defined AIR_CPU_ARM64
 #endif
 
-
+#define FLAMEMATH
 #endif

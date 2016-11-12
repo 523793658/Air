@@ -8,6 +8,7 @@
 			"include_dirs":[
 				"..",
 				"../../external/boost",
+				"../../external/FlameMath",
 			],
 			"includes":[
 				"../../tools/gyp/common.gypi",
@@ -25,6 +26,8 @@
 				"../basic/include/Log.hpp",
 				"../basic/include/Timer.hpp",
 				"../basic/include/Math.hpp",
+				"../basic/include/ThrowErr.hpp",
+				"../basic/include/COMPtr.hpp",
 				
 				"../basic/src/Thread.cpp",
 				"../basic/src/CPP11.cpp",
@@ -35,6 +38,9 @@
 				"../basic/src/Timer.cpp",
 				"../basic/src/DllLoader.cpp",
 				"../basic/src/Log.cpp",
+				"../basic/src/Math.cpp",
+				"../basic/src/ThrowErr.cpp",
+				"../basic/src/COMPtr.cpp",
 			],
 			"conditions":[
 				[
