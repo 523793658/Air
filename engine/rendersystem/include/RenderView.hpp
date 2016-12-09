@@ -42,7 +42,7 @@ namespace Air
 		virtual void onBind(FrameBuffer& fb, uint32_t att);
 		virtual void onUnbind(FrameBuffer& fb, uint32_t att);
 
-	private:
+	protected:
 		uint32_t mWidth;
 		uint32_t mHeight;
 		ElementFormat mFormat;
@@ -74,8 +74,8 @@ namespace Air
 		{
 			return mFormat;
 		}
-		virtual void clear(Float4 const & val) = 0;
-		virtual void clear(Uint4 const & val) = 0;
+		virtual void clear(float4 const & val) = 0;
+		virtual void clear(uint4 const & val) = 0;
 		virtual void discard() = 0;
 		virtual void onAttached(FrameBuffer& fb, uint32_t att) = 0;
 		virtual void onDetached(FrameBuffer& fb, uint32_t att) = 0;

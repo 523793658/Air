@@ -3,6 +3,9 @@
 
 #pragma once
 
+#include <functional>
+#include <iostream>
+
 namespace Air
 {
 	template<typename T>

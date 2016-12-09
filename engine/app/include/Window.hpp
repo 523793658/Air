@@ -27,7 +27,6 @@
 
 #include <string.h>
 #include "basic/include/Math.hpp"
-
 namespace Air
 {
 	class AIR_CORE_API Window
@@ -141,10 +140,10 @@ namespace Air
 		typedef boost::signals2::signal<void(Window const & wnd, HTOUCHINPUT hti, uint32_t num_inputs)> TouchEvent;
 #endif
 #endif
-		typedef boost::signals2::signal<void(Window const & wnd, Int2 const & pt, uint32_t id)> PointerDownEvent;
-		typedef boost::signals2::signal<void(Window const & wnd, Int2 const & pt, uint32_t id)> PointerUpEvent;
-		typedef boost::signals2::signal<void(Window const & wnd, Int2 const & pt, uint32_t id, bool down)> PointerUpdateEvent;
-		typedef boost::signals2::signal<void(Window const & wnd, Int2 const & pt, uint32_t id, int32_t wheel_delta)> PointerWheelEvent;
+		typedef boost::signals2::signal<void(Window const & wnd, int2 const & pt, uint32_t id)> PointerDownEvent;
+		typedef boost::signals2::signal<void(Window const & wnd, int2 const & pt, uint32_t id)> PointerUpEvent;
+		typedef boost::signals2::signal<void(Window const & wnd, int2 const & pt, uint32_t id, bool down)> PointerUpdateEvent;
+		typedef boost::signals2::signal<void(Window const & wnd, int2 const & pt, uint32_t id, int32_t wheel_delta)> PointerWheelEvent;
 		typedef boost::signals2::signal<void(Window const & wnd)> CloseEvent;
 
 		ActiveEvent& onActive()

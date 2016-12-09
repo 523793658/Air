@@ -47,17 +47,26 @@ namespace Air
 
 		void attach(uint32_t att, RenderViewPtr renderview);
 		void detach(uint32_t att);
-		RenderViewPtr Attached(uint32_t att) const;
+		RenderViewPtr getAttached(uint32_t att) const;
 
 		virtual void onBind();
 		virtual void onUnbind();
+
+		virtual void discard(uint32_t flags) = 0;
+
+		virtual void swapBuffers()
+		{
+
+		}
 
 		bool isDirty() const
 		{
 			return mViewsDirty;
 		}
 
-	private:
+		virtual void clear(uint32_t flags, Color const& clr, float depth, int32_t stencil) = 0;
+
+	protected:
 		bool mViewsDirty;
 		uint32_t mLeft;
 		uint32_t mTop;

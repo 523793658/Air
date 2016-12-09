@@ -5,8 +5,12 @@
 		{
 			"target_name": "RenderEngineD3D11",
 			"dependencies": [
+				'basic',
 				'engine',
 			],
+			'variables': {
+				'outputSubDir': 'render\\',
+			},
 			"type": "shared_library",
 			"include_dirs":[
 				"../../external/boost",
@@ -28,6 +32,10 @@
 				"../render_engine_d3d11/include/D3D11Adapter.hpp",
 				"../render_engine_d3d11/include/D3D11VideoMode.hpp",
 				"../render_engine_d3d11/include/D3D11RenderWindow.hpp",
+				"../render_engine_d3d11/include/D3D11FrameBuffer.hpp",
+				"../render_engine_d3d11/include/D3D11Mapping.hpp",
+				"../render_engine_d3d11/include/D3D11Texture.hpp",
+				"../render_engine_d3d11/include/D3D11RenderView.hpp",
 				
 				
 				"../render_engine_d3d11/src/D3D11RenderFactory.cpp",
@@ -37,14 +45,20 @@
 				"../render_engine_d3d11/src/D3D11Adapter.cpp",
 				"../render_engine_d3d11/src/D3D11VideoMode.cpp",
 				"../render_engine_d3d11/src/D3D11RenderWindow.cpp",
+				"../render_engine_d3d11/src/D3D11FrameBuffer.cpp",
+				"../render_engine_d3d11/src/D3D11Mapping.cpp",
+				"../render_engine_d3d11/src/D3D11Texture.cpp",
+				"../render_engine_d3d11/src/D3D11Texture1D.cpp",
+				"../render_engine_d3d11/src/D3D11Texture2D.cpp",
+				"../render_engine_d3d11/src/D3D11Texture3D.cpp",
+				"../render_engine_d3d11/src/D3D11TextureCube.cpp",
+				"../render_engine_d3d11/src/D3D11RenderView.cpp",
 			],
 			"conditions":[
 				[
 					"OS == 'win'",
 					{
-						"msbuild_configuration_attributes":{
-							"CharacterSet": "1",
-						}, 
+				
 						"msbuild_settings":{
 							"ClCompile":{
 								'PreprocessorDefinitions': [
@@ -56,10 +70,56 @@
 							"Debug":{
 								"msbuild_settings":{
 									'Link': {
-										'GenerateDebugInformation': 'true',
 										'AdditionalDependencies':[
+											'dxgi.lib',
+											'd3d11.lib',
+										],
+										'AdditionalLibraryDirectories':[
+											'../../external/dxsdk/lib/x86',
 										],
 									},
+								},
+							},
+							"Debug_x64":{
+								"msbuild_settings":{
+									'Link': {
+										'AdditionalDependencies':[
+											'dxgi.lib',
+											'd3d11.lib',
+										],
+										'AdditionalLibraryDirectories':[
+											'../../external/dxsdk/lib/x64',
+										],
+									},
+									
+								},
+							},
+							"Release":{
+								"msbuild_settings":{
+									'Link': {
+										'AdditionalDependencies':[
+											'dxgi.lib',
+											'd3d11.lib',
+										],
+										'AdditionalLibraryDirectories':[
+											'../../external/dxsdk/lib/x86',
+										],
+									},
+									
+								},
+							},
+							"Release_x64":{
+								"msbuild_settings":{
+									'Link': {
+										'AdditionalDependencies':[
+											'dxgi.lib',
+											'd3d11.lib',
+										],
+										'AdditionalLibraryDirectories':[
+											'../../external/dxsdk/lib/x64',
+										],
+									},
+									
 								},
 							},
 						},

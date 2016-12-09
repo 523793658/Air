@@ -52,17 +52,17 @@ namespace Air
 			return true;
 		}
 
-// 		Camera const & getActiveCamera() const;
-// 
-// 		Camera& getActiveCamera();
+		Camera const & getActiveCamera() const;
+
+ 		Camera& getActiveCamera();
 // 
 // 		uint32_t getTotalNumFrams() const;
 // 
 // 		float getFps() const;
-// 
-// 		float getAppTime() const;
-// 
-// 		float getFrameTime() const;
+
+		float getAppTime() const;
+
+		float getFrameTime() const;
 // 		void quit();
 
 		void run();
@@ -75,7 +75,7 @@ namespace Air
 		void Proj(float nearPlane, float farPlane);*/
 
 	protected:
-		//uint32_t Update(uint32_t pass);
+		uint32_t update(uint32_t pass);
 		//void UpdateStats();
 
 	private:
@@ -94,7 +94,7 @@ namespace Air
 		}
 
 		//virtual void doUpdateOverlay() = 0;
-		//virtual uint32_t doUpdate(uint32_t pass) = 0;
+		virtual uint32_t doUpdate(uint32_t pass) = 0;
 
 	protected:
 		std::string mName;

@@ -1,6 +1,7 @@
 #include <array>
 
 #include "Engine.h"
+#include "render_engine_d3d11/include/D3D11VideoMode.hpp"
 #include "render_engine_d3d11/include/D3D11Adapter.hpp"
 
 namespace Air
@@ -67,7 +68,7 @@ namespace Air
 		mModes.resize(0);
 
 		IDXGIAdapter2* adapter2;
-		mAdapter->QueryInterface(IID_IDXGIAdapter2, reinterpret_cast<void**>(&adapter2));
+		mAdapter->QueryInterface(__uuidof(IDXGIAdapter2), reinterpret_cast<void**>(&adapter2));
 		if (adapter2 != nullptr)
 		{
 			DXGI_ADAPTER_DESC2 desc2;

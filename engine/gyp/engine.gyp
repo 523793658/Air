@@ -6,8 +6,10 @@
 			"dependencies":[
 				"engine",
 				"basic",
-				"SampleCreateWindow",
 				"RenderEngineD3D11",
+				"SceneManagerOCTree",
+				"SampleCreateWindow",
+				"SampleRenderOneBall",
 			],
 		}
 	],
@@ -17,6 +19,7 @@
 		'engine.gypi',
 		'sample.gypi',
 		'render_engine_d3d11.gypi',
+		'scene_manager_octree.gypi',
 	],
 	
 }

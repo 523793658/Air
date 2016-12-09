@@ -24,9 +24,9 @@ namespace Air
 	std::string combineFileLine(std::string const & file, int line);
 }
 
-#define THR(x)		{throw std::system_error(std::make_error_code(x), Air::combineFileLine(__FILE__, __LINE__));}
+#define THR(x)			{ throw std::system_error(std::make_error_code(x), Air::combineFileLine(__FILE__, __LINE__)); }
 
-#define TIF(x)		{HRESULT _hr = x; if(static_cast<HRESULT>(_hr) < 0){throw std::runtime_error(Air::combineFileLine(__FILE__, __LINE__));}}
+#define TIF(x)			{ HRESULT _hr = x; if (static_cast<HRESULT>(_hr) < 0) { throw std::runtime_error(Air::combineFileLine(__FILE__, __LINE__)); } }
 
 namespace Air
 {

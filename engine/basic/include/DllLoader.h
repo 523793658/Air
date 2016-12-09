@@ -13,7 +13,7 @@
 #	define DLL_EXT_NAME	"dll"
 #endif
 
-#define DLL_SUFFIX	AIR_OUTPUT_SUFFIX "." DLL_EXT_NAME
+#define DLL_SUFFIX	"." DLL_EXT_NAME
 
 namespace Air
 {

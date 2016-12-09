@@ -136,7 +136,7 @@ namespace Air
 		}
 		mViewsDirty = true;
 	}
-	RenderViewPtr FrameBuffer::Attached(uint32_t att) const
+	RenderViewPtr FrameBuffer::getAttached(uint32_t att) const
 	{
 		switch (att)
 		{

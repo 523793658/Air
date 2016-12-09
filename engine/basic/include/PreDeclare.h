@@ -28,6 +28,7 @@ namespace Air
 	typedef std::shared_ptr<XMLAttribute> XMLAttributePtr;
 
 	class bad_join;
+	class thread_pool;
 }
 
 

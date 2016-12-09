@@ -28,12 +28,16 @@ namespace Air
 		virtual void endFrame();
 		virtual void updateGPUTimestampsFrequency();
 
+		virtual void refresh();
+
 		virtual void forceFlush() = 0;
 		uint32_t getNumPrimitivesJustRendered();
 		uint32_t getNumVerticesJustRendered();
 		uint32_t getNumDrawsJustCalled();
 		uint32_t getNumDispatchesJustCalled();
-
+		FrameBufferPtr const & getScreenFrameBuffer() const;
+		FrameBufferPtr const & getOverlayFrameBuffer() const;
+		FrameBufferPtr const & getCurrentFrameBuffer() const;
 		void createRenderWindow(std::string const & name, RenderSettings& settings);
 		void destroyRenderWindow();
 
@@ -48,6 +52,13 @@ namespace Air
 		void bindFrameBuffer(FrameBufferPtr const &fb);
 		FrameBufferPtr const & getDefaultFrameBuffer() const;
 
+		void postProcess(bool skip);
+
+		StereoMethod getStereo() const
+		{
+			return mStereoMethod;
+		}
+
 	private:
 		virtual void checkConfig(RenderSettings& settings);
 		virtual void doCreateRenderWindow(std::string const & name, RenderSettings const & settings) = 0;
@@ -59,9 +70,12 @@ namespace Air
 		FrameBufferPtr mCurrenFrameBuffer;
 		FrameBufferPtr mScreenFrameBuffer;
 		FrameBufferPtr mDefaultFrameBuffers[4];
+		FrameBufferPtr mOverlayFrameBuffer;
 
 		float mStereoSeparation;
 		RenderDeviceCaps mCaps;
+
+		StereoMethod mStereoMethod;
 
 		float mDefaultRenderWidthScale;
 		float mDefaultRenderHeightScale;

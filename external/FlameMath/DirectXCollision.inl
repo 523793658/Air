@@ -13,6 +13,8 @@
 #pragma once
 #endif
 
+#pragma warning(disable:4838) 
+
 XMGLOBALCONST XMVECTORF32 g_BoxOffset[8] =
 {
     { -1.0f, -1.0f,  1.0f, 0.0f },

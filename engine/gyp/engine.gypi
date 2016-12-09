@@ -7,10 +7,12 @@
 			"dependencies": [
 				'basic',
 			],
+			'variables': {
+				'outputSubDir': '',
+			},
 			"type": "shared_library",
 			"include_dirs":[
 				"../../external/boost",
-				"../../external/FlameMath",
 				"../core/include",
 				"../",
 			],
@@ -21,17 +23,15 @@
 				"../core/include/Context.h",
 				"../core/include/ElementFormat.h",
 				"../core/include/Engine.h",
-
 				"../core/include/PreDeclare.h",
 				"../core/include/ResLoader.h",
 				"../core/include/Camera.hpp",
-				"../core/include/SceneManager.hpp",
+				
 				"../core/src/Engine.cpp",
 				"../core/src/Context.cpp",
 				"../core/src/ElementFormat.cpp",
 				"../core/src/ResLoader.cpp",
 				"../core/src/Camera.cpp",
-				"../core/src/SceneManager.cpp",
 				
 				"../rendersystem/include/RenderFactory.h",
 				"../rendersystem/include/RenderEngine.hpp",
@@ -53,6 +53,13 @@
 				"../rendersystem/src/Texture.cpp",
 				"../rendersystem/src/RenderLayout.cpp",
 				"../rendersystem/src/Mesh.cpp",
+				
+				"../scene_manager/include/SceneManager.hpp",
+				"../scene_manager/include/SceneObject.hpp",
+				"../scene_manager/include/SceneObjectHelper.hpp",
+				"../scene_manager/src/SceneManager.cpp",
+				"../scene_manager/src/SceneObject.cpp",
+				"../scene_manager/src/SceneObjectHelper.cpp",
 				
 				"../app/include/Window.hpp",
 				"../app/include/App3D.hpp",

@@ -1,6 +1,7 @@
 #include "Engine.h"
 #include "basic/include/Util.h"
 #include "basic/include/ThrowErr.hpp"
+#include "basic/include/COMPtr.hpp"
 #include "D3D11AdapterList.hpp"
 
 namespace Air

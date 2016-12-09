@@ -78,7 +78,7 @@ struct RenderDeviceCaps
 	bool mPackToRGBARequired : 1;
 	bool mDrawIndirectSupport : 1;
 	bool mNoOverwriteSupport : 1;
-	bool mFullNoptTxtureSupport : 1;
+	bool mFullNoptTextureSupport : 1;
 	bool mRenderToTextureArraySupport : 1;
 	bool mLoadFromBufferSupport : 1;
 

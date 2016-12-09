@@ -1,6 +1,8 @@
 #ifndef _D3D11VideoMode_H_
 #define _D3D11VideoMode_H_
 #pragma once
+
+#include "D3D11Typedefs.hpp"
 namespace Air
 {
 	class D3D11VideoMode

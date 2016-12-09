@@ -4,7 +4,7 @@
 #pragma once
 
 #include <core/include/PreDeclare.h>
-#include "basic/include/Util.h"
+#include "rendersystem/include/RenderFactory.h"
 
 #ifdef AIR_D3D11_RE_SOURCE
 #define AIR_D3D11_RE_API AIR_SYMBOL_EXPORT

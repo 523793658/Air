@@ -5,7 +5,7 @@
 #include <basic\include\Basic.h>
 
 
-#define AIR_NAME		AIR
+#define AIR_NAME		Air
 
 
 #ifdef AIR_CORE_SOURCE
@@ -20,5 +20,6 @@
 #include "PreDeclare.h"
 #include "Context.h"
 #include "basic/include/Util.h"
+#include "basic/include/COMPtr.hpp"
 
 #endif

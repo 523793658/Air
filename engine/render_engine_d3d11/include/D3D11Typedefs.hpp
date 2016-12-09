@@ -6,7 +6,6 @@
 #include <d3d11_3.h>
 #include <memory>
 #include "dxgiformat.h"
-#include "basic/include/COMPtr.hpp"
 namespace Air
 {
 	typedef std::shared_ptr<IDXGIFactory1>				IDXGIFactory1Ptr;
@@ -18,6 +17,7 @@ namespace Air
 	typedef std::shared_ptr<IDXGIAdapter1>				IDXGIAdapter1Ptr;
 	typedef std::shared_ptr<IDXGIAdapter2>				IDXGIAdapter2Ptr;
 
+	typedef std::shared_ptr<IDXGISwapChain>				IDXGISwapChainPtr;
 	typedef std::shared_ptr<IDXGISwapChain1>			IDXGISwapChain1Ptr;
 	typedef std::shared_ptr<IDXGISwapChain2>			IDXGISwapChain2Ptr;
 	typedef std::shared_ptr<IDXGISwapChain3>			IDXGISwapChain3Ptr;

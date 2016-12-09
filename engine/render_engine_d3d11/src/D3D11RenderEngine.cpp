@@ -1,9 +1,12 @@
+#include <dxgi1_5.h>
 #include "Engine.h"
+#include "basic/include/Util.h"
 #include "basic/include/ThrowErr.hpp"
 #include "D3D11Typedefs.hpp"
 #include "D3D11RenderFactory.hpp"
 #include "D3D11RenderWindow.hpp"
 #include "D3D11RenderEngine.hpp"
+
 namespace Air
 {
 	D3D11RenderEngine::D3D11RenderEngine()
@@ -34,33 +37,33 @@ namespace Air
 		mDynamicD3D11CreateDevice = ::D3D11CreateDevice;
 #endif
 		IDXGIFactory1* gi_factory;
-		TIF(mDynamicCreateDXGIFactory1(IID_IDXGIFactory1, reinterpret_cast<void**>(&gi_factory)));
+		TIF(mDynamicCreateDXGIFactory1(__uuidof(IDXGIFactory1), reinterpret_cast<void**>(&gi_factory)));
 		mGIFactory1 = MakeComPtr(gi_factory);
 		mDXGISubVersion = 1;
 
 		IDXGIFactory2* gi_factory2;
-		gi_factory->QueryInterface(IID_IDXGIFactory2, reinterpret_cast<void**>(&gi_factory2));
+		gi_factory->QueryInterface(__uuidof(IDXGIFactory2), reinterpret_cast<void**>(&gi_factory2));
 		if (gi_factory2 != nullptr)
 		{
 			mGIFactory2 = MakeComPtr(gi_factory2);
 			mDXGISubVersion = 2;
 
 			IDXGIFactory3* gi_factor3;
-			gi_factory->QueryInterface(IID_IDXGIFactory3, reinterpret_cast<void**>(&gi_factor3));
+			gi_factory->QueryInterface(__uuidof(IDXGIFactory3), reinterpret_cast<void**>(&gi_factor3));
 			if (gi_factor3 != nullptr)
 			{
 				mGIFactory3 = MakeComPtr(gi_factor3);
 				mDXGISubVersion = 3;
 
 				IDXGIFactory4* gi_factory4;
-				gi_factory->QueryInterface(IID_IDXGIFactory4, reinterpret_cast<void**>(&gi_factory4));
+				gi_factory->QueryInterface(__uuidof(IDXGIFactory4), reinterpret_cast<void**>(&gi_factory4));
 				if (gi_factory4 != nullptr)
 				{
 					mGIFactory4 = MakeComPtr(gi_factory4);
 					mDXGISubVersion = 4;
 
 					IDXGIFactory5* gi_factory5;
-					gi_factory->QueryInterface(IID_IDXGIFactory5, reinterpret_cast<void**>(&gi_factory5));
+					gi_factory->QueryInterface(__uuidof(IDXGIFactory5), reinterpret_cast<void**>(&gi_factory5));
 					if (gi_factory5 != nullptr)
 					{
 						mGIFactory5 = MakeComPtr(gi_factory5);
@@ -218,11 +221,11 @@ namespace Air
 		mD3D11RuntimeSubVer = 0;
 
 		ID3D11Device1* d3d_device1 = nullptr;
-		device->QueryInterface(IID_ID3D11Device1, reinterpret_cast<void**>(&d3d_device1));
+		device->QueryInterface(__uuidof(ID3D11Device1), reinterpret_cast<void**>(&d3d_device1));
 		if (d3d_device1)
 		{
 			ID3D11DeviceContext1* d3d_imm_ctx_1 = nullptr;
-			imm_ctx->QueryInterface(IID_ID3D11DeviceContext1, reinterpret_cast<void**>(&d3d_imm_ctx_1));
+			imm_ctx->QueryInterface(__uuidof(ID3D11DeviceContext1), reinterpret_cast<void**>(&d3d_imm_ctx_1));
 			if (d3d_imm_ctx_1)
 			{
 				mD3DIMMContext1 = MakeComPtr(d3d_imm_ctx_1);
@@ -230,11 +233,11 @@ namespace Air
 				mD3D11RuntimeSubVer = 1;
 
 				ID3D11Device2* d3d_device2 = nullptr;
-				device->QueryInterface(IID_ID3D11Device2, reinterpret_cast<void**>(&d3d_device2));
+				device->QueryInterface(__uuidof(ID3D11Device2), reinterpret_cast<void**>(&d3d_device2));
 				if (d3d_device2)
 				{
 					ID3D11DeviceContext2* d3d_imm_ctx2 = nullptr;
-					imm_ctx->QueryInterface(IID_ID3D11DeviceContext2, reinterpret_cast<void**>(&d3d_imm_ctx2));
+					imm_ctx->QueryInterface(__uuidof(ID3D11DeviceContext2), reinterpret_cast<void**>(&d3d_imm_ctx2));
 					if (d3d_imm_ctx2)
 					{
 						mD3D11Device2 = MakeComPtr(d3d_device2);
@@ -242,11 +245,11 @@ namespace Air
 						mD3D11RuntimeSubVer = 2;
 
 						ID3D11Device3* d3d_device3 = nullptr;
-						device->QueryInterface(IID_ID3D11Device3, reinterpret_cast<void**>(&d3d_device3));
+						device->QueryInterface(__uuidof(ID3D11Device3), reinterpret_cast<void**>(&d3d_device3));
 						if (d3d_device3)
 						{
 							ID3D11DeviceContext3* d3d_context3 = nullptr;
-							imm_ctx->QueryInterface(IID_ID3D11DeviceContext3, reinterpret_cast<void**>(&d3d_context3));
+							imm_ctx->QueryInterface(__uuidof(ID3D11DeviceContext3), reinterpret_cast<void**>(&d3d_context3));
 							if (d3d_context3)
 							{
 								mD3D11Device3 = MakeComPtr(d3d_device3);
@@ -444,11 +447,11 @@ namespace Air
 		{
 			D3D11_FEATURE_DATA_D3D9_OPTIONS d3d11_feature;
 			mD3D11Device->CheckFeatureSupport(D3D11_FEATURE_D3D9_OPTIONS, &d3d11_feature, sizeof(d3d11_feature));
-			mCaps.mFullNoptTxtureSupport= d3d11_feature.FullNonPow2TextureSupport ? true : false;
+			mCaps.mFullNoptTextureSupport = d3d11_feature.FullNonPow2TextureSupport ? true : false;
 		}
 		else
 		{
-			mCaps.mFullNoptTxtureSupport= false;
+			mCaps.mFullNoptTextureSupport= false;
 		}
 		mCaps.mRenderToTextureArraySupport = (mD3DFeatureLevel>= D3D_FEATURE_LEVEL_10_0);
 		mCaps.mLoadFromBufferSupport = (mD3DFeatureLevel >= D3D_FEATURE_LEVEL_10_0);
@@ -668,6 +671,11 @@ namespace Air
 		return mAdapterList.getAdapter(mAdapterList.getCurrentAdapterIndex());
 	}
 
+	void D3D11RenderEngine::invalidRTVCache()
+	{
+		mRenderTargetViewPtrChache.clear();
+	}
+
 	void D3D11RenderEngine::doCreateRenderWindow(std::string const & name, RenderSettings const & settings)
 	{
 		mMotionFrames = settings.mMotionFrames;
@@ -726,6 +734,70 @@ namespace Air
 		this->resetRenderStates();
 		this->bindFrameBuffer(win);
 
-		this(STM_LCDShutter)
+// 		if (STM_LCDShutter == settings.mStereoMethod)
+// 		{
+// 			mStereoMethod = SM_None;
+// 			if ((mDXGISubVersion >= 2) && mGIFactory2->IsWindowedStereoEnabled())
+// 			{
+// 				mStereoMethod = SM_DXGI;
+// 			}
+// 			if (SM_None == mStereoMethod)
+// 			{
+// 				if (win->getAdapter().getDescription().find(L"NVIDIA", 0) != std::wstring::npos)
+// 				{
+// 					mStereoMethod = SM_NV3DVision;
+// 					RenderFactory& rf = Context::getInstance().getRenderFactoryInstance();
+// 					uint32_t const w = win->getWidth();
+// 					uint32_t const h = win->getHeight();
+// 
+// 				}
+// 			}
+// 		}
+
+		if (mD3DFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+		{
+			D3D11_QUERY_DESC desc;
+			desc.Query = D3D11_QUERY_TIMESTAMP_DISJOINT;
+			desc.MiscFlags = 0;
+
+			ID3D11Query* disjoint_query;
+			mD3D11Device->CreateQuery(&desc, &disjoint_query);
+			mTimestampDisJointQuery = MakeComPtr(disjoint_query);
+		}
+	}
+
+	void D3D11RenderEngine::doBindFrameBuffer(FrameBufferPtr const & fb)
+	{
+		BOOST_ASSERT(mD3D11Device);
+		BOOST_ASSERT(fb);
+
+	}
+
+	void D3D11RenderEngine::resetRenderStates()
+	{
+		//»Ö¸´äÖÈ¾×´Ì¬
+	}
+
+	void D3D11RenderEngine::doSuspend()
+	{
+		if (mD3D11RuntimeSubVer >= 2)
+		{
+			IDXGIDevice3* dxgi_device = nullptr;
+			mD3D11Device->QueryInterface(__uuidof(IDXGIDevice3), reinterpret_cast<void**>(dxgi_device));
+			if (dxgi_device != nullptr)
+			{
+				dxgi_device->Trim();
+				dxgi_device->Release();
+			}
+		}
+	}
+	void D3D11RenderEngine::doResume()
+	{
+
+	}
+
+	HRESULT D3D11RenderEngine::d3d11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE driver_type, HMODULE Software, UINT flags, D3D_FEATURE_LEVEL const * pFeatureLevels, UINT featureLveleCount, UINT SDKVersion, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext) const
+	{
+		return mDynamicD3D11CreateDevice(pAdapter, driver_type, Software, flags, pFeatureLevels, featureLveleCount, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
 	}
 }

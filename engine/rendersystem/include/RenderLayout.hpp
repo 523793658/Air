@@ -57,8 +57,21 @@ namespace Air
 		{
 			mTopologyType = type;
 		}
-	private:
+
+		uint32_t getNumVertexStreams() const
+		{
+			return static_cast<uint32_t>(mVertexStreams.size());
+		}
+	protected:
+
 		TopologyType mTopologyType;
+
+		struct StreamUnit
+		{
+			
+		};
+
+		std::vector<StreamUnit> mVertexStreams;
 
 	};
 }

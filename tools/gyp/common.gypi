@@ -1,6 +1,6 @@
 # 各个平台的设置
 #
-{
+{		
 	'conditions' : [
 		[ 'OS == "win"',
 			{
@@ -17,24 +17,29 @@
 					4305,       # 警告：截断从'大类型' 到 '小类型'.
 					4306,       # 警告：将'小类型'转换为 '大类型'
 				], 
+				
 				'msbuild_configuration_attributes': {
-					'OutputDirectory': '$(SolutionDir)..\\..\\tools\\',         		#输出目录
+					'OutputDirectory': '$(SolutionDir)..\\..\\bin\\$(Platform)\\$(Configuration)\\<(outputSubDir)',         		#输出目录
 					'IntermediateDirectory': '$(Configuration)\\$(ProjectName)\\obj\\',   #中间目录
-					'CharacterSet': '2',
+					'CharacterSet': '1',
 				},
+				'include_dirs':[
+					"../../external/FlameMath",
+				],
+				'product_name': 'Air$(ProjectName)',
 				'msbuild_settings': {
 					'ClCompile': {
 						'TreatWChar_tAsBuiltInType': 'true',  							#将WChar_t视为内置类型
 						'WarningLevel': 'Level4',										#警告等级
-						'ProgramDataBaseFileName': '$(OutDir)pdb\\$(Configuration)\\$(TargetName).pdb', #程序数据库文件名
+						'ProgramDataBaseFileName': '$(OutDir)\\$(TargetName).pdb', #程序数据库文件名
 						'PreprocessorDefinitions': [],      #预处理器定义
-						#'ExceptionHandling': '/EHsc',
+						'RuntimeTypeInfo': 'true',      							# /GR-
 					},
 					'Link': {
 						'SubSystem': 'Console',											#控制台
 						'ImportLibrary' : '$(IntDir)..\\lib\\$(TargetName).lib', 		#到入库
 						#'LinkIncremental': 'true',
-						'ProgramDatabaseFile': '$(OutDir)pdb\\$(Configuration)\\$(TargetName).pdb', #生成程序数据库文件
+						'ProgramDatabaseFile': '$(OutDir)\\$(TargetName).pdb', #生成程序数据库文件
 						#'GenerateManifest': 'false',
 						'GenerateDebugInformation': 'false',      						#生成调试信息
 
@@ -65,9 +70,9 @@
 								'BasicRuntimeChecks': 'EnableFastChecks',					#基本运行时检查（/RTC1）
 								'DebugInformationFormat': 'EditAndContinue', 				# editAndContiue (/ZI)
 								'Optimization': 'Disabled',           						# optimizeDisabled (/Od)
-								'RuntimeTypeInfo': 'false',      							# /GR-
 								'RuntimeLibrary': 'MultiThreadedDebugDLL',
 								'IntrinsicFunctions': 'false'								#启用内部函数（否）
+								
 							},
 							'Link': {
 								'GenerateDebugInformation': 'true',
@@ -82,12 +87,11 @@
 						},
 					},
 					'Debug_x64': {
-						'msbuild_settings': {
+						'msbuild_settings': {	
 							'ClCompile': {
 								'BasicRuntimeChecks': 'EnableFastChecks',					#基本运行时检查（/RTC1）
 								'DebugInformationFormat': 'EditAndContinue', 				# editAndContiue (/ZI)
 								'Optimization': 'Disabled',           						# optimizeDisabled (/Od)
-								'RuntimeTypeInfo': 'false',      							# /GR-
 								'RuntimeLibrary': 'MultiThreadedDebugDLL',
 								'IntrinsicFunctions': 'false'								#启用内部函数（否）
 							},
@@ -111,7 +115,6 @@
 								'DebugInformationFormat': 'ProgramDatabase',      			# programDatabase (/Zi)
 								'Optimization': 'MaxSpeed',                					# optimizeDisabled (/O2)
 								'WholeProgramOptimization': 'true', 						#/GL
-								'RuntimeTypeInfo': 'false',      							# /GR-
 								'RuntimeLibrary': 'MultiThreadedDLL',    						# /GR-
 								'IntrinsicFunctions': 'true'								#启用内部函数（是）
 							},
@@ -134,7 +137,6 @@
 								'DebugInformationFormat': 'ProgramDatabase',      			# programDatabase (/Zi)
 								'Optimization': 'MaxSpeed',                					# optimizeDisabled (/O2)
 								'WholeProgramOptimization': 'true', 						#/GL
-								'RuntimeTypeInfo': 'false',      							# /GR-
 								'RuntimeLibrary': 'MultiThreadedDLL',    						# /GR-
 								'IntrinsicFunctions': 'true'								#启用内部函数（是）
 							},
@@ -145,6 +147,7 @@
 								],
 								'GenerateDebugInformation': 'true',		
 							},
+							
 						},
 						'msbuild_configuration_attributes': {
 							'LinkIncremental': 'false',										#不启用增量链接

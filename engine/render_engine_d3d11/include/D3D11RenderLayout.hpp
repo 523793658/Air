@@ -12,7 +12,7 @@ namespace Air
 	{
 	public:
 		D3D11RenderLayout();
-		D3D11RenderLayout* getInputLayout(size_t signature, std::vector<uint8_t> const & vs_code) const;
+		ID3D11InputLayout* getInputLayout(size_t signature, std::vector<uint8_t> const & vs_code) const;
 
 	private:
 		std::vector<D3D11_INPUT_ELEMENT_DESC> mVertexElement;

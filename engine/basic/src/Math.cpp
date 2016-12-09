@@ -1,4 +1,5 @@
 #include "basic/include/Basic.h"
+#include "FlameMath.h"
 #include "basic/include/Math.hpp"
 namespace Air
 {

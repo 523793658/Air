@@ -172,8 +172,9 @@
 		#endif
 	#endif
 #elif 
-	defined AIR_CPU_ARM64
+defined AIR_CPU_ARM64
 #endif
 
 #define FLAMEMATH
+
 #endif

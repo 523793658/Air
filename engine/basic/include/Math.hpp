@@ -1,11 +1,18 @@
 #ifndef _Basic_Math_H_
 #define _Basic_Math_H_
 #pragma once
-
+#include <algorithm>
+#include "FlameMath.h"
 namespace Air
 {
 #ifdef FLAMEMATH
-#include "FlameMath.h"
+	typedef Float2 float2;
+	typedef Float4 float4;
+	typedef Float3 float3;
+	typedef Int2 int2;
+	typedef Uint4 uint4;
+
+	typedef Float4x4 float4x4;
 #endif
 	// 常量定义
 	/////////////////////////////////////////////////////////////////////////////////
@@ -35,6 +42,13 @@ namespace Air
 	float const DEG2RAD = 0.01745329f;			// 角度化弧度因数
 	float const RAD2DEG = 57.29577f;			// 弧度化角度因数
 
+
+	enum BoundOverlap
+	{
+		BO_Yes,
+		BO_No,
+		BO_Partial
+	};
 
 	namespace MathLib
 	{

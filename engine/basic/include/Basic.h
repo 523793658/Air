@@ -6,6 +6,9 @@
 #include "Types.h"
 #include "PreDeclare.h"
 
+#include "Math.hpp"
+#include "Color.hpp"
+
 
 
 #endif

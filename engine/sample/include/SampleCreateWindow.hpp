@@ -6,9 +6,8 @@
 	{
 	public:
 		SampleCreateWindow();
-
-
-
+	private:
+		uint32_t doUpdate(uint32_t pass);
 	};
 
 

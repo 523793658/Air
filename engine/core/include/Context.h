@@ -4,16 +4,18 @@
 #include <string>
 #include <boost/assert.hpp>
 #include "rendersystem/include/RenderSettings.hpp"
-#include "basic/include/Thread.h"
-
 #include "basic/include/DllLoader.h"
+
 
 namespace Air
 {
+	struct RenderSettings;
+
 	struct ContextCfg
 	{
-		std::string render_factory_name;
-		std::string scene_manager_name;
+		std::string mRenderFactoryName;
+		std::string mSceneManagerName;
+
 
 		RenderSettings mGraphicsCfg;
 		bool mDeferredRendering;
@@ -43,6 +45,9 @@ namespace Air
 
 		void setAppInstance(App3DFramework& app);
 
+		App3DFramework& getAppInstance();
+		SceneManager& getSceneManangerInstance();
+
 		thread_pool& getThreadPool()
 		{
 			return *mGTPInstance;
@@ -58,6 +63,7 @@ namespace Air
 		std::unique_ptr<RenderFactory> mRenderFactory;
 
 		DllLoader mRenderLoader;
+		DllLoader mSceneManagerLoader;
 
 		//Ïß³Ì³Ø
 		std::unique_ptr<thread_pool> mGTPInstance;

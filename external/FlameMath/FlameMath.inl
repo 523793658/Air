@@ -52,8 +52,8 @@ inline Float2& Float2::operator*= (float S)
 inline Float2& Float2::operator/= (float S)
 {
 	float inv = 1.0f / S;
-	x *= S;
-	y *= S;
+	x *= inv;
+	y *= inv;
 	return *this;
 } 
 

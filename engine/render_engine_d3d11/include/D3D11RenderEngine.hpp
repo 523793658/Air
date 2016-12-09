@@ -4,12 +4,13 @@
 
 #include <set>
 #include <map>
-
-#include "rendersystem/include/RenderEngine.hpp"
+#include "../../external/dxsdk/Include/dxgi1_5.h"
 
 #include "render_engine_d3d11/include/D3D11AdapterList.hpp"
 
 #include "render_engine_d3d11/include/D3D11Typedefs.hpp"
+
+#include "rendersystem/include/RenderEngine.hpp"
 
 namespace Air
 {
@@ -27,6 +28,9 @@ namespace Air
 
 		void beginFrame() override;
 		void endFrame() override;
+
+		void invalidRTVCache();
+
 		void updateGPUTimestampsFrequency() override;
 
 		IDXGIFactory1* getDXGIFactory1() const;
@@ -63,6 +67,8 @@ namespace Air
 		void destroy();
 
 
+		HRESULT d3d11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE driver_type, HMODULE Software, UINT flags, D3D_FEATURE_LEVEL const * pFeatureLevels, UINT featureLveleCount, UINT SDKVersion, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext) const;
+
 		bool isFullScreen() const;
 		void setFullScreen(bool fs);
 
@@ -70,10 +76,12 @@ namespace Air
 		bool isVertexFormatSupport(ElementFormat elem_fmt);
 		bool isTextureFormatSupport(ElementFormat elem_fmt);
 		bool isRenderTargetFormatSupport(ElementFormat elem_fmt, uint32_t sample_count, uint32_t sample_quality);
-		void doCreateRenderWindow(std::string const & name, RenderSettings const & settings);
+		virtual void doCreateRenderWindow(std::string const & name, RenderSettings const & settings);
+		void doBindFrameBuffer(FrameBufferPtr const & fb);
 		D3D11AdapterPtr const & getActiveAdapter() const;
-
 		void resetRenderStates();
+		void doSuspend();
+		void doResume();
 
 	private:
 		typedef HRESULT(WINAPI *CreateDXGIFactory1Func)(REFIID riid, void** ppFactory);
@@ -111,6 +119,9 @@ namespace Air
 		std::set<ElementFormat> mTextureFormats;
 		std::map<ElementFormat, std::vector<std::pair<uint32_t, uint32_t>>> mRendertargetFormats;
 
+		std::vector<ID3D11RenderTargetView*> mRenderTargetViewPtrChache;
+
+
 	private:
 		HMODULE mModDXGI;
 		HMODULE mModD3D11;
@@ -121,6 +132,15 @@ namespace Air
 
 		ID3D11QueryPtr mTimestampDisJointQuery;
 
+		enum StereoMethod
+		{
+			SM_None,
+			SM_DXGI,
+			SM_NV3DVision,
+			SM_AMDQuadBuffer
+		};
+		
+		StereoMethod mStereoMethod;
 		double mInvTimestampFreq;
 
 		char const * mVSProfile;
@@ -129,6 +149,7 @@ namespace Air
 		char const * mCSProfile;
 		char const * mHSProfile;
 		char const * mDSProfile;
+
 	};
 }
 

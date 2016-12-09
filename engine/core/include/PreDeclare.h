@@ -29,17 +29,18 @@ namespace Air
 	typedef std::shared_ptr<GraphicsBuffer> GraphicsBufferPtr;
 	class RenderView;
 	typedef std::shared_ptr<RenderView> RenderViewPtr;
+	class Texture;
+	typedef std::shared_ptr<Texture> TexturePtr;
 
+	class SceneObject;
+	typedef std::shared_ptr<SceneObject> SceneObjectPtr;
 
 
 
 	struct Viewport;
 	typedef std::shared_ptr<Viewport> ViewportPtr;
 
-	template<typename T>
-	class Color_T;
-	typedef Color_T<float> Color;
-
+	struct RenderSettings;
 
 
 }

@@ -9,6 +9,9 @@
 #include "Camera.hpp"
 
 #include "rendersystem/include/RenderFactory.h"
+#include "rendersystem/include/RenderEngine.hpp"
+#include "rendersystem/include/Viewport.hpp"
+#include "rendersystem/include/FrameBuffer.hpp"
 
 #include "app/include/App3D.hpp"
 
@@ -56,7 +59,8 @@ namespace Air
 	{
 #endif
 		ContextCfg cfg = Context::getInstance().getConfig();
-		Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance().createRenderWindow(mName, cfg.mGraphicsCfg);
+		RenderFactory& factory = Context::getInstance().getRenderFactoryInstance();
+		factory.getRenderEngineInstance().createRenderWindow(mName, cfg.mGraphicsCfg);
 
 	}
 
@@ -72,6 +76,7 @@ namespace Air
 
 	void App3DFramework::run()
 	{
+		RenderEngine& engine = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		bool gotMsg;
 		MSG msg;
 		::PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE);
@@ -93,16 +98,51 @@ namespace Air
 			else
 			{
 				//¸üÐÂäÖÈ¾
+				engine.refresh();
 			}
 
 
 			this->onDestroy();
 		}
 	}
+	Camera const & App3DFramework::getActiveCamera() const
+	{
+		RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		CameraPtr const & camera = re.getCurrentFrameBuffer()->getViewport()->mCamera;
+		BOOST_ASSERT(camera);
+		return *camera;
+	}
+
+	Camera& App3DFramework::getActiveCamera()
+	{
+		RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		CameraPtr const & camera = re.getCurrentFrameBuffer()->getViewport()->mCamera;
+		BOOST_ASSERT(camera);
+		return *camera;
+	}
+
+	float App3DFramework::getAppTime() const
+	{
+		return mAppTime;
+	}
+
+	float App3DFramework::getFrameTime() const
+	{
+		return mFrameTime;
+	}
 
 
 	void App3DFramework::onDestroy()
 	{
 
+	}
+
+	uint32_t App3DFramework::update(uint32_t pass)
+	{
+		if (0 == pass)
+		{
+			//this->updates
+		}
+		return this->doUpdate(pass);
 	}
 }

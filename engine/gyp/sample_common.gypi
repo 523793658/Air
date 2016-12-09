@@ -1,6 +1,7 @@
 {
 	'variables': {
 		'source_path': '../sample',
+		'outputSubDir': '',
 	},
 	'include_dirs': [
 		"../../external/boost",
@@ -12,6 +13,8 @@
 		'../../tools/gyp/common.gypi',
 	],
 	'dependencies': [
+		'RenderEngineD3D11',
+		'engine',
 	],
 	'conditions': [
 		[ 'OS == "win"',

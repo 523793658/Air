@@ -13,6 +13,9 @@
 			"includes":[
 				"../../tools/gyp/common.gypi",
 			],
+			'variables': {
+				'outputSubDir': '',
+			},
 			"sources":[
 				"../basic/include/Thread.h",
 				"../basic/include/CPP11.h",
@@ -28,6 +31,7 @@
 				"../basic/include/Math.hpp",
 				"../basic/include/ThrowErr.hpp",
 				"../basic/include/COMPtr.hpp",
+				"../basic/include/Color.hpp",
 				
 				"../basic/src/Thread.cpp",
 				"../basic/src/CPP11.cpp",
@@ -41,6 +45,7 @@
 				"../basic/src/Math.cpp",
 				"../basic/src/ThrowErr.cpp",
 				"../basic/src/COMPtr.cpp",
+				"../basic/src/Color.cpp",
 			],
 			"conditions":[
 				[

@@ -4,7 +4,7 @@
 
 #include "PreDeclare.h"
 #include "D3D11Typedefs.hpp"
-#include "render_engine_d3d11/include/D3D11VideoMode.hpp"
+#include "D3D11VideoMode.hpp"
 namespace Air
 {
 	class D3D11Adapter

@@ -17,11 +17,15 @@
 
 
 #pragma once
+
+#pragma  warning(disable: 4838)
+
 #include "DirectXMath.h"
 #include "DirectXPackedVector.h"
 #include "DirectXCollision.h"
+#include <memory.h>
 
-namespace
+namespace Air
 {
 	
 	typedef DirectX::XMVECTOR Vector4;
@@ -1422,26 +1426,4 @@ namespace
 			return DirectX::XMFresnelTerm(CosIncidentAngle,RefractionIndex);
 		}
 	};
-
-	Vector4 operator+ (Vector4Param v){return v;}
-	Vector4 operator- (Vector4Param v){return DirectX::operator -(v);}
-
-	Vector4& operator+= (Vector4& V1, Vector4Param V2){return DirectX::operator +=(V1,V2);}
-	Vector4& operator-= (Vector4& V1, Vector4Param V2){return DirectX::operator -= (V1,V2);}
-	Vector4& operator*= (Vector4& V1, Vector4Param V2){return DirectX::operator *= (V1,V2);}
-	Vector4& operator/= (Vector4& V1, Vector4Param V2){return DirectX::operator /= (V1,V2);}
-	Vector4& operator*= (Vector4& V, float S) {return DirectX::operator *= (V,S);}
-	Vector4& operator/= (Vector4& V, float S) {return DirectX::operator /= (V,S);}
-
-	Vector4 operator+ (Vector4Param V1, Vector4Param V2){return DirectX::operator +(V1 ,V2);}
-	Vector4 operator- (Vector4Param V1, Vector4Param V2){return DirectX::operator -(V1 ,V2);}
-	Vector4 operator* (Vector4Param V1, Vector4Param V2){return DirectX::operator *(V1 ,V2);}
-	Vector4 operator/ (Vector4Param V1, Vector4Param V2){return DirectX::operator /(V1 ,V2);}
-	Vector4 operator* (Vector4Param V, float S){return DirectX::operator *(V,S);}
-	Vector4 operator* (float S, Vector4Param V){return DirectX::operator *(S,V);}
-	Vector4 operator/ (Vector4Param V, float S){return DirectX::operator /(V,S);}
-
-
-#include "FlameMath.inl"
-
 }

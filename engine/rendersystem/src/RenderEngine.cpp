@@ -3,7 +3,9 @@
 #include "rendersystem/include/FrameBuffer.hpp"
 #include "rendersystem/include/RenderFactory.h"
 #include "rendersystem/include/RenderLayout.hpp"
-
+#include "app/include/App3D.hpp"
+#include "app/include/Window.hpp"
+#include "scene_manager/include/SceneManager.hpp"
 
 #include "rendersystem/include/RenderEngine.hpp"
 namespace Air
@@ -53,6 +55,32 @@ namespace Air
 
 	}
 
+	FrameBufferPtr const & RenderEngine::getScreenFrameBuffer() const
+	{
+		return mScreenFrameBuffer;
+	}
+	FrameBufferPtr const & RenderEngine::getOverlayFrameBuffer() const
+	{
+		return mOverlayFrameBuffer;
+	}
+
+	FrameBufferPtr const & RenderEngine::getCurrentFrameBuffer() const
+	{
+		return mCurrenFrameBuffer;
+	}
+
+	void RenderEngine::refresh()
+	{
+		FrameBuffer& fb = *this->getScreenFrameBuffer();
+		//激活才更新
+		if (Context::getInstance().getAppInstance().getMainWnd()->getActive())
+		{
+			Context::getInstance().getSceneManangerInstance().update();
+			fb.swapBuffers();
+			//fb.
+		}
+	}
+
 	void RenderEngine::destroyRenderWindow()
 	{
 
@@ -73,6 +101,7 @@ namespace Air
 	{
 		return mDefaultFrameBuffers[mFBStage];
 	}
+
 
 	void RenderEngine::bindFrameBuffer(FrameBufferPtr const &fb)
 	{
@@ -150,6 +179,8 @@ namespace Air
 		uint32_t const render_height = static_cast<uint32_t>(settings.height * mDefaultRenderHeightScale + 0.5);
 
 		bool need_resize = false;
+		float2 posScale;
+
 		if (!settings.hide_win)
 		{
 			//need_resize = ((render_width != screen_width) || (render_height != screen_height));
@@ -157,7 +188,6 @@ namespace Air
 // 			float const scale_x = static_cast<float>(screen_width) / render_width;
 // 			float const scale_y = static_cast<float>(screen_height) / render_height;
 // 
-// 			Float2 posScale;
 // 			if (scale_x < scale_y)
 // 			{
 // 				posScale.x = 1;

@@ -29,6 +29,22 @@ namespace Air
 		ECT_SharedExp = 7UL
 	};
 
+	enum ElementAccessHint
+	{
+		EAH_CPU_Read = 1UL << 0,
+		EAH_CPU_Write = 1UL << 1,
+		EAH_GPU_Read = 1UL << 2,
+		EAH_GPU_Write = 1UL << 3,
+		EAH_GPU_Unordered = 1UL << 4,
+		EAH_GPU_Structured = 1UL << 5,
+		EAH_Generate_Mips = 1UL << 6,
+		EAH_Immutable = 1UL << 7,
+		EAH_Raw = 1UL << 8,
+		EAH_Append = 1UL << 9,
+		EAH_Counter = 1UL << 10,
+		EAH_DrawIndirectArgs = 1UL << 11
+	};
+
 	// element format is a 64-bit value:
 	// 00000000 T3[4] T2[4] T1[4] T0[4] S3[6] S2[6] S1[6] S0[6] C3[4] C2[4] C1[4] C0[4]
 
@@ -64,6 +80,13 @@ namespace Air
 	struct MakeElementFormat1
 	{
 		static uint64_t const value = MakeElementFormat2<ch0, 0, ch0_size, 0, ch0_type, 0>::value;
+	};
+
+	struct ElementInitData
+	{
+		void const * data;
+		uint32_t mRowPitch;
+		uint32_t mSlicePitch;
 	};
 
 	enum ElementFormat : uint64_t
@@ -310,6 +333,11 @@ namespace Air
 	inline bool isDepthFormat(ElementFormat format)
 	{
 		return (EC_D == getChannel<0>(format));
+	}
+
+	inline bool isCompressedFormat(ElementFormat format)
+	{
+		return (EC_BC == getChannel<0>(format)) || (EC_ETC == getChannel<0>(format));
 	}
 }
 
