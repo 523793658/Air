@@ -1,6 +1,8 @@
 #ifndef _Bound_H_
 #define _Bound_H_
 #pragma once
+#include "PreDeclare.h"
+#include "basic/include/Math.hpp"
 
 namespace Air
 {
@@ -12,7 +14,7 @@ namespace Air
 
 		}
 		virtual bool isEmpty() const AIR_NOEXCEPT = 0;
-		virtual bool verInBound(float3 const & v) const AIR_NOEXCEPT = 0;
+		virtual bool contains(float3 const & v) const AIR_NOEXCEPT = 0;
 		virtual float getMaxRadiusSq() const AIR_NOEXCEPT = 0;
 	};
 

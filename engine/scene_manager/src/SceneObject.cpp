@@ -51,6 +51,7 @@ namespace Air
 	AABBox& SceneObject::getAABB()
 	{
 		AABBox& a = *mAABB;
+
 	}
 
 	bool SceneObject::mainThreadUpdate(float app_time, float elapsed_time)

@@ -92,7 +92,7 @@ namespace Air
 				}
 				if (attr & SceneObject::SOA_Cullable)
 				{
-					visible = AABB::Intersects()
+					visible = MathLib::perspective_area(eye_pos, view_proj, obj->getAABB()
 				}
 			}
 		}

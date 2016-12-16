@@ -36,6 +36,7 @@
 				"../basic/include/Frustum.hpp",
 				"../basic/include/Plane.hpp",
 				"../basic/include/AABBBox.hpp",
+				"../basic/include/Vector.hpp",
 				
 				"../basic/src/Thread.cpp",
 				"../basic/src/CPP11.cpp",
@@ -54,6 +55,7 @@
 				"../basic/src/Frustum.cpp",
 				"../basic/src/Plane.cpp",
 				"../basic/src/AABBBox.cpp",
+				"../basic/src/Vector.cpp",
 			],
 			"conditions":[
 				[

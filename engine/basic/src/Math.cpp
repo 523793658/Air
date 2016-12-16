@@ -113,16 +113,31 @@ namespace Air
 			return std::tanh(x);
 		}
 
+		BoundOverlap intersect_aabb_frustum(AABBox const aabb, Frustum const & frustum)
+		{
+			float3 const & minPt = aabb.getMin();
+			float3 const & maxPt = aabb.getMax();
+
+			bool intersect = false;
+			Plane planes[6];
+			frustum.GetPlanes(&planes[0], &planes[1], &planes[2], &planes[3], &planes[4], &planes[5], &planes[6]);
+			for (int i = 0; i < 6; i++)
+			{
+			}
+		}
+
 		BoundOverlap perspective_area(float3 eye_pos, float4x4 view_proj, AABBox const & aabbox)
 		{
-			if (aabbox.Contains(eye_pos))
+			if (aabbox.contains(eye_pos))
 			{
 				return BO_Yes;
 			}
 			
 			Frustum frustum;
 			Frustum::CreateFromMatrix(frustum, view_proj);
-			return static_cast<BoundOverlap>(frustum.Contains(aabbox));
+#ifdef FLAMEMATH
+			return static_cast<BoundOverlap>(frustum.Contains(AABB(aabbox.getCenter(), aabbox.getHalfSize())));
+#endif
 		}
 
 #ifdef FLAMEMATH

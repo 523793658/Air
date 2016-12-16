@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <functional>
 #include "FlameMath.h"
-#include "basic/include/AABBBox.hpp"
 
 namespace Air
 {
@@ -245,6 +244,8 @@ namespace Air
 		float tanh(float x) AIR_NOEXCEPT;
 
 		float perspective_area(float3 eye_pos, float4x4 view_proj, AABBox const & aabbox);
+
+		BoundOverlap intersect_aabb_frustum(AABBox const aabb, Frustum const & frustum);
 
 #ifdef FLAMEMATH
 #else
