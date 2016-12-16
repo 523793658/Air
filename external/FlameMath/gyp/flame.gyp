@@ -27,8 +27,10 @@
 			],
 			'conditions': [
 				[
+				
 					"OS == 'win'",
 					{
+						"msvs_postbuild":'copy /Y "$(OutDir)lib\\Air$(ProjectName)$(TargetExt)" "..\\..\..\lib\\$(Platform)\\$(Configuration)"',
 						"msbuild_configuration_attributes":{
 							"CharacterSet": "1",
 						}, 

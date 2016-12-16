@@ -5,9 +5,10 @@
 #include "Config.h"
 #include "Types.h"
 #include "PreDeclare.h"
-
+#include <array>
 #include "Math.hpp"
 #include "Color.hpp"
+
 
 
 

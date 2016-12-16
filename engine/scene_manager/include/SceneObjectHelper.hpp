@@ -10,10 +10,12 @@ namespace Air
 	{
 	public:
 		explicit SceneObjectHelper(uint32_t attrib);
+		SceneObjectHelper(RenderablePtr const & renderable, uint32_t attrib);
 		virtual ~SceneObjectHelper()
 		{
 		}
 		virtual void onAttachRenderable(bool add_to_scene) override;
+
 	};
 
 

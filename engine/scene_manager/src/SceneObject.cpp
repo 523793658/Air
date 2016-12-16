@@ -29,18 +29,43 @@ namespace Air
 
 	const SceneObjectPtr& SceneObject::getChild(uint32_t index) const
 	{
-		return nullptr;
+		BOOST_ASSERT(index < mChildren.size());
+		return mChildren[index];
 	}
 
+
+	bool SceneObject::isVisible() const
+	{
+		return (0 == (mAttrib & SOA_Invisible));
+	}
 	void SceneObject::setVisibleMark(BoundOverlap vm)
 	{
+		mVisibleMark = vm;
+	}
 
+	BoundOverlap SceneObject::getVisibleMark() const
+	{
+		return mVisibleMark;
+	}
+
+	AABBox& SceneObject::getAABB()
+	{
+		AABBox& a = *mAABB;
 	}
 
 	bool SceneObject::mainThreadUpdate(float app_time, float elapsed_time)
 	{
 		bool refreshed = false;
 		return refreshed;
+	}
+
+	void SceneObject::addToSceneManager()
+	{
+		Context::getInstance().getSceneManangerInstance().addSceneObject(this->shared_from_this());
+		for (auto const & child : mChildren)
+		{
+			child->addToSceneManager();
+		}
 	}
 
 	void SceneObject::addToSceneManagerLocked()
@@ -65,16 +90,31 @@ namespace Air
 		return mAttrib;
 	}
 
-	void SceneObject::updateAbsModelMatrix()
+	void SceneObject::updateWorldMatrix()
 	{
 		if (mParent)
 		{
-			mWorldMatrix = mParent->getModelMatrix() * mLocalMatrix;
+			mWorldMatrix = mParent->getWorldMatrix() * mLocalMatrix;
 		}
 	}
 
-	float4x4 const & SceneObject::getModelMatrix() const
+	float4x4 const & SceneObject::getLocalMatrix() const
 	{
 		return mWorldMatrix;
+	}
+
+	void SceneObject::setLocalMatrix(float4x4 const & mat)
+	{
+		mLocalMatrix = mat;
+	}
+
+	float4x4 const & SceneObject::getWorldMatrix() const
+	{
+		return mWorldMatrix;
+	}
+
+	Renderable const & SceneObject::getRenderable() const
+	{
+		return *mRenderable;
 	}
 }

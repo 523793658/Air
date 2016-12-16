@@ -76,7 +76,11 @@
 							},
 							'Link': {
 								'GenerateDebugInformation': 'true',
+								'AdditionalLibraryDirectories':[
+									'../../external/x86/Debug',
+								],
 								'AdditionalDependencies':[
+									"AirFlameMath.lib",
 								],
 								
 							},
@@ -100,6 +104,7 @@
 								'AdditionalDependencies':[
 								],
 								'AdditionalLibraryDirectories':[
+									'../../external/x64/Debug',
 								],
 							},
 						},
@@ -123,6 +128,9 @@
 								#'GenerateManifest': 'true',
 								'AdditionalDependencies':[
 								],
+								'AdditionalLibraryDirectories':[
+									'../../external/x86/Release',
+								],
 								'GenerateDebugInformation': 'true',		
 							},
 						},
@@ -144,6 +152,9 @@
 								#'LinkIncremental': 'false',
 								#'GenerateManifest': 'true',
 								'AdditionalDependencies':[
+								],
+								'AdditionalLibraryDirectories':[
+									'../../external/x64/Debug',
 								],
 								'GenerateDebugInformation': 'true',		
 							},

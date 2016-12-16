@@ -5,7 +5,7 @@
 #include "DirectXMathMisc.inl"
 namespace Air
 {
-#include "FlameMath.inl"
+	const float MathHelper::Pi = 3.1415926f;
 
 	Vector4 operator+ (Vector4Param v) { return v; }
 	Vector4 operator- (Vector4Param v) { return DirectX::operator -(v); }

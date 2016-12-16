@@ -32,24 +32,45 @@ namespace Air
 		const SceneObjectPtr& getChild(uint32_t index) const;
 
 		void setVisibleMark(BoundOverlap vm);
+		BoundOverlap getVisibleMark() const;
 
-		virtual float4x4 const & getModelMatrix() const;
+		AABBox& getAABB();
+
+		bool isVisible() const;
+
+		virtual float4x4 const & getLocalMatrix() const;
+		virtual void setLocalMatrix(float4x4 const &mat);
+
+		virtual float4x4 const & getWorldMatrix() const;
 
 		bool mainThreadUpdate(float app_time, float elapsed_time);
 
 		virtual void onAttachRenderable(bool add_to_scene);
 
+		virtual void addToSceneManager();
+
 		virtual void addToSceneManagerLocked();
 
-		void updateAbsModelMatrix();
+		void updateWorldMatrix();
+
+		Renderable const & getRenderable() const;
 	protected:
 		uint32_t mAttrib;
 
 		SceneObject* mParent;
 		std::vector<SceneObjectPtr> mChildren;
 
+		RenderablePtr mRenderable;
+		bool mRenderableHWResReady;
+
 		float4x4 mWorldMatrix;
 		float4x4 mLocalMatrix;
+
+		BoundOverlap mVisibleMark;
+
+		AABBoxPtr mAABB;
+
+
 	};
 }
 

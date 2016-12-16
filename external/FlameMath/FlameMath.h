@@ -293,6 +293,7 @@ namespace Air
 	Float3 operator* (const Float3& V, float S);
 	Float3 operator/ (const Float3& V1, const Float3& V2);
 	Float3 operator* (float S, const Float3& V);
+	Float3 operator^ (const Float3& V1, const Float3& V2);
 
 	//------------------------------------------------------------------------------
 	// 4D vector
@@ -1426,4 +1427,5 @@ namespace Air
 			return DirectX::XMFresnelTerm(CosIncidentAngle,RefractionIndex);
 		}
 	};
+#include "FlameMath.inl"
 }

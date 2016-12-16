@@ -70,9 +70,9 @@ namespace Air
 		//virtual void onResize(uint32_t width, uint32_t height);
 
 	protected:
-		/*void LookAt(float3 const & eye, float3 const & lookAt);
+		void LookAt(float3 const & eye, float3 const & lookAt);
 		void LookAt(float3 const & eye, float3 const & lookAt, float3 const & up);
-		void Proj(float nearPlane, float farPlane);*/
+		void Proj(float nearPlane, float farPlane);
 
 	protected:
 		uint32_t update(uint32_t pass);

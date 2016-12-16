@@ -10,6 +10,13 @@ namespace Air
 	public:
 		OCTree();
 
+	private:
+		virtual void onAddSceneObject(SceneObjectPtr const & obj);
+		virtual void onDelSceneObject(std::vector<SceneObjectPtr>::iterator iter);
+
+	private:
+		bool mRebuildTree;
+
 	};
 }
 

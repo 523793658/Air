@@ -52,12 +52,17 @@ namespace Air
 		void bindFrameBuffer(FrameBufferPtr const &fb);
 		FrameBufferPtr const & getDefaultFrameBuffer() const;
 
+		virtual void adjustProjectionMatrix(float4x4&);
+
 		void postProcess(bool skip);
 
 		StereoMethod getStereo() const
 		{
 			return mStereoMethod;
 		}
+
+		float getDefaultFov() const;
+		void setDefaultFov(float fov) ;
 
 	private:
 		virtual void checkConfig(RenderSettings& settings);
@@ -76,7 +81,7 @@ namespace Air
 		RenderDeviceCaps mCaps;
 
 		StereoMethod mStereoMethod;
-
+		float mDefaultFov;
 		float mDefaultRenderWidthScale;
 		float mDefaultRenderHeightScale;
 		int mFBStage;
@@ -90,7 +95,6 @@ namespace Air
 		RenderLayoutPtr mPPRenderLayout;
 
 		std::string mNativeShaderPlatformName;
-
 
 	};
 

@@ -55,6 +55,15 @@ namespace Air
 
 	}
 
+	float RenderEngine::getDefaultFov() const
+	{
+		return mDefaultFov;
+	}
+	void RenderEngine::setDefaultFov(float fov)
+	{
+		mDefaultFov = fov;
+	}
+
 	FrameBufferPtr const & RenderEngine::getScreenFrameBuffer() const
 	{
 		return mScreenFrameBuffer;
@@ -82,6 +91,11 @@ namespace Air
 	}
 
 	void RenderEngine::destroyRenderWindow()
+	{
+
+	}
+
+	void RenderEngine::adjustProjectionMatrix(float4x4&)
 	{
 
 	}

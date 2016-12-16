@@ -35,6 +35,15 @@ namespace Air
 	class SceneObject;
 	typedef std::shared_ptr<SceneObject> SceneObjectPtr;
 
+	class SceneObjectHelper;
+	typedef std::shared_ptr<SceneObjectHelper> SceneObjectHelperPtr;
+
+	class Renderable;
+	typedef std::shared_ptr<Renderable> RenderablePtr;
+
+	class RenderableHelper;
+	typedef std::shared_ptr<RenderableHelper> RenderableHelperPtr;
+
 
 
 	struct Viewport;

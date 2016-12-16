@@ -27,6 +27,9 @@ namespace Air
 	class XMLAttribute;
 	typedef std::shared_ptr<XMLAttribute> XMLAttributePtr;
 
+	typedef struct AABBox AABBox;
+	typedef std::shared_ptr<AABBox> AABBoxPtr;
+
 	class bad_join;
 	class thread_pool;
 }

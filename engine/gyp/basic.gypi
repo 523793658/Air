@@ -32,6 +32,10 @@
 				"../basic/include/ThrowErr.hpp",
 				"../basic/include/COMPtr.hpp",
 				"../basic/include/Color.hpp",
+				"../basic/include/Bound.hpp",
+				"../basic/include/Frustum.hpp",
+				"../basic/include/Plane.hpp",
+				"../basic/include/AABBBox.hpp",
 				
 				"../basic/src/Thread.cpp",
 				"../basic/src/CPP11.cpp",
@@ -46,6 +50,10 @@
 				"../basic/src/ThrowErr.cpp",
 				"../basic/src/COMPtr.cpp",
 				"../basic/src/Color.cpp",
+				"../basic/src/Bound.cpp",
+				"../basic/src/Frustum.cpp",
+				"../basic/src/Plane.cpp",
+				"../basic/src/AABBBox.cpp",
 			],
 			"conditions":[
 				[

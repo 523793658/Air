@@ -4,6 +4,7 @@
 #include "boost/noncopyable.hpp"
 #include "mutex"
 #include "basic/include/Thread.h"
+#include "basic/include/Frustum.hpp"
 namespace Air
 {
 	class AIR_CORE_API SceneManager : boost::noncopyable
@@ -17,7 +18,7 @@ namespace Air
 // 
 // 		void setSmallObjectThreshold(float area);
 // 		void sceneObjectElapse(float elapse);
-// 		virtual void clipScene();
+ 		virtual void clipScene();
 // 
 // 		void addCamera(CameraPtr const & camera);
 // 		void delCamera(CameraPtr const & camera);
@@ -26,11 +27,20 @@ namespace Air
 // 		CameraPtr& getCamera(uint32_t index);
 // 		CameraPtr const & getCamera(uint32_t index) const;
 
+		void addSceneObject(SceneObjectPtr const & obj);
+
 		void addSceneObjectLocked(SceneObjectPtr const & obj);
 
 		void update();
+
+
 	protected:
 		void flush(uint32_t urt);
+
+		virtual void onAddSceneObject(SceneObjectPtr const & obj) = 0;
+		virtual void onDelSceneObject(std::vector<SceneObjectPtr>::iterator iter) = 0;
+
+		BoundOverlap visibleTestFromParent(SceneObject* obj, float3 const & eye_pos, float4x4 const & view_proj);
 	private:
 		void flushScene();
 
@@ -55,6 +65,7 @@ namespace Air
 		std::vector<SceneObjectPtr> mOverlaySceneObjs;
 		float mSmallObjThreshold;
 		float mUpdateElapse;
+		Frustum const * mFrustum;
 	};
 }
 

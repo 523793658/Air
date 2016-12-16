@@ -61,7 +61,8 @@ namespace Air
 		ContextCfg cfg = Context::getInstance().getConfig();
 		RenderFactory& factory = Context::getInstance().getRenderFactoryInstance();
 		factory.getRenderEngineInstance().createRenderWindow(mName, cfg.mGraphicsCfg);
-
+		Context::getInstance().setConfig(cfg);
+		this->onCreate();
 	}
 
 	WindowPtr App3DFramework::makeWindow(std::string const & name, RenderSettings const & settings)
@@ -144,5 +145,23 @@ namespace Air
 			//this->updates
 		}
 		return this->doUpdate(pass);
+	}
+
+	void App3DFramework::LookAt(float3 const & eye, float3 const & lookAt)
+	{
+		this->getActiveCamera().setViewParams(eye, lookAt);
+	}
+	void App3DFramework::LookAt(float3 const & eye, float3 const & lookAt, float3 const & up)
+	{
+		this->getActiveCamera().setViewParams(eye, lookAt, up);
+	}
+	void App3DFramework::Proj(float nearPlane, float farPlane)
+	{
+		BOOST_ASSERT(nearPlane != 0);
+		BOOST_ASSERT(farPlane != 0);
+		RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		FrameBuffer& fb = *re.getCurrentFrameBuffer();
+
+		this->getActiveCamera().setProjParams(re.getDefaultFov(), static_cast<float>(fb.getWidth()) / fb.getHeight(), nearPlane, farPlane);
 	}
 }

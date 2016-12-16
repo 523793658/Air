@@ -43,6 +43,8 @@
 				"../rendersystem/include/Texture.hpp",
 				"../rendersystem/include/RenderLayout.hpp",
 				"../rendersystem/include/Mesh.hpp",
+				"../rendersystem/include/Renderable.hpp",
+				"../rendersystem/include/RenderableHelper.hpp",
 				
 				"../rendersystem/src/RenderSettings.cpp",
 				"../rendersystem/src/RenderFactory.cpp",
@@ -53,6 +55,8 @@
 				"../rendersystem/src/Texture.cpp",
 				"../rendersystem/src/RenderLayout.cpp",
 				"../rendersystem/src/Mesh.cpp",
+				"../rendersystem/src/Renderable.cpp",
+				"../rendersystem/src/RenderableHelper.cpp",
 				
 				"../scene_manager/include/SceneManager.hpp",
 				"../scene_manager/include/SceneObject.hpp",

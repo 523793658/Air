@@ -3,7 +3,6 @@
 #pragma once
 
 
-const float MathHelper::Pi = 3.1415926f;
 
 #pragma region Float2
 /****************************************************************************
@@ -545,6 +544,12 @@ inline Float3 operator* (float S, const Float3& V)
 {
 	return Float3(V.x * S,V.y * S,V.z * S);
 }
+
+inline Float3 operator^ (const Float3& V1, const Float3& V2)
+{
+	return Float3(V1.y * V2.z - V1.z * V2.y, V1.z * V2.x - V1.x * V2.z, V1.x * V2.y - V1.y * V2.x);
+}
+
 
 //------------------------------------------------------------------------------
 // Vector operations

@@ -19,6 +19,10 @@
 			'includes': [
 				'sample_common.gypi',
 			],
+			"dependencies": [
+				'basic',
+				'engine',
+			],
 			'sources': [
 				'../sample/include/RenderOneBall.hpp',
 				'../sample/src/RenderOneBall.cpp',

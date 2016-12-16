@@ -2,7 +2,10 @@
 #define _Basic_Math_H_
 #pragma once
 #include <algorithm>
+#include <functional>
 #include "FlameMath.h"
+#include "basic/include/AABBBox.hpp"
+
 namespace Air
 {
 #ifdef FLAMEMATH
@@ -45,9 +48,9 @@ namespace Air
 
 	enum BoundOverlap
 	{
-		BO_Yes,
 		BO_No,
-		BO_Partial
+		BO_Partial,
+		BO_Yes
 	};
 
 	namespace MathLib
@@ -241,6 +244,29 @@ namespace Air
 		float cosh(float x) AIR_NOEXCEPT;
 		float tanh(float x) AIR_NOEXCEPT;
 
+		float perspective_area(float3 eye_pos, float4x4 view_proj, AABBox const & aabbox);
+
+#ifdef FLAMEMATH
+#else
+		float4x4 scaling(float const & sx, float const & sy, float const & sz) AIR_NOEXCEPT;
+		float4x4 translation(float const & tx, float const & ty, float const &tz) AIR_NOEXCEPT;
+
+		float4x4 buildViewMatrixLH(float3 const & vEye, float3 const & vAt, float3 const & vUp)AIR_NOEXCEPT;
+
+		float4x4 buildProjMatrixLH(float fov, float aspect, float near_plane, float far_plane)AIR_NOEXCEPT;
+
+		float4x4 buildProjMatrixLH(float const & left, float const & right, float const bottom, float const & top, float const &nearPlane, float const & farPlane)AIR_NOEXCEPT;
+
+		float4x4 buildProjOrthoMatrixLH(float const & w, float const & h, float const & nearPlane, float const & farPlane) AIR_NOEXCEPT;
+
+		float4x4 buildProjOrthoMatrixLH(float const & left, float const & right, float const & bottom, float const & top, float const & nearPlane, float const & farPlane) AIR_NOEXCEPT;
+
+#endif // DEBUG
+
+
+
+
+		
 	}
 }
 #endif
