@@ -1,5 +1,12 @@
 #ifndef _UTIL_H_
 #define _UTIL_H_
+#include "basic/include/PreDeclare.h"
+#include <string>
+#include "boost/assert.hpp"
+
+
+#define AIR_UNUSED(x) (void)(x)
+
 #ifdef AIR_DEBUG
 #define AIR_DBG_SUFFIX "_d"
 #else
@@ -36,6 +43,53 @@ namespace Air
 		return MakeUniquePtrHelper<T>(std::is_array<T>(), std::forward<Args>(args)...);
 	}
 
+	std::string readShortString(ResIdentifierPtr const & res);
+
+
+	// EndianµÄ×ª»»
+	template <int size>
+	void EndianSwitch(void* p);
+
+	template<typename T>
+	T Native2BE(T x)
+	{
+#ifdef AIR_LITTLE_ENDIAN
+		EndianSwitch<sizeof(T)>(&x);
+#else
+		AIR_UNUSED(x);
+#endif
+		return x;
+	}
+
+	template<typename T>
+	T Native2LE(T x)
+	{
+#ifdef AIR_LITTLE_ENDIAN
+		AIR_UNUSED(x);
+#
+		EndianSwitch<sizeof(T)>(&x);
+#endif
+		return x;
+	}
+
+	template<typename T>
+	T BE2Native(T x)
+	{
+		return Native2BE(x);
+	}
+
+	template <typename T>
+	T LE2Native(T x)
+	{
+		return Native2LE(x);
+	}
+
+	template<uint8_t ch0, uint8_t ch1, uint8_t ch2, uint8_t ch3>
+	struct MakeFourCC
+	{
+		enum { value = (ch0 << 0) + (ch1 << 8) + (ch2 << 16) + (ch3 << 24) };
+	};
+
 	std::string& convert(std::string& strDest, std::string const & strSrc);
 	std::string& convert(std::string& strDest, std::wstring const & wstrSrc);
 	std::wstring& convert(std::wstring & wstrDest, std::string const & strSrc);
@@ -48,6 +102,14 @@ namespace Air
 		BOOST_ASSERT(dynamic_cast<To>(p) == static_cast<To>(p));
 		return static_cast<To>(p);
 	}
+
+	template<typename To, typename From>
+	inline std::shared_ptr<T>
+		checked_pointer_cast(std::shared_ptr<From> const & p)
+		{
+			BOOST_ASSERT(std::dynamic_pointer_cast<To>(p) == std::static_pointer_cast<To>(p));
+			return std::static_pointer_cast<To>(p);
+		}
 
 #define PRIME_NUM 0x9e3779b9
 

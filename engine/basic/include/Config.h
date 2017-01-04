@@ -175,6 +175,24 @@
 defined AIR_CPU_ARM64
 #endif
 
-#define FLAMEMATH
+//#define FLAMEMATH
+
+#if defined(AIR_CPU_ARM) || defined(AIR_CPU_ARM64)
+#if defined(__BIG_ENDIAN__) || defined(__ARMEB__) || defined(__THUMBEB__) || defined(__AARCH64EB__)
+#define AIR_BIG_ENDIAN
+#else
+#define  AIR_LITTLE_ENDIAN
+#endif
+#elif defined(AIR_CPU_X86) || defined(AIR_CPU_X64) || defined(AIR_PLATFORM_WINDOWS)
+#define AIR_LITTLE_ENDIAN
+#else
+#error "Unknown CPU endian."
+#endif
+
+#if defined(AIR_PLATFORM_WINDOWS_DESKTOP) || defined(AIR_PLATFORM_LINUX) || defined(AIR_PLATFORM_DARWIN)
+#define AIR_IS_DEV_PLATFORM	1
+#else
+#define AIR_IS_DEV_PLATFORM 0
+#endif
 
 #endif

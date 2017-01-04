@@ -65,7 +65,7 @@ namespace Air
 	}
 	void D3D11RenderTargetRenderView::clearColor(Color const &clr)
 	{
-		mD3DImmContext->ClearRenderTargetView(mRenderTargetView.get(), clr);
+		mD3DImmContext->ClearRenderTargetView(mRenderTargetView.get(), &clr.r());
 	}
 
 	void D3D11RenderTargetRenderView::clearDepth(float depth)

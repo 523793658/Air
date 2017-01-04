@@ -3,19 +3,10 @@
 #pragma once
 #include <algorithm>
 #include <functional>
-#include "FlameMath.h"
+#include "PreDeclare.h"
 
 namespace Air
 {
-#ifdef FLAMEMATH
-	typedef Float2 float2;
-	typedef Float4 float4;
-	typedef Float3 float3;
-	typedef Int2 int2;
-	typedef Uint4 uint4;
-
-	typedef Float4x4 float4x4;
-#endif
 	// 常量定义
 	/////////////////////////////////////////////////////////////////////////////////
 	float const PI = 3.141592f;			// PI
@@ -243,31 +234,104 @@ namespace Air
 		float cosh(float x) AIR_NOEXCEPT;
 		float tanh(float x) AIR_NOEXCEPT;
 
-		float perspective_area(float3 eye_pos, float4x4 view_proj, AABBox const & aabbox);
+		template <typename T>
+		typename T::value_type dot(T const & lhs, T const & rhs) AIR_NOEXCEPT;
 
-		BoundOverlap intersect_aabb_frustum(AABBox const aabb, Frustum const & frustum);
+		template <typename T>
+		Vector_T<T, 3> cross(Vector_T<T, 3> const & lhs, Vector_T<T, 3> const & rhs) AIR_NOEXCEPT;
 
-#ifdef FLAMEMATH
-#else
-		float4x4 scaling(float const & sx, float const & sy, float const & sz) AIR_NOEXCEPT;
-		float4x4 translation(float const & tx, float const & ty, float const &tz) AIR_NOEXCEPT;
+		template<typename T>
+		typename T::value_type length_sq(T const & rhs) AIR_NOEXCEPT;
 
-		float4x4 buildViewMatrixLH(float3 const & vEye, float3 const & vAt, float3 const & vUp)AIR_NOEXCEPT;
+		template <typename T>
+		typename T::value_type length(T const & rhs) AIR_NOEXCEPT;
 
-		float4x4 buildProjMatrixLH(float fov, float aspect, float near_plane, float far_plane)AIR_NOEXCEPT;
+		template<typename T>
+		T transform_coord(T const & v, Matrix4_T<typename T::value_type> const & mat) AIR_NOEXCEPT;
 
-		float4x4 buildProjMatrixLH(float const & left, float const & right, float const bottom, float const & top, float const &nearPlane, float const & farPlane)AIR_NOEXCEPT;
+		template<typename T>
+		T normalize(T const & rhs) AIR_NOEXCEPT;
 
-		float4x4 buildProjOrthoMatrixLH(float const & w, float const & h, float const & nearPlane, float const & farPlane) AIR_NOEXCEPT;
+		template<typename T>
+		Plane_T<T> normalize(Plane_T<T> const & rhs) AIR_NOEXCEPT;
 
-		float4x4 buildProjOrthoMatrixLH(float const & left, float const & right, float const & bottom, float const & top, float const & nearPlane, float const & farPlane) AIR_NOEXCEPT;
+		template <typename T>
+		T dot_coord(Plane_T<T> const & lhs, Vector_T<T, 3> const & rhs) AIR_NOEXCEPT;
 
-#endif // DEBUG
+		template<typename T>
+		bool intersect_point_frustum(Vector_T<T, 3> const & v, Frustum_T<T> const & frustum) AIR_NOEXCEPT;
+
+		template<typename T>
+		bool intersect_aabb_aabb(AABBox_T<T> const & lhs, AABBox_T<T> const & aabb) AIR_NOEXCEPT;
+
+		template <typename T>
+		BoundOverlap intersect_aabb_frustum(AABBox_T<T> const & lhs, Frustum_T<T> const & frustum) AIR_NOEXCEPT;
+
+		template <typename T>
+		BoundOverlap intersect_frustum_frustum(Frustum_T<T> const & lhs, Frustum_T<T> const & frustum) AIR_NOEXCEPT;
 
 
 
+		template<typename T>
+		Color_T<T>	negative(Color_T<T> const & rhs) AIR_NOEXCEPT;
 
-		
+		template <typename T>
+		T determinant(Matrix4_T<T> const & rhs) AIR_NOEXCEPT;
+
+		template<typename T>
+		Color_T<T> modulate(Color_T<T> const & lhs, Color_T<T> const & rhs) AIR_NOEXCEPT;
+
+		template<typename T>
+		Matrix4_T<T> scaling(T const & sx, T const & sy, T const & sz) AIR_NOEXCEPT;
+
+
+		template<typename T>
+		Matrix4_T<T> scaling(Vector_T<T, 3> const & s) AIR_NOEXCEPT;
+
+		template<typename T>
+		Matrix4_T<T> translation(T const & tx, T const & ty, T const & tz) AIR_NOEXCEPT;
+
+
+		template<typename T>
+		Matrix4_T<T> translation(Vector_T<T, 3> const & t) AIR_NOEXCEPT;
+
+		template<typename T>
+		Quaternion_T<T> mul(Quaternion_T<T> const & lhs, Quaternion_T<T> const & rhs) AIR_NOEXCEPT;
+
+		template <typename T>
+		Matrix4_T<T> mul(Matrix4_T<T> const & lhs, Matrix4_T<T> const & rhs) AIR_NOEXCEPT;
+
+		template <typename T>
+		Matrix4_T<T> inverse(Matrix4_T<T> const & rhs) AIR_NOEXCEPT;
+
+		template<typename T>
+		Matrix4_T<T> look_at_lh(Vector_T<T, 3> const &vEye, Vector_T<T, 3> const & vAt) AIR_NOEXCEPT;
+
+		template<typename T>
+		Matrix4_T<T> look_at_lh(Vector_T<T, 3> const & vEye, Vector_T<T, 3> const & vAt, Vector_T<T, 3> const &vUp) AIR_NOEXCEPT;
+
+		template <typename T>
+		Matrix4_T<T> perspective_fov_lh(T const & fov, T const & aspect, T const & nearPlane, T const & farPlane) AIR_NOEXCEPT;
+
+		template <typename T>
+		Matrix4_T<T> ortho_lh(T const & w, T const & h, T const & nearPlane, T const & farPlane) AIR_NOEXCEPT;
+
+		template <typename T>
+		Matrix4_T<T> ortho_off_center_lh(T const & left, T const & right, T const & bottom, T const & top,
+			T const & nearPlane, T const & farPlane) AIR_NOEXCEPT;
+
+		template <typename T>
+		T perspective_area(Vector_T<T, 3> const & view_pos, Matrix4_T<T> const & view_proj, AABBox_T<T> const & aabbox) AIR_NOEXCEPT;
 	}
 }
+
+#include "basic/include/Vector.hpp"
+#include "basic/include/Bound.hpp"
+#include "basic/include/Plane.hpp"
+#include "basic/include/AABBBox.hpp"
+#include "basic/include/Frustum.hpp"
+#include "basic/include/Matrix.hpp"
+
+
+
 #endif

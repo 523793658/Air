@@ -6,6 +6,9 @@
 #include "rendersystem/include/FrameBuffer.hpp"
 #include "scene_manager/include/SceneObject.hpp"
 #include "boost/functional/hash.hpp"
+#include "rendersystem/include/Renderable.hpp"
+#include "rendersystem/include/RenderEffect.hpp"
+#include <map>
 
 #include "scene_manager/include/SceneManager.hpp"
 
@@ -57,7 +60,7 @@ namespace Air
 			{
 				if (mSceneObjs[i]->isVisible())
 				{
-					visible_list[i / 32] != (1UL << (i & 31));
+					visible_list[i / 32] |= (1UL << (i & 31));
 				}
 			}
 			size_t seed = 0;
@@ -69,8 +72,82 @@ namespace Air
 			if (vmiter == mVisibleMarksMap.end())
 			{
 				this->clipScene();
+				std::shared_ptr<std::vector<BoundOverlap>> visible_marks
+					= MakeSharedPtr<std::vector<BoundOverlap>>(scene_objs.size());
+				for (size_t i = 0; i < scene_objs.size(); ++i)
+				{
+					(*visible_marks)[i] = scene_objs[i]->getVisibleMark();
+				}
+				mVisibleMarksMap.emplace(seed, visible_marks);
+			}
+			else
+			{
+				for (size_t i = 0; i < scene_objs.size(); ++i)
+				{
+					scene_objs[i]->setVisibleMark((*vmiter->second)[i]);
+				}
 			}
 		}
+		if (urt & App3DFramework::URV_Overlay)
+		{
+			for (auto const & scene_obj : scene_objs)
+			{
+				scene_obj->mainThreadUpdate(app_time, frame_time);
+				scene_obj->setVisibleMark(scene_obj->isVisible() ? BO_Yes : BO_No);
+			}
+		}
+		std::vector<std::pair<Renderable*, std::vector<SceneObject*>>> renderables;
+		{
+			std::map<Renderable*, size_t> renderables_map;
+			for (auto const & obj : scene_objs)
+			{
+				auto so = obj.get();
+				if ((so->getVisibleMark() != BO_No) && (0 == so->getNumChildren()))
+				{
+					auto renderable = so->getRenderable().get();
+					if (renderable)
+					{
+						auto iter = renderables_map.lower_bound(renderable);
+						if ((iter != renderables_map.end()) && (iter->first == renderable))
+						{
+							renderables[iter->second].second.push_back(so);
+						}
+						else
+						{
+							renderables_map.emplace(renderable, renderables.size());
+							renderables.emplace_back(renderable, std::vector<SceneObject*>(1, so));
+						}
+						++mNumObjectsRendered;
+					}
+				}
+			}
+		}
+		for (auto const & renderable : renderables)
+		{
+			Renderable& ra(*renderable.first);
+			ra.assignInstances(renderable.second.begin(), renderable.second.end());
+			ra.addToRenderQueue();
+		}
+		std::sort(mRenderQueue.begin(), mRenderQueue.end(), [](std::pair<RenderTechnique const *, std::vector<Renderable*>> const & lhs,
+			std::pair<RenderTechnique const *, std::vector<Renderable*>> const & rhs)
+		{
+			BOOST_ASSERT(lhs.first);
+			BOOST_ASSERT(rhs.first);
+			return lhs.first->getWeight() < rhs.first->getWeight();
+		});
+		float4 const & view_mat_z = camera.getViewMatrix().col(2);
+		for (auto & items : mRenderQueue)
+		{
+			for (auto const & item : items.second)
+			{
+				item->render();
+			}
+			mNumRenderablesRendered += static_cast<uint32_t>(items.second.size());
+		}
+		mRenderQueue.resize(0);
+		mNumPrimitivesRendered += re.getNumPrimitivesJustRendered();
+		mNumVerticesRendered += re.getNumVerticesJustRendered();
+		urt = 0;
 	}
 
 	BoundOverlap SceneManager::visibleTestFromParent(SceneObject* obj, float3 const & eye_pos, float4x4 const & view_proj)
@@ -92,10 +169,19 @@ namespace Air
 				}
 				if (attr & SceneObject::SOA_Cullable)
 				{
-					visible = MathLib::perspective_area(eye_pos, view_proj, obj->getAABB()
+					visible = MathLib::perspective_area(eye_pos, view_proj, obj->getAABB()) > mSmallObjThreshold ? parent_bo : BO_No;
+				}
+				else
+				{
+					visible = parent_bo;
 				}
 			}
 		}
+		else
+		{
+			visible = BO_Partial;
+		}
+		return visible;
 	}
 
 	void SceneManager::clipScene()
@@ -108,10 +194,34 @@ namespace Air
 			auto so = obj.get();
 			BoundOverlap visible;
 			uint32_t const attr = so->getAttrib();
-			if (so->isVisible());
+			if (so->isVisible())
 			{
-				visible = this->Visible
+				visible = this->visibleTestFromParent(so, camera.getEyePos(), viewProjMat);
+				if (BO_Partial == visible)
+				{
+					if (attr & SceneObject::SOA_Moveable) 
+					{
+						so->updateWorldMatrix();
+					}
+					if (attr & SceneObject::SOA_Cullable)
+					{
+						visible = (MathLib::perspective_area(camera.getEyePos(), viewProjMat, so->getAABB()) > mSmallObjThreshold) ? BO_Yes : BO_No;
+					}
+					else
+					{
+						visible = BO_Yes;
+					}
+					if (!camera.getOmniDirectionalMode() && (attr & SceneObject::SOA_Cullable) && (BO_Yes == visible))
+					{
+						visible = this->testAABBVisible(so->getAABB());
+					}
+				}
 			}
+			else
+			{
+				visible = BO_No;
+			}
+			so->setVisibleMark(visible);
 		}
 	}
 

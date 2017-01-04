@@ -37,6 +37,9 @@
 				"../basic/include/Plane.hpp",
 				"../basic/include/AABBBox.hpp",
 				"../basic/include/Vector.hpp",
+				"../basic/include/MathHelper.hpp",
+				"../basic/include/Matrix.hpp",
+				"../basic/include/Quaternion.hpp",
 				
 				"../basic/src/Thread.cpp",
 				"../basic/src/CPP11.cpp",
@@ -56,6 +59,9 @@
 				"../basic/src/Plane.cpp",
 				"../basic/src/AABBBox.cpp",
 				"../basic/src/Vector.cpp",
+				"../basic/src/MathHelper.cpp",
+				"../basic/src/Matrix.cpp",
+				"../basic/src/Quaternion.cpp",
 			],
 			"conditions":[
 				[

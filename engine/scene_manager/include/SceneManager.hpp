@@ -26,12 +26,25 @@ namespace Air
 // 		uint32_t getNumCameras() const;
 // 		CameraPtr& getCamera(uint32_t index);
 // 		CameraPtr const & getCamera(uint32_t index) const;
+		void addRenderable(Renderable* obj);
 
 		void addSceneObject(SceneObjectPtr const & obj);
 
 		void addSceneObjectLocked(SceneObjectPtr const & obj);
 
 		void update();
+
+		BoundOverlap testAABBVisible(AABBox const & aabb) const
+		{
+			if (mFrustum)
+			{
+				return mFrustum->intersect(aabb);
+			}
+			else
+			{
+				return BO_Yes;
+			}
+		}
 
 
 	protected:
@@ -46,6 +59,9 @@ namespace Air
 
 	private:
 		uint32_t mURT;
+
+		std::vector<std::pair<RenderTechnique const *, std::vector<Renderable*>>> mRenderQueue;
+
 		uint32_t mNumObjectsRendered;
 		uint32_t mNumRenderablesRendered;
 		uint32_t mNumPrimitivesRendered;

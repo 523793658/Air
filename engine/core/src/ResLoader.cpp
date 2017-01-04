@@ -306,4 +306,72 @@ namespace Air
 		}
 		return *mInstance;
 	}
+
+	std::shared_ptr<void> ResLoader::syncQuery(ResLoadingDescPtr const & res_desc)
+	{
+		this->removeUnrefResources();
+		std::shared_ptr<void> loaded_res = this->findMatchLoadedResource(res_desc);
+		std::shared_ptr<void> res;
+		if (loaded_res)
+		{
+			if (res_desc->getStateLess())
+			{
+				res = loaded_res;
+			}
+			else
+			{
+				res = res_desc->cloneResourceFrom(loaded_res);
+				if (res != loaded_res)
+				{
+					this->addLoadedResource(res_desc, res);
+				}
+			}
+		}
+		else
+		{
+			std::shared_ptr<volatile LoadingStatus> async_is_done;
+			bool found = false;
+			{
+				std::lock_guard<std::mutex> lock(mLoadingMutex);
+				for (auto const & lrq : mLoadingRes)
+				{
+					if (lrq.first->match(*res_desc))
+					{
+						res_desc->copyDataFrom(*lrq.first);
+						res = lrq.first->getResource();
+						async_is_done = lrq.second;
+						found = true;
+						break;
+					}
+				}
+			}
+			if (found)
+			{
+				if (!res_desc->getStateLess())
+				{
+					std::lock_guard<std::mutex> lock(mLoadingMutex);
+					mLoadingRes.emplace_back(res_desc, async_is_done);
+				}
+			}
+			else
+			{
+				if (res_desc->hasSubThreadStage())
+				{
+					res = res_desc->createResource();
+					async_is_done = MakeSharedPtr<LoadingStatus>(LS_Loading);
+					{
+						std::lock_guard<std::mutex> lock(mLoadingMutex);
+						mLoadingRes.emplace_back(res_desc, async_is_done);
+					}
+					mLoadingResQueue.push(std::make_pair(res_desc, async_is_done));
+				}
+				else
+				{
+					res = res_desc->mainThreadStage();
+					this->addLoadedResource(res_desc, res);
+				}
+			}
+		}
+		return res;
+	}
 }

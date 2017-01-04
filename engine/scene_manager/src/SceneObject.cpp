@@ -5,8 +5,14 @@
 namespace Air
 {
 	SceneObject::SceneObject(uint32_t attrib)
+		:mAttrib(attrib), mParent(nullptr), mRenderableHWResReady(false),
+		mLocalMatrix(float4x4::identify()), mWorldMatrix(float4x4::identify()),
+		mVisibleMark(BO_No)
 	{
-
+		if (!(attrib & SOA_Overlay) && (attrib & (SOA_Cullable | SOA_Moveable)))
+		{
+			mAABB = MakeSharedPtr<AABBox>();
+		}
 	}
 	SceneObject::~SceneObject()
 	{
@@ -50,8 +56,7 @@ namespace Air
 
 	AABBox& SceneObject::getAABB()
 	{
-		AABBox& a = *mAABB;
-
+		return *mAABB;
 	}
 
 	bool SceneObject::mainThreadUpdate(float app_time, float elapsed_time)
@@ -86,6 +91,11 @@ namespace Air
 		}
 	}
 
+	AABBox const & SceneObject::getAABB() const
+	{
+		return *mAABB;
+	}
+
 	uint32_t SceneObject::getAttrib() const
 	{
 		return mAttrib;
@@ -114,8 +124,8 @@ namespace Air
 		return mWorldMatrix;
 	}
 
-	Renderable const & SceneObject::getRenderable() const
+	RenderablePtr const & SceneObject::getRenderable() const
 	{
-		return *mRenderable;
+		return mRenderable;
 	}
 }

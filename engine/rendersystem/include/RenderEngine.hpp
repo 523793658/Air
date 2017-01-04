@@ -56,6 +56,11 @@ namespace Air
 
 		void postProcess(bool skip);
 
+		uint32_t getNumMotionFrames() const
+		{
+			return mMotionFrames;
+		}
+
 		StereoMethod getStereo() const
 		{
 			return mStereoMethod;

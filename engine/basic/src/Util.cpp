@@ -53,5 +53,44 @@ namespace Air
 		wstrDst = wstrSrc;
 		return wstrDst;
 	}
+
+	template<>
+	void EndianSwitch<2>(void* p)
+	{
+		uint8_t* bytes = static_cast<uint8_t*>(p);
+		std::swap(bytes[0], bytes[1]);
+	}
+
+	template<>
+	void EndianSwitch<4>(void* p)
+	{
+		uint8_t* bytes = static_cast<uint8_t*>(p);
+		std::swap(bytes[0], bytes[3]);
+		std::swap(bytes[1], bytes[2]);
+	}
+
+	template<>
+	void EndianSwitch<8>(void* p)
+	{
+		uint8_t* bytes = static_cast<uint8_t*>(p);
+		std::swap(bytes[0], bytes[7]);
+		std::swap(bytes[1], bytes[6]);
+		std::swap(bytes[2], bytes[5]);
+		std::swap(bytes[3], bytes[4]);
+
+	}
+
+	std::string readShortString(ResIdentifierPtr const & res)
+	{
+		uint8_t len;
+		res->read(&len, sizeof(len));
+		std::string tmp;
+		if (len > 0)
+		{
+			tmp.resize(len);
+			res->read(&tmp[0], len * sizeof(tmp[0]));
+		}
+		return tmp;
+	}
 }
 

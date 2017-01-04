@@ -2,12 +2,12 @@
 #define _BASIC_H_
 #pragma once
 
-#include "Config.h"
-#include "Types.h"
-#include "PreDeclare.h"
+#include "basic/include/Config.h"
+#include "basic/include/Types.h"
+#include "basic/include/PreDeclare.h"
 #include <array>
-#include "Math.hpp"
-#include "Color.hpp"
+#include "basic/include/Math.hpp"
+#include "basic/include/Color.hpp"
 
 
 
