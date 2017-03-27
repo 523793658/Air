@@ -39,9 +39,15 @@ namespace Air
 		virtual void subThreadStage() = 0;
 		virtual std::shared_ptr<void> mainThreadStage() = 0;
 
+		virtual std::shared_ptr<void> createResource()
+		{
+			return std::shared_ptr<void>();
+		}
+
 		virtual bool hasSubThreadStage() const = 0;
 
 		virtual bool match(ResLoadingDesc const & rhs) const = 0;
+		virtual void copyDataFrom(ResLoadingDesc const & rhs) = 0;
 		virtual std::shared_ptr<void> cloneResourceFrom(std::shared_ptr<void> const& resource) = 0;
 
 		virtual std::shared_ptr<void> getResource() const = 0;
@@ -67,9 +73,22 @@ namespace Air
 		ResIdentifierPtr open(std::string const & name);
 		std::string locate(std::string const & name);
 		ResIdentifierPtr LocatePkt(std::string const & name, std::string const & res_name, std::string& password, std::string& internal_name);
+
+
+		std::shared_ptr<void> syncQuery(ResLoadingDescPtr const & res_desc);
+
+		template<typename T>
+		std::shared_ptr<T> syncQueryT(ResLoadingDescPtr const & res_desc)
+		{
+			return std::static_pointer_cast<T>(this->syncQuery(res_desc));
+		}
 	private:
 		std::string getRealPath(std::string const & path);
 		void loadingThreadFunc();
+		void removeUnrefResources();
+		std::shared_ptr<void> findMatchLoadedResource(ResLoadingDescPtr const & res_desc);
+
+		void addLoadedResource(ResLoadingDescPtr const & res_desc, std::shared_ptr<void> const & res);
 	private:
 		static std::unique_ptr<ResLoader> mInstance;
 
@@ -84,9 +103,10 @@ namespace Air
 		std::vector<std::string> mPaths;
 		std::mutex pathsMutex;
 
-		std::mutex loadedMutex;
-		std::mutex loadingMutex;
+		std::mutex mLoadedMutex;
+		std::mutex mLoadingMutex;
 
+		std::vector<std::pair<ResLoadingDescPtr, std::shared_ptr<volatile LoadingStatus>>> mLoadingRes;
 		boost::lockfree::spsc_queue<std::pair<ResLoadingDescPtr, std::shared_ptr<volatile LoadingStatus>>, boost::lockfree::capacity<1024>> mLoadingResQueue;
 
 		std::unique_ptr<joiner<void>> mLoadingThread;

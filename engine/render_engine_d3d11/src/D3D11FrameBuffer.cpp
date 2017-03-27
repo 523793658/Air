@@ -15,7 +15,6 @@ namespace Air
 		mViewport->mTop = mTop;
 		mD3DViewport.MinDepth = 0.0f;
 		mD3DViewport.MaxDepth = 1.0f;
-		Color32 r;
 
 	}
 	D3D11FrameBuffer::~D3D11FrameBuffer()

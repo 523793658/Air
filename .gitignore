@@ -3,3 +3,7 @@ test_build/
 *.idb
 *.fxo
 *.pdb
+*.exe
+*.ilk
+*.lib
+*.dll

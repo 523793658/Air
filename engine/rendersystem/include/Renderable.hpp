@@ -124,7 +124,103 @@ namespace Air
 		Renderable();
 		virtual ~Renderable();
 
+		virtual RenderEffectPtr const & getRenderEffect() const
+		{
+			return mEffect;
+		}
+
+		virtual RenderTechnique* getRenderTechnique() const
+		{
+			return mTechnique;
+		}
+
+		virtual RenderLayout& getRenderLayout() const = 0;
+
+		virtual std::wstring const & getName() const = 0;
+
+		virtual void onRenderBegin();
+		virtual void onRenderEnd();
+
+		virtual void onInstanceBegin(uint32_t id);
+		virtual void onInstanceEnd(uint32_t id);
+
+		virtual AABBox const & getAABB() const = 0;
+		virtual AABBox const & getTexcoordAABB() const = 0;
+
+		void addInstance(SceneObject const * obj);
+
+		virtual void addToRenderQueue();
+
+		virtual void render();
+		
+
+		template<typename Iterator>
+		void assignInstances(Iterator begin, Iterator end)
+		{
+			mInstances.resize(0);
+			for (Iterator iter = begin; iter != end; ++iter)
+			{
+				this->addInstance(*iter);
+			}
+		}
+
+		uint32_t getNumInstances() const
+		{
+			return static_cast<uint32_t>(mInstances.size());
+		}
+
+		SceneObject const * getInstance(uint32_t index) const
+		{
+			return mInstances[index];
+		}
+
+		virtual void setLocalMatrix(float4x4 const & mat);
+
+		template<typename ForwardIterator>
+		void assignSubrenderable(ForwardIterator first, ForwardIterator last)
+		{
+			mSubRenderables.assign(first, last);
+			this->updateAABB();
+		}
+
+		RenderablePtr const & getSubRenderable(size_t id) const
+		{
+			return mSubRenderables[id];
+		}
+
+		uint32_t getNumSubRenderables() const
+		{
+			return static_cast<uint32_t>(mSubRenderables.size());
+		}
+
+		virtual bool isHWResourceReady() const
+		{
+			return true;
+		}
+
+
+		bool isAllHWResourceReady() const;
+
+		virtual void setObjectID(uint32_t id);
+
+
+
+
 		virtual bool getHWResourceReady() const;
+
+
+	protected:
+		virtual void updateAABB();
+
+		virtual void updateInstanceStream();
+
+	protected:
+		std::vector<SceneObject const *> mInstances;
+
+		RenderEffectPtr mEffect;
+		RenderTechnique* mTechnique;
+
+		std::vector<RenderablePtr> mSubRenderables;
 	};
 }
 

@@ -12,15 +12,26 @@ namespace Air
 		CM_Omni = 1UL << 1
 	};
 
+	Camera::Camera()
+		:mViewProjMatDirty(true), mViewProjMatrixWoAdjustDirty(true), mFrustumDirty(true), mMode(0), mCurJitterIndex(0)
+	{
+		RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		uint32_t num_motion_frames = re.getNumMotionFrames();
+		mPrevProjMats.resize(num_motion_frames);
+		mPrevProjMats.resize(num_motion_frames);
+		this->setViewParams(float3(0, 0, 0), float3(0, 0, 1), float3(0, 1, 0));
+		this->setProjParams(PI / 4, 1, 1, 1000);
+	}
+
 	void Camera::setViewParams(float3 const & eye_pos, float3 const & look_at)
 	{
 		this->setViewParams(eye_pos, look_at, float3(0.0f, 1.0f, 0.0f));
 	}
 	void Camera::setViewParams(float3 const & eye_pos, float3 const & look_at, float3 const & up_vec)
 	{
-		mLookDistance = (look_at - eye_pos).Length();
-		mViewMatrix = float4x4::CreateLookAt(eye_pos, look_at, up_vec);
-		mInvViewMatrix = mViewMatrix.Invert();
+		mLookDistance = (look_at - eye_pos).length();
+		mViewMatrix = float4x4::createLookAtLH(eye_pos, look_at, up_vec);
+		mInvViewMatrix = mViewMatrix.inverse();
 		mViewProjMatDirty = true;
 		mViewProjMatrixWoAdjustDirty = true;
 		mFrustumDirty = true;
@@ -33,13 +44,13 @@ namespace Air
 		mNearPlane = near_plane;
 		mFarPlane = far_plane;
 
-		mProjectMatrix = float4x4::CreatePerspectiveFieldOfView(fov, aspect, near_plane, far_plane);
+		mProjectMatrix = float4x4::createPerspectiveFOVLH(fov, aspect, near_plane, far_plane);
 		mProjectMatrixWoAdjust = mProjectMatrix;
 
 		RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		re.adjustProjectionMatrix(mProjectMatrix);
-		mInvProjectMatrix = mProjectMatrix.Invert();
-		mInvProjectMatrixWoAdjust = mProjectMatrixWoAdjust.Invert();
+		mInvProjectMatrix = mProjectMatrix.inverse();
+		mInvProjectMatrixWoAdjust = mProjectMatrixWoAdjust.inverse();
 		mViewProjMatDirty = true;
 		mViewProjMatrixWoAdjustDirty = true;
 		mFrustumDirty = true;
@@ -52,12 +63,12 @@ namespace Air
 		mNearPlane = near_plane;
 		mFarPlane = far_plane;
 
-		mProjectMatrix = float4x4::CreateOrthographic(w, h, near_plane, far_plane);
+		mProjectMatrix = float4x4::createOrthoLH(w, h, near_plane, far_plane);
 		mProjectMatrixWoAdjust = mProjectMatrix;
 		RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		re.adjustProjectionMatrix(mProjectMatrix);
-		mInvProjectMatrix = mProjectMatrix.Invert();
-		mInvProjectMatrixWoAdjust = mProjectMatrixWoAdjust.Invert();
+		mInvProjectMatrix = mProjectMatrix.inverse();
+		mInvProjectMatrixWoAdjust = mProjectMatrixWoAdjust.inverse();
 		mViewProjMatDirty = true;
 		mViewProjMatrixWoAdjustDirty = true;
 		mFrustumDirty = true;
@@ -69,13 +80,13 @@ namespace Air
 		mNearPlane = near_plane;
 		mFarPlane = far_plane;
 
-		mProjectMatrix = float4x4::CreateOrthographicOffCenter(left, right, bottom, top, near_plane, far_plane);
+		mProjectMatrix = float4x4::createOrthoCenterLH(left, right, bottom, top, near_plane, far_plane);
 		mProjectMatrixWoAdjust = mProjectMatrix;
 
 		RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		re.adjustProjectionMatrix(mProjectMatrix);
-		mInvProjectMatrix = mProjectMatrix.Invert();
-		mInvProjectMatrixWoAdjust = mProjectMatrixWoAdjust.Invert();
+		mInvProjectMatrix = mProjectMatrix.inverse();
+		mInvProjectMatrixWoAdjust = mProjectMatrixWoAdjust.inverse();
 
 		mViewProjMatDirty = true;
 		mViewProjMatrixWoAdjustDirty = true;
@@ -87,7 +98,7 @@ namespace Air
 	{
 		if (mFrustumDirty)
 		{
-			Frustum::CreateFromMatrix(mFrustum, mProjectMatrixWoAdjust);
+			mFrustum.clipMatrix(mViewProjectMatrixWOAdjust, mInvViewProjectMatrixWOAdjust);
 			mFrustumDirty = false;
 		}
 		return mFrustum;

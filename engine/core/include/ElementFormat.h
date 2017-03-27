@@ -339,6 +339,12 @@ namespace Air
 	{
 		return (EC_BC == getChannel<0>(format)) || (EC_ETC == getChannel<0>(format));
 	}
+
+	inline uint8_t
+		getNumFormatBytes(ElementFormat format)
+	{
+		return getNumFormatBytes(format) / 8;
+	}
 }
 
 

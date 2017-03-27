@@ -3,12 +3,39 @@
 #pragma once
 #include <boost/circular_buffer.hpp>
 #include "basic/include/Frustum.hpp"
-
+#include "basic/include/Vector.hpp"
+#include "basic/include/Matrix.hpp"
 namespace Air
 {
 	class AIR_CORE_API Camera : public std::enable_shared_from_this<Camera>
 	{
 	public:
+		Camera();
+		float3 const & getEyePos() const
+		{
+			return *reinterpret_cast<float3 const *>(&mInvViewMatrix.row(3));
+		}
+
+		float3 getLookAt() const
+		{
+			return this->getEyePos() + this->getForwardVec()* mLookDistance;
+		}
+
+		float3 getRightVec() const
+		{
+			return *reinterpret_cast<float3 const *>(&mInvViewMatrix.row(0));
+		}
+
+		float3 getUpVec() const
+		{
+			return *reinterpret_cast<float3 const *>(&mInvViewMatrix.row(1));
+		}
+
+		float3 const & getForwardVec() const
+		{
+			return *reinterpret_cast<float3 const *>(&mInvViewMatrix.row(2));
+		}
+
 		void setViewParams(float3 const & eye_pos, float3 const & look_at);
 		void setViewParams(float3 const & eye_pos, float3 const & look_at, float3 const & up_vec);
 		void setProjParams(float fov, float aspect, float near_plane, float far_plane);
@@ -51,12 +78,15 @@ namespace Air
 		float4x4 mViewProjectMatrixWOAdjust;
 		float4x4 mInvViewProjectMatrixWOAdjust;
 
+		boost::circular_buffer<float4x4> mPrevViewMats;
+		boost::circular_buffer<float4x4> mPrevProjMats;
 
 		mutable bool mViewProjMatDirty;
 		mutable bool mViewProjMatrixWoAdjustDirty;
 		mutable bool mFrustumDirty;
 
 		uint32_t mMode;
+		int mCurJitterIndex;
 
 
 	};

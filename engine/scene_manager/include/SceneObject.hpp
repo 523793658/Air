@@ -53,7 +53,9 @@ namespace Air
 
 		void updateWorldMatrix();
 
-		Renderable const & getRenderable() const;
+		AABBox const & getAABB() const;
+
+		RenderablePtr const & getRenderable() const;
 	protected:
 		uint32_t mAttrib;
 

@@ -36,7 +36,6 @@ namespace Air
 	struct Float4;
 	struct Float4x4;
 	struct Quaternion;
-	struct Plane;
 	struct Color32;
 	typedef DirectX::PackedVector::XMCOLOR Color8;
 	typedef DirectX::PackedVector::XMUBYTEN4 Uint8_n4;

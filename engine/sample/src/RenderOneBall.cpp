@@ -17,7 +17,7 @@ namespace
 			:SceneObjectHelper(SOA_Cullable)
 		{
 			//¼ÓÔØrenderableObj
-			mRenderable = nullptr;
+			mRenderable = ;
 		}
 
 		void setRenderingType(int type)
@@ -59,12 +59,13 @@ void SampleRenderOneBall::onCreate()
 	this->Proj(0.05f, 100.0f);
 
 
+
 }
 
 uint32_t SampleRenderOneBall::doUpdate(uint32_t pass)
 {
 	RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
-	Color32 c = { 1.0, 1.0, 0.0, 1.0 };
+	Color c(1.0, 1.0, 0.0, 1.0 );
 	re.getCurrentFrameBuffer()->clear(FrameBuffer::CBM_Color | FrameBuffer::CBM_Depth | FrameBuffer::CBM_Stencil, c, 1.0, 0);
 	return App3DFramework::URV_NeedFlush | App3DFramework::URV_Finished;
 }

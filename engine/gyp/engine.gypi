@@ -26,12 +26,14 @@
 				"../core/include/PreDeclare.h",
 				"../core/include/ResLoader.h",
 				"../core/include/Camera.hpp",
+				"../core/include/LZMACodec.hpp",
 				
 				"../core/src/Engine.cpp",
 				"../core/src/Context.cpp",
 				"../core/src/ElementFormat.cpp",
 				"../core/src/ResLoader.cpp",
 				"../core/src/Camera.cpp",
+				"../core/src/LZMACodec.cpp",
 				
 				"../rendersystem/include/RenderFactory.h",
 				"../rendersystem/include/RenderEngine.hpp",
@@ -45,6 +47,9 @@
 				"../rendersystem/include/Mesh.hpp",
 				"../rendersystem/include/Renderable.hpp",
 				"../rendersystem/include/RenderableHelper.hpp",
+				"../rendersystem/include/RenderEffect.hpp",
+				"../rendersystem/include/GraphicsBuffer.hpp",
+				"../rendersystem/include/RenderMaterial.hpp",
 				
 				"../rendersystem/src/RenderSettings.cpp",
 				"../rendersystem/src/RenderFactory.cpp",
@@ -57,6 +62,9 @@
 				"../rendersystem/src/Mesh.cpp",
 				"../rendersystem/src/Renderable.cpp",
 				"../rendersystem/src/RenderableHelper.cpp",
+				"../rendersystem/src/RenderEffect.cpp",
+				"../rendersystem/src/GraphicsBuffer.cpp",
+				"../rendersystem/src/RenderMaterial.cpp",
 				
 				"../scene_manager/include/SceneManager.hpp",
 				"../scene_manager/include/SceneObject.hpp",

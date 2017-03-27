@@ -44,14 +44,27 @@ namespace Air
 	class RenderableHelper;
 	typedef std::shared_ptr<RenderableHelper> RenderableHelperPtr;
 
+	class RenderTechnique;
 
+	class RenderEffect;
+	typedef std::shared_ptr<RenderEffect> RenderEffectPtr;
 
 	struct Viewport;
 	typedef std::shared_ptr<Viewport> ViewportPtr;
 
 	struct RenderSettings;
 
+	class StaticMesh;
+	typedef std::shared_ptr<StaticMesh> StaticMeshPtr;
 
+	class RenderModel;
+	typedef std::shared_ptr<RenderModel> RenderModelPtr;
+
+	struct RenderMaterial;
+	typedef std::shared_ptr<RenderMaterial> RenderMaterialPtr;
+
+
+	struct VertexElement;
 }
 
 
