@@ -149,7 +149,7 @@ namespace Air
 	{
 		return mProjectMatrixWoAdjust;
 	}
-	float4x4 const & Camera::getViewProjMatrix()
+	float4x4 const & Camera::getViewProjMatrix() const
 	{
 		if (mViewProjMatDirty)
 		{
@@ -159,7 +159,7 @@ namespace Air
 		}
 		return mViewProjectMatrix;
 	}
-	float4x4 const & Camera::getViewProjMatrixWOAdjust()
+	float4x4 const & Camera::getViewProjMatrixWOAdjust() const
 	{
 		if (mViewProjMatrixWoAdjustDirty)
 		{
@@ -170,5 +170,4 @@ namespace Air
 		return mViewProjectMatrixWOAdjust;
 
 	}
-
 }

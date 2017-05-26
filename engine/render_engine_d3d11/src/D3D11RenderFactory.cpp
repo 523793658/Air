@@ -55,6 +55,19 @@ namespace Air
 	{
 		return MakeSharedPtr<D3D11DepthStencilRenderView>(texture, first_array_index, array_size, level);
 	}
+
+	GraphicsBufferPtr D3D11RenderFactory::makeDelayCreationVertexBuffer(BufferUsage usage, uint32_t access_hint, uint32_t size_in_byte, ElementFormat fmt)
+	{
+		return MakeSharedPtr(D3D11gr)
+	}
+	GraphicsBufferPtr D3D11RenderFactory::makeDelayCreationIndexBuffer(BufferUsage usage, uint32_t access_hint, uint32_t size_in_byte, ElementFormat fmt)
+	{
+
+	}
+	GraphicsBufferPtr D3D11RenderFactory::makeDelayCreationConstantBuffer(BufferUsage usage, uint32_t access_hint, uint32_t size_in_byte, ElementFormat fmt)
+	{
+
+	}
 }
 
 void makeRenderFactory(std::unique_ptr<Air::RenderFactory>& ptr)

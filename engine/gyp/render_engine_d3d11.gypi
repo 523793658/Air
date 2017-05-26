@@ -36,6 +36,7 @@
 				"../render_engine_d3d11/include/D3D11Mapping.hpp",
 				"../render_engine_d3d11/include/D3D11Texture.hpp",
 				"../render_engine_d3d11/include/D3D11RenderView.hpp",
+				"../render_engine_d3d11/include/D3D11GraphicsBuffer.hpp",
 				
 				
 				"../render_engine_d3d11/src/D3D11RenderFactory.cpp",
@@ -53,6 +54,7 @@
 				"../render_engine_d3d11/src/D3D11Texture3D.cpp",
 				"../render_engine_d3d11/src/D3D11TextureCube.cpp",
 				"../render_engine_d3d11/src/D3D11RenderView.cpp",
+				"../render_engine_d3d11/src/D3D11GraphicsBuffer.cpp",
 			],
 			"conditions":[
 				[

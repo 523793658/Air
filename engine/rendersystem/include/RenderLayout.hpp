@@ -2,7 +2,8 @@
 #define _Air_Render_Layout_H_
 #pragma once
 #include "PreDeclare.h"
-
+#include "rendersystem/include/GraphicsBuffer.hpp"
+#include "ElementFormat.h"
 namespace Air
 {
 	enum VertexElementUsage
@@ -110,16 +111,96 @@ namespace Air
 		{
 			return mVertexStreams[index].mStream;
 		}
+
+		VertexElementsType const & getVertexStreamFormat(uint32_t index) const
+		{
+			return mVertexStreams[index].mFormat;
+		}
+
 		void setVertexStream(uint32_t index, GraphicsBufferPtr const & gb)
 		{
 			mVertexStreams[index].mStream = gb;
 			mStreamsDirty = true;
 		}
 
+		GraphicsBufferPtr const & getIndexStream() const
+		{
+			BOOST_ASSERT(mIndexStream);
+			return mIndexStream;
+		}
+
+		ElementFormat getIndexStreamFormat() const
+		{
+			return mIndexFormat;
+		}
+
 		uint32_t getNumVertexStreams() const
 		{
 			return static_cast<uint32_t>(mVertexStreams.size());
 		}
+
+		void setNumVertices(uint32_t n)
+		{
+			mForceNumVertices = n;
+			mStreamsDirty = true;
+		}
+		uint32_t getNumVertices() const 
+		{
+			uint32_t n;
+			if (0xffffffff == mForceNumVertices)
+			{
+				n = mVertexStreams[0].mStream->getSize() / mVertexStreams[0].mVertexSize;
+			}
+			else
+			{
+				n = mForceNumVertices;
+			}
+			return n;
+		}
+		void setNumIndices(uint32_t n)
+		{
+			mForceNumIndices = n;
+			mStreamsDirty = true;
+		}
+		uint32_t getNumIndices() const
+		{
+			uint32_t n = 0; 
+			if (mIndexStream)
+			{
+				if (0xffffffff == mForceNumIndices)
+				{
+					n = mIndexStream->getSize() / getNumFormatBytes(mIndexFormat);
+				}
+				else
+				{
+					n = mForceNumIndices;
+				}
+			}
+			return n;
+		}
+
+		void setStartVertexLocation(uint32_t location)
+		{
+			mStartVertexLocation = location;
+			mStreamsDirty = true;
+		}
+
+		uint32_t getStartVertexLocation() const
+		{
+			return mStartVertexLocation;
+		}
+
+		void setStartIndexLocation(uint32_t location)
+		{
+			mStartIndexLocation = location;
+			mStreamsDirty = true;
+		}
+
+		uint32_t getStartIndexLocation() const
+		{
+			return mStartIndexLocation;
+		}
+
 
 	private:
 		template <typename tuple_type, int N>
@@ -155,7 +236,15 @@ namespace Air
 		};
 
 		std::vector<StreamUnit> mVertexStreams;
-		mutable bool mStreamsDirty;
+
+		GraphicsBufferPtr mIndexStream;
+		ElementFormat mIndexFormat;
+		uint32_t mForceNumVertices{ 0xffffffff };
+		uint32_t mForceNumIndices{ 0xffffffff };
+		mutable bool mStreamsDirty{ true };
+
+		uint32_t mStartVertexLocation{ 0 };
+		uint32_t mStartIndexLocation{ 0 };
 	};
 }
 

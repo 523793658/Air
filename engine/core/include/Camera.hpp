@@ -5,6 +5,7 @@
 #include "basic/include/Frustum.hpp"
 #include "basic/include/Vector.hpp"
 #include "basic/include/Matrix.hpp"
+#include "PreDeclare.h"
 namespace Air
 {
 	class AIR_CORE_API Camera : public std::enable_shared_from_this<Camera>
@@ -46,8 +47,8 @@ namespace Air
 		float4x4 const & getViewMatrix() const;
 		float4x4 const & getProjMatrix() const;
 		float4x4 const & getProjMatrixWOAdjust() const;
-		float4x4 const & getViewProjMatrix();
-		float4x4 const & getViewProjMatrixWOAdjust();
+		float4x4 const & getViewProjMatrix() const;
+		float4x4 const & getViewProjMatrixWOAdjust() const;
 
 		bool getOmniDirectionalMode() const;
 
@@ -72,11 +73,11 @@ namespace Air
 		float4x4 mProjectMatrixWoAdjust;
 		float4x4 mInvProjectMatrixWoAdjust;
 
-		float4x4 mViewProjectMatrix;
-		float4x4 mInvViewPorjectMatirx;
+		mutable float4x4 mViewProjectMatrix;
+		mutable float4x4 mInvViewPorjectMatirx;
 
-		float4x4 mViewProjectMatrixWOAdjust;
-		float4x4 mInvViewProjectMatrixWOAdjust;
+		mutable float4x4 mViewProjectMatrixWOAdjust;
+		mutable float4x4 mInvViewProjectMatrixWOAdjust;
 
 		boost::circular_buffer<float4x4> mPrevViewMats;
 		boost::circular_buffer<float4x4> mPrevProjMats;

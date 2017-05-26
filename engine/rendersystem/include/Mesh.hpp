@@ -54,6 +54,11 @@ namespace Air
 			return mTCAABB;
 		}
 
+		virtual bool isSkinned() const
+		{
+			return false;
+		}
+
 
 		virtual RenderLayout& getRenderLayout() const;
 
@@ -61,6 +66,43 @@ namespace Air
 		void addVertexStream(GraphicsBufferPtr const & buffer, VertexElement const & ve);
 		void addIndexStream(void const * buf, uint32_t size, ElementFormat format, uint32_t access_hint);
 		void addIndexStream(GraphicsBufferPtr const & index_stream, ElementFormat format);
+
+		void setNumVertices(uint32_t n)
+		{
+			mRenderLayout->setNumVertices(n);
+		}
+		uint32_t getNumVertices() const
+		{
+			return mRenderLayout->getNumVertices();
+		}
+
+		void setNumIndices(uint32_t n)
+		{
+			return mRenderLayout->setNumIndices(n);
+		}
+
+		uint32_t getNumIndices() const
+		{
+			return mRenderLayout->getNumIndices();
+		}
+
+		void setStartVertexLocation(uint32_t location)
+		{
+			mRenderLayout->setStartVertexLocation(location);
+		}
+		uint32_t getStartVertexLocation() const
+		{
+			return mRenderLayout->getStartVertexLocation();
+		}
+
+		void setStartIndexLocation(uint32_t location)
+		{
+			mRenderLayout->setStartIndexLocation(location);
+		}
+		uint32_t getStartIndexLocation() const
+		{
+			return mRenderLayout->getStartIndexLocation();
+		}
 	protected:
 		std::wstring mName;
 		RenderLayoutPtr mRenderLayout;
@@ -80,6 +122,7 @@ namespace Air
 
 		}
 
+
 		size_t getNumMaterials() const 
 		{
 			return mMaterials.size();
@@ -98,6 +141,11 @@ namespace Air
 		RenderMaterialPtr const & getMaterial(size_t index) const
 		{
 			return mMaterials[index];
+		}
+
+		virtual bool isSkinned() const override
+		{
+			return false;
 		}
 
 		void buildModelInfo()

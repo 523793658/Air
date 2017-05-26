@@ -17,6 +17,10 @@ namespace Air
 
 		RenderLayoutPtr MakeRenderLayout();
 
+		virtual GraphicsBufferPtr makeDelayCreationVertexBuffer(BufferUsage usage, uint32_t access_hint, uint32_t size_in_byte, ElementFormat fmt = EF_Unknown) override;
+		virtual GraphicsBufferPtr makeDelayCreationIndexBuffer(BufferUsage usage, uint32_t access_hint, uint32_t size_in_byte, ElementFormat fmt = EF_Unknown) override;
+		virtual GraphicsBufferPtr makeDelayCreationConstantBuffer(BufferUsage usage, uint32_t access_hint, uint32_t size_in_byte, ElementFormat fmt = EF_Unknown) override;
+
 		RenderViewPtr Make1DRenderView(Texture& texture, int first_array_index, int array_size, int level);
 		RenderViewPtr Make2DRenderView(Texture& texture, int first_array_index, int array_size, int level);
 		RenderViewPtr Make2DRenderView(Texture& texture, int array_index, Texture::CubeFace face, int level);

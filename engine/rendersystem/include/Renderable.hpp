@@ -1,7 +1,7 @@
 #ifndef _Renderable_H_
 #define _Renderable_H_
 #pragma once
-
+#include "core/include/PreDeclare.h"
 namespace Air
 {
 
@@ -144,8 +144,10 @@ namespace Air
 		virtual void onInstanceBegin(uint32_t id);
 		virtual void onInstanceEnd(uint32_t id);
 
-		virtual AABBox const & getAABB() const = 0;
+		virtual AABBox const & getPosAABB() const = 0;
 		virtual AABBox const & getTexcoordAABB() const = 0;
+
+		virtual bool isSkinned() const = 0;
 
 		void addInstance(SceneObject const * obj);
 
@@ -208,7 +210,6 @@ namespace Air
 
 		virtual bool getHWResourceReady() const;
 
-
 	protected:
 		virtual void updateAABB();
 
@@ -220,6 +221,8 @@ namespace Air
 		RenderEffectPtr mEffect;
 		RenderTechnique* mTechnique;
 
+		float4 mSelectModeObjectId;
+		float4x4 mModelMat;
 		std::vector<RenderablePtr> mSubRenderables;
 	};
 }

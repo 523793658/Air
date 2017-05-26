@@ -74,6 +74,8 @@ namespace Air
 		std::string locate(std::string const & name);
 		ResIdentifierPtr LocatePkt(std::string const & name, std::string const & res_name, std::string& password, std::string& internal_name);
 
+		void update();
+
 
 		std::shared_ptr<void> syncQuery(ResLoadingDescPtr const & res_desc);
 
@@ -106,6 +108,7 @@ namespace Air
 		std::mutex mLoadedMutex;
 		std::mutex mLoadingMutex;
 
+		std::vector<std::pair<ResLoadingDescPtr, std::weak_ptr<void>>> mLoadedRes;
 		std::vector<std::pair<ResLoadingDescPtr, std::shared_ptr<volatile LoadingStatus>>> mLoadingRes;
 		boost::lockfree::spsc_queue<std::pair<ResLoadingDescPtr, std::shared_ptr<volatile LoadingStatus>>, boost::lockfree::capacity<1024>> mLoadingResQueue;
 

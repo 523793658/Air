@@ -104,7 +104,7 @@ namespace Air
 	}
 
 	template<typename To, typename From>
-	inline std::shared_ptr<T>
+	inline std::shared_ptr<To>
 		checked_pointer_cast(std::shared_ptr<From> const & p)
 		{
 			BOOST_ASSERT(std::dynamic_pointer_cast<To>(p) == std::static_pointer_cast<To>(p));

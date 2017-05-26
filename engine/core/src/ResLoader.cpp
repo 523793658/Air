@@ -374,4 +374,103 @@ namespace Air
 		}
 		return res;
 	}
+
+	std::shared_ptr<void> ResLoader::findMatchLoadedResource(ResLoadingDescPtr const & res_desc)
+	{
+		std::lock_guard<std::mutex> lock(mLoadedMutex);
+		std::shared_ptr<void> loadedRes;
+		for (auto const & lr : mLoadedRes)
+		{
+			if (lr.first->match(*res_desc))
+			{
+				loadedRes = lr.second.lock();
+				break;
+			}
+		}
+		return loadedRes;
+	}
+
+	void ResLoader::addLoadedResource(ResLoadingDescPtr const & res_desc, std::shared_ptr<void> const & res)
+	{
+		std::lock_guard<std::mutex> lock(mLoadedMutex);
+		bool found = false;
+		for (auto& c_desc : mLoadedRes)
+		{
+			if (c_desc.first == res_desc)
+			{
+				c_desc.second = std::weak_ptr<void>(res);
+				found = true;
+				break;
+			}
+		}
+		if (!found)
+		{
+			mLoadedRes.emplace_back(res_desc, std::weak_ptr<void>(res));
+		}
+	}
+
+	void ResLoader::removeUnrefResources()
+	{
+		std::lock_guard<std::mutex> lock(mLoadedMutex);
+		for (auto iter = mLoadedRes.begin(); iter != mLoadedRes.end(); )
+		{
+			if (iter->second.lock())
+			{
+				++iter;
+			}
+			else
+			{
+				iter = mLoadedRes.erase(iter);
+			}
+		}
+	}
+
+	void ResLoader::update()
+	{
+		std::vector<std::pair<ResLoadingDescPtr, std::shared_ptr<volatile LoadingStatus>>> tmpLoadingRes;
+		{
+			std::lock_guard<std::mutex> lock(mLoadingMutex);
+			tmpLoadingRes = mLoadingRes;
+		}
+		for (auto & lrq : tmpLoadingRes)
+		{
+			if (LS_Complete == *lrq.second)
+			{
+				ResLoadingDescPtr const & res_desc = lrq.first;
+				std::shared_ptr<void> res;
+				std::shared_ptr<void> loaded_res = this->findMatchLoadedResource(res_desc);
+				if (loaded_res)
+				{
+					if (!res_desc->getStateLess())
+					{
+						res = res_desc->cloneResourceFrom(loaded_res);
+						if (res != loaded_res)
+						{
+							this->addLoadedResource(res_desc, res);
+						}
+					}
+				}
+				else
+				{
+					res = res_desc->mainThreadStage();
+					this->addLoadedResource(res_desc, res);
+				}
+				*lrq.second = LS_CanBeRemoved;
+			}
+		}
+		{
+			std::lock_guard<std::mutex> lock(mLoadingMutex);
+			for (auto iter = mLoadingRes.begin(); iter != mLoadingRes.end();)
+			{
+				if (LS_CanBeRemoved == *(iter->second))
+				{
+					iter = mLoadingRes.erase(iter);
+				}
+				else
+				{
+					++iter;
+				}
+			}
+		}
+	}
 }

@@ -76,7 +76,7 @@ namespace Air
 
 	private:
 		virtual void * map(BufferAccess ba) = 0;
-		virtual void * unmap() = 0;
+		virtual void unmap() = 0;
 
 	protected:
 		BufferUsage mUsage;

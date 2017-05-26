@@ -330,6 +330,13 @@ namespace Air
 		return static_cast<ElementChannel>((static_cast<uint64_t>(ef) >> (4 * c)) & 0xf);
 	}
 
+	template <int c>
+	inline uint8_t
+		getChannelBits(ElementFormat ef)
+	{
+		return (static_cast<uint64_t>(ef) >> (16 + 6 * c)) & 0x3F;
+	}
+
 	inline bool isDepthFormat(ElementFormat format)
 	{
 		return (EC_D == getChannel<0>(format));
@@ -341,9 +348,53 @@ namespace Air
 	}
 
 	inline uint8_t
+		getNumFormatBits(ElementFormat format)
+	{
+		switch (format)
+		{
+		case EF_BC1:
+		case EF_SIGNED_BC1:
+		case EF_BC1_SRGB:
+		case EF_BC4:
+		case EF_SIGNED_BC4:
+		case EF_BC4_SRGB:
+		case EF_ETC2_R11:
+		case EF_SIGNED_ETC2_R11:
+		case EF_ETC2_BGR8:
+		case EF_ETC2_BGR8_SRGB:
+		case EF_ETC2_A1BGR8:
+		case EF_ETC2_A1BGR8_SRGB:
+		case EF_ETC1:
+			return 16;
+
+		case EF_BC2:
+		case EF_SIGNED_BC2:
+		case EF_BC2_SRGB:
+		case EF_BC3:
+		case EF_SIGNED_BC3:
+		case EF_BC3_SRGB:
+		case EF_BC5:
+		case EF_SIGNED_BC5:
+		case EF_BC5_SRGB:
+		case EF_BC6:
+		case EF_SIGNED_BC6:
+		case EF_BC7:
+		case EF_BC7_SRGB:
+		case EF_ETC2_GR11:
+		case EF_SIGNED_ETC2_GR11:
+		case EF_ETC2_ABGR8:
+		case EF_ETC2_ABGR8_SRGB:
+			return 32;
+		default:
+			BOOST_ASSERT(!isCompressedFormat(format));
+			return getChannelBits<0>(format) + getChannelBits<1>(format) + getChannelBits<2>(format) + getChannelBits<3>(format);
+		}
+	}
+
+	inline uint8_t
 		getNumFormatBytes(ElementFormat format)
 	{
-		return getNumFormatBytes(format) / 8;
+		return getNumFormatBits(format) / 8;
 	}
 }
 

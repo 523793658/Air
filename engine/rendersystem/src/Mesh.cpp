@@ -107,6 +107,7 @@ namespace
 				RenderModelLoadingDesc const & rmld = static_cast<RenderModelLoadingDesc const &>(rhs);
 				return (mModelDesc.mResName == rmld.mModelDesc.mResName) && (mModelDesc.mAccessHint == rmld.mModelDesc.mAccessHint);
 			}
+			return false;
 		}
 		void copyDataFrom(ResLoadingDesc const & rhs)
 		{
@@ -140,15 +141,35 @@ namespace
 					mesh->setMaterialID(rhs_mesh->getMaterialID());
 					mesh->setPosAABB(rhs_mesh->getPosAABB());
 					mesh->setTexcoordAABB(rhs_mesh->getTexcoordAABB());
-
+					for (uint32_t ve_index = 0; ve_index < rhs_rl.getNumVertexStreams(); ++ve_index)
+					{
+						mesh->addVertexStream(rhs_rl.getVertexStream(ve_index), rhs_rl.getVertexStreamFormat(ve_index)[0]);
+					}
+					mesh->addIndexStream(rhs_rl.getIndexStream(), rhs_rl.getIndexStreamFormat());
+					mesh->setNumVertices(rhs_mesh->getNumVertices());
+					mesh->setNumIndices(rhs_mesh->getNumIndices());
+					mesh->setStartVertexLocation(rhs_mesh->getStartVertexLocation());
+					mesh->setStartIndexLocation(rhs_mesh->getStartIndexLocation());
 				}
+				BOOST_ASSERT(model->isSkinned() == rhs_model->isSkinned());
 
+				if (rhs_model->isSkinned())
+				{
+				}
+				model->assignSubrenderable(meshes.begin(), meshes.end());
 			}
+			this->addsSubPath();
+			model->buildModelInfo();
+			for (uint32_t i = 0; i < model->getNumSubRenderables(); ++i)
+			{
+				checked_pointer_cast<StaticMesh>(model->getSubRenderable(i))->buildMeshInfo();
+			}
+			return std::static_pointer_cast<void>(model);
 		}
 
 		std::shared_ptr<void> getResource() const
 		{
-
+			return *mModelDesc.mModel;
 		}
 	private:
 		void fillModel()
@@ -164,7 +185,19 @@ namespace
 }
 namespace Air
 {
+	StaticMesh::~StaticMesh()
+	{
+	}
+	RenderLayout& StaticMesh::getRenderLayout() const
+	{
+		return *mRenderLayout;
+	}
 
+	void StaticMesh::addVertexStream(void const * buf, uint32_t size, VertexElement const & ve, uint32_t access_hint)
+	{
+		RenderFactory& rf = Context::getInstance().getRenderFactoryInstance();
+		GraphicsBufferPtr vb = rf.makeVertex
+	}
 
 	RenderModelPtr syncLoadModel(std::string const & meshml_name, uint32_t access_hint, std::function<RenderModelPtr(std::wstring const &)> createModelFactoryFunc, std::function<StaticMeshPtr(RenderModelPtr const &, std::wstring const &)> createMeshFactoryFunc)
 	{
