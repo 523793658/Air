@@ -1,15 +1,23 @@
 #include "ResourcePluginFBX.h"
+#include "basic/include/Log.hpp"
 namespace Air
 {
 
 	ResourcePluginFBX::ResourcePluginFBX() : ResourcePlugin("ResourcePluginFBX", "fbx")
 	{
-
+		mSDKManager = FbxManager::Create();
+		if (!mSDKManager)
+		{
+			logError("Unable to create FBX Manager");
+		}
+		FbxIOSettings* ios = FbxIOSettings::Create(mSDKManager, IOSROOT);
+		mSDKManager->SetIOSettings(ios);
 	}
 
 
 	void ResourcePluginFBX::importResource(ResLoadingDescPtr& res_desc)
 	{
+		
 
 	}
 	void ResourcePluginFBX::exportResource(ResLoadingDescPtr& res_desc)

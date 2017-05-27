@@ -16,7 +16,7 @@
 				"../core/include",
 				"../resource_plugin_fbx/include",
 				"../",
-				'$(FBX_SDK_PATH)Include',
+				'../../external/2018.1.1/Include',
 			],
 			"includes":[
 				"../../tools/gyp/common.gypi",
@@ -42,8 +42,10 @@
 								"msbuild_settings":{
 									'Link': {
 										'AdditionalDependencies':[
+											'libfbxsdk.lib',
 										],
 										'AdditionalLibraryDirectories':[
+											'../../external/2018.1.1/lib/vs2015/x86/debug',
 										],
 									},
 								},
@@ -52,9 +54,10 @@
 								"msbuild_settings":{
 									'Link': {
 										'AdditionalDependencies':[
-											
+											'libfbxsdk.lib',
 										],
 										'AdditionalLibraryDirectories':[
+											'../../external/2018.1.1/lib/vs2015/x64/debug',
 										],
 									},
 									
@@ -64,9 +67,10 @@
 								"msbuild_settings":{
 									'Link': {
 										'AdditionalDependencies':[
-										
+											'libfbxsdk.lib',
 										],
 										'AdditionalLibraryDirectories':[
+											'../../external/2018.1.1/lib/vs2015/x86/release',
 										],
 									},
 									
@@ -76,9 +80,11 @@
 								"msbuild_settings":{
 									'Link': {
 										'AdditionalDependencies':[
-										
+											'libfbxsdk.lib',
+
 										],
 										'AdditionalLibraryDirectories':[
+											'../../external/2018.1.1/lib/vs2015/x64/release',
 										],
 									},
 									

@@ -1,5 +1,8 @@
 #ifndef _Resource_Plugins_FBX_H_
 #define _Resource_Plugins_FBX_H_
+#include "fbxsdk.h"
+
+
 #include "basic/include/Config.h"
 #include "Engine.h"
 
@@ -30,7 +33,8 @@ namespace Air
 		virtual void importResource(ResLoadingDescPtr& res_desc);
 		virtual void exportResource(ResLoadingDescPtr& res_desc);
 	private:
-		
+
+		FbxManager* mSDKManager;
 	};
 
 

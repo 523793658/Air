@@ -1,0 +1,6 @@
+gyp_build/
+test_build/
+*.idb
+*.fxo
+*.pdb
+*.ilk

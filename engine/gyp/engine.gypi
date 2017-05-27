@@ -26,7 +26,6 @@
 				"../core/include/PreDeclare.h",
 				"../core/include/ResLoader.h",
 				"../core/include/Camera.hpp",
-				"../core/include/LZMACodec.hpp",
 				"../core/include/ResourcePlugin.h",
 				
 				"../core/src/Engine.cpp",
@@ -34,7 +33,6 @@
 				"../core/src/ElementFormat.cpp",
 				"../core/src/ResLoader.cpp",
 				"../core/src/Camera.cpp",
-				"../core/src/LZMACodec.cpp",
 				"../core/src/ResourcePlugin.cpp",
 				
 				"../rendersystem/include/RenderFactory.h",
@@ -74,6 +72,9 @@
 				"../scene_manager/src/SceneManager.cpp",
 				"../scene_manager/src/SceneObject.cpp",
 				"../scene_manager/src/SceneObjectHelper.cpp",
+				
+				"../packing_system/include/LZMACodec.h",
+				"../packing_system/src/LZMACodec.cpp",
 				
 				"../app/include/Window.hpp",
 				"../app/include/App3D.hpp",

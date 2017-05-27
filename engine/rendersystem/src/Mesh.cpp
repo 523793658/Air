@@ -208,106 +208,7 @@ namespace Air
 
 	std::string const jit_ext_name = ".model_bin";
 
-	void modelJIT(std::string const & meshml_name)
-	{
-		std::string::size_type const pkt_offset(meshml_name.find("//"));
-		std::string folder_name;
-		std::string path_name;
-
-		if (pkt_offset != std::string::npos)
-		{
-			std::string pkt_name = meshml_name.substr(0, pkt_offset);
-			std::string::size_type const password_offset = pkt_name.find("|");
-			if (password_offset != std::string::npos)
-			{
-				pkt_name = path_name.substr(0, password_offset - 1);
-			}
-			std::string::size_type offset = pkt_name.rfind("/");
-			if (offset != std::string::npos)
-			{
-				folder_name = pkt_name.substr(0, offset + 1);
-			}
-			std::string const file_name = meshml_name.substr(pkt_offset + 2);
-			path_name = folder_name + file_name;
-		}
-		else
-		{
-			std::string::size_type offset = meshml_name.rfind("/");
-			if (offset != std::string::npos)
-			{
-				folder_name = meshml_name.substr(0, offset + 1);
-			}
-			path_name = meshml_name;
-		}
-		bool jit = false;
-		if (ResLoader::getInstance().locate(path_name + jit_ext_name).empty())
-		{
-			jit = true;
-		}
-		else
-		{
-			ResIdentifierPtr lzma_file = ResLoader::getInstance().open(path_name + jit_ext_name);
-			uint32_t fourcc;
-			lzma_file->read(&fourcc, sizeof(fourcc));
-			fourcc = LE2Native(fourcc);
-			uint32_t ver;
-			lzma_file->read(&ver, sizeof(ver));
-			ver = LE2Native(ver);
-			if ((fourcc != MakeFourCC<'A', 'I', 'R', 'M'>::value) || (ver != MODEL_BIN_VERSION))
-			{
-				jit = true;
-			}
-			else
-			{
-				ResIdentifierPtr file = ResLoader::getInstance().open(meshml_name);
-				if (file)
-				{
-					if (lzma_file->getTimestamp() < file->getTimestamp())
-					{
-						jit = true;
-					}
-				}
-			}
-		}
-
-#if AIR_IS_DEV_PLATFORM
-		if (jit)
-		{
-			std::string meshmljit_name = "MeshMLJIT" AIR_DBG_SUFFIX;
-#ifdef AIR_PLATFORM_WINDOWS_DESKTOP
-			meshmljit_name += ".exe";
-#endif
-			meshmljit_name = ResLoader::getInstance().locate(meshmljit_name);
-			bool failed = false;
-			if (meshmljit_name.empty())
-			{
-				failed = true;
-			}
-			else
-			{
-#ifndef AIR_PLATFORM_WINDOWS
-				if (std::string::npos == meshmljit_name.find("/"))
-				{
-					meshmljit_name = "./" + meshmljit_name;
-				}
-#endif
-				if (system((meshmljit_name + " -I \"" + meshmljit_name + "\" -T \"" + folder_name + "\" -q").c_str()) != 0)
-				{
-					failed = true;
-				}
-			}
-			if (failed)
-			{
-				logError("MeshMLJIT failed. Forgot to build Tools?");
-			}
-		}
-#else
-		BOOST_ASSERT(!jit);
-		AIR_UNUSED(jit);
-#endif
-	}
-
-	void loadModel(std::string const & meshml_name, std::vector<RenderMaterialPtr>& mtls,
+	void loadModel(std::string const & path, std::vector<RenderMaterialPtr>& mtls,
 		std::vector<VertexElement> & merged_ves, char& all_is_index_16_bit,
 		std::vector<std::vector<uint8_t>>& merged_buff, std::vector<uint8_t>& merged_indices,
 		std::vector<std::string>& mesh_names, std::vector<int32_t>& mtl_ids,
@@ -320,35 +221,15 @@ namespace Air
 		std::vector<std::shared_ptr<AABBKeyFrames>>& frame_pos_bbs)
 	{
 		ResIdentifierPtr lzma_file;
-		if (meshml_name.rfind(jit_ext_name) + jit_ext_name.size() == meshml_name.size())
-		{
-			lzma_file = ResLoader::getInstance().open(meshml_name);
-		}
-		else
-		{
-			std::string full_meshml_name = ResLoader::getInstance().locate(meshml_name);
-			if (full_meshml_name.empty())
-			{
-				full_meshml_name = meshml_name;
-			}
-			std::replace(full_meshml_name.begin(), full_meshml_name.end(), '\\', '/');
-			modelJIT(full_meshml_name);
-			std::string no_packing_name;
-			size_t offset = full_meshml_name.rfind("//");
-			if (offset != std::string::npos)
-			{
-				no_packing_name = full_meshml_name.substr(offset + 2);
-			}
-			else
-			{
-				no_packing_name = full_meshml_name;
-			}
-			lzma_file = ResLoader::getInstance().open(no_packing_name + jit_ext_name);
-		}
+		std::string absPath = ResLoader::getInstance().getAbsPath(path + ".asset");
+		std::replace(absPath.begin(), absPath.end(), '\\', '/');
+
+		lzma_file = ResLoader::getInstance().open(absPath);
 		uint32_t fourcc;
 		lzma_file->read(&fourcc, size_t(fourcc));
 		fourcc = LE2Native(fourcc);
-		BOOST_ASSERT((fourcc == MakeFourCC<'A', 'I', 'R', 'M'>::value));
+		BOOST_ASSERT((fourcc == MakeFourCC<'M', 'E', 'S', 'H'>::value));
+
 
 		uint32_t ver;
 		lzma_file->read(&ver, sizeof(ver));
@@ -369,29 +250,15 @@ namespace Air
 		ResIdentifierPtr decoded = MakeSharedPtr<ResIdentifier>(lzma_file->getResName(), lzma_file->getTimestamp(), ss);
 
 
-		uint32_t num_mtls;
-		decoded->read(&num_mtls, sizeof(num_mtls));
-		num_mtls = LE2Native(num_mtls);
+
+		//模型数量
 		uint32_t num_meshes;
 		decoded->read(&num_meshes, sizeof(num_meshes));
 		num_meshes = LE2Native(num_meshes);
-		uint32_t num_joints;
-		decoded->read(&num_joints, sizeof(num_joints));
-		num_joints = LE2Native(num_joints);
-		uint32_t num_kfs;
-		decoded->read(&num_kfs, sizeof(num_kfs));
-		num_kfs = LE2Native(num_kfs);
-		uint32_t num_actions;
-		decoded->read(&num_actions, sizeof(num_actions));
-		num_actions = LE2Native(num_actions);
 
-		mtls.resize(num_mtls);
-		for (uint32_t mtl_index = 0; mtl_index < num_mtls; mtl_index++)
-		{
-			RenderMaterialPtr mtl = MakeSharedPtr<RenderMaterial>();
-			mtls[mtl_index] = mtl;
-			mtl->mName = readShortString(decoded);
-		}
+
+		//读一个短字符串 readShortString();
+
 
 	}
 }
