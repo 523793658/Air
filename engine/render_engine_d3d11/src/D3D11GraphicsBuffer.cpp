@@ -14,7 +14,7 @@ namespace Air
 		{
 			mBindFlags = 0;
 		}
-		D3D11RenderEngine const & renderEngine(*checked_cast<D3D11RenderEngine const *>(&Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance()));
+		D3D11RenderEngine const & renderEngine(*checked_cast<D3D11RenderEngine const *>(&Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance()));
 		mD3DDevice = renderEngine.getD3DDevice();
 		mD3DImmCtx = renderEngine.getD3DDeviceContext();
 	}
@@ -77,7 +77,7 @@ namespace Air
 		{
 			bind_flags = mBindFlags;
 		}
-		D3D11RenderEngine const & re = *checked_cast<D3D11RenderEngine const *>(&Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance());
+		D3D11RenderEngine const & re = *checked_cast<D3D11RenderEngine const *>(&Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance());
 		if(re.getDeviceFeatureLevel() > D3D_FEATURE_LEVEL_9_3)
 		{
 			if ((mAccessHint & EAH_GPU_Read) && !(mAccessHint & EAH_CPU_Write))

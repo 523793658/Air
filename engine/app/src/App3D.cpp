@@ -22,29 +22,29 @@ namespace Air
 		:mName(name), mTotalNumFrames(0), mFps(0), mAccumulateTime(0), mNumFrames(0),
 		mAppTime(0), mFrameTime(0)
 	{
-		Context::getInstance().setAppInstance(*this);
-		ContextCfg cfg = Context::getInstance().getConfig();
+		Engine::getInstance().setAppInstance(*this);
+		ContextCfg cfg = Engine::getInstance().getConfig();
 		mMainWnd = this->makeWindow(mName, cfg.mGraphicsCfg);
 #ifndef AIR_PLATFORM_WINDOWS_RUNTIME
 		cfg.mGraphicsCfg.left = mMainWnd->getLeft();
 		cfg.mGraphicsCfg.top = mMainWnd->getTop();
 		cfg.mGraphicsCfg.width = mMainWnd->getWidth();
 		cfg.mGraphicsCfg.height = mMainWnd->getHeight();
-		Context::getInstance().setConfig(cfg);
+		Engine::getInstance().setConfig(cfg);
 #endif // !AIR_PLATFORM_WINDOWS_RUNTIME
 	}
 
 	App3DFramework::App3DFramework(std::string const &name, void* native_wnd)
 	{
-		Context::getInstance().setAppInstance(*this);
-		ContextCfg cfg = Context::getInstance().getConfig();
+		Engine::getInstance().setAppInstance(*this);
+		ContextCfg cfg = Engine::getInstance().getConfig();
 		mMainWnd = this->makeWindow(mName, cfg.mGraphicsCfg, native_wnd);
 #ifndef AIR_PLATFORM_WINDOWS_RUNTIME
 		cfg.mGraphicsCfg.left = mMainWnd->getLeft();
 		cfg.mGraphicsCfg.top = mMainWnd->getTop();
 		cfg.mGraphicsCfg.width = mMainWnd->getWidth();
 		cfg.mGraphicsCfg.height = mMainWnd->getHeight();
-		Context::getInstance().setConfig(cfg);
+		Engine::getInstance().setConfig(cfg);
 #endif // !AIR_PLATFORM_WINDOWS_RUNTIME
 
 	}
@@ -58,10 +58,10 @@ namespace Air
 	void App3DFramework::create()
 	{
 #endif
-		ContextCfg cfg = Context::getInstance().getConfig();
-		RenderFactory& factory = Context::getInstance().getRenderFactoryInstance();
+		ContextCfg cfg = Engine::getInstance().getConfig();
+		RenderFactory& factory = Engine::getInstance().getRenderFactoryInstance();
 		factory.getRenderEngineInstance().createRenderWindow(mName, cfg.mGraphicsCfg);
-		Context::getInstance().setConfig(cfg);
+		Engine::getInstance().setConfig(cfg);
 		this->onCreate();
 	}
 
@@ -77,7 +77,7 @@ namespace Air
 
 	void App3DFramework::run()
 	{
-		RenderEngine& engine = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& engine = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		bool gotMsg;
 		MSG msg;
 		::PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE);
@@ -108,7 +108,7 @@ namespace Air
 	}
 	Camera const & App3DFramework::getActiveCamera() const
 	{
-		RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		CameraPtr const & camera = re.getCurrentFrameBuffer()->getViewport()->mCamera;
 		BOOST_ASSERT(camera);
 		return *camera;
@@ -116,7 +116,7 @@ namespace Air
 
 	Camera& App3DFramework::getActiveCamera()
 	{
-		RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		CameraPtr const & camera = re.getCurrentFrameBuffer()->getViewport()->mCamera;
 		BOOST_ASSERT(camera);
 		return *camera;
@@ -159,7 +159,7 @@ namespace Air
 	{
 		BOOST_ASSERT(nearPlane != 0);
 		BOOST_ASSERT(farPlane != 0);
-		RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		FrameBuffer& fb = *re.getCurrentFrameBuffer();
 
 		this->getActiveCamera().setProjParams(re.getDefaultFov(), static_cast<float>(fb.getWidth()) / fb.getHeight(), nearPlane, farPlane);

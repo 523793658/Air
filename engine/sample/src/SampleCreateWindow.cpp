@@ -14,7 +14,7 @@ using namespace Air;
 
 	int SampleMain()
 	{
-		ContextCfg  cfg = Context::getInstance().getConfig();
+		ContextCfg  cfg = Engine::getInstance().getConfig();
 		SampleCreateWindow app;
 		app.create();
 		app.run();
@@ -23,7 +23,7 @@ using namespace Air;
 
 	uint32_t SampleCreateWindow::doUpdate(uint32_t pass)
 	{
-		RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		Color32 c = { 1.0, 1.0, 0.0, 1.0 };
 		re.getCurrentFrameBuffer()->clear(FrameBuffer::CBM_Color | FrameBuffer::CBM_Depth | FrameBuffer::CBM_Stencil, c, 1.0, 0);
 		return App3DFramework::URV_NeedFlush | App3DFramework::URV_Finished;

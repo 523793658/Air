@@ -88,7 +88,7 @@ namespace Air
 
 	void D3D11RenderEngine::beginFrame()
 	{
-		if ((mD3DFeatureLevel >= D3D_FEATURE_LEVEL_10_0) && Context::getInstance().getConfig().mPerfProfiler)
+		if ((mD3DFeatureLevel >= D3D_FEATURE_LEVEL_10_0) && Engine::getInstance().getConfig().mPerfProfiler)
 		{
 			mD3DIMMContext->Begin(mTimestampDisJointQuery.get());
 		}
@@ -97,7 +97,7 @@ namespace Air
 	void D3D11RenderEngine::endFrame()
 	{
 		RenderEngine::endFrame();
-		if ((mD3DFeatureLevel >= D3D_FEATURE_LEVEL_10_0) && Context::getInstance().getConfig().mPerfProfiler)
+		if ((mD3DFeatureLevel >= D3D_FEATURE_LEVEL_10_0) && Engine::getInstance().getConfig().mPerfProfiler)
 		{
 			mD3DIMMContext->End(mTimestampDisJointQuery.get());
 		}

@@ -82,9 +82,9 @@ namespace Air
 	{
 		FrameBuffer& fb = *this->getScreenFrameBuffer();
 		//激活才更新
-		if (Context::getInstance().getAppInstance().getMainWnd()->getActive())
+		if (Engine::getInstance().getAppInstance().getMainWnd()->getActive())
 		{
-			Context::getInstance().getSceneManangerInstance().update();
+			Engine::getInstance().getSceneManangerInstance().update();
 			fb.swapBuffers();
 			//fb.
 		}
@@ -187,7 +187,7 @@ namespace Air
 		{
 			settings.width = static_cast<uint32_t>(settings.height * screen_aspect + 0.5f);
 		}
-		RenderFactory& renderFactory = Context::getInstance().getRenderFactoryInstance();
+		RenderFactory& renderFactory = Engine::getInstance().getRenderFactoryInstance();
 
 		uint32_t const render_width = static_cast<uint32_t>(settings.width * mDefaultRenderWidthScale + 0.5);
 		uint32_t const render_height = static_cast<uint32_t>(settings.height * mDefaultRenderHeightScale + 0.5);

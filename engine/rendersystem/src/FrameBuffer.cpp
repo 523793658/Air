@@ -67,7 +67,7 @@ namespace Air
 		default:
 		{
 			BOOST_ASSERT(att >= ATT_Color0);
-			RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+			RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 			if (att >= static_cast<uint32_t>(ATT_Color0 + re.getDeviceCaps().mMaxSimultaneousRts))
 			{
 				THR(errc::function_not_supported);
@@ -120,7 +120,7 @@ namespace Air
 		break;
 		default:
 		{
-			RenderEngine &re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+			RenderEngine &re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 			if (att >= static_cast<uint32_t>(ATT_Color0 + re.getDeviceCaps().mMaxSimultaneousRts))
 			{
 				THR(errc::function_not_supported);

@@ -27,6 +27,7 @@
 				"../core/include/ResLoader.h",
 				"../core/include/Camera.hpp",
 				"../core/include/LZMACodec.hpp",
+				"../core/include/ResourcePlugin.h",
 				
 				"../core/src/Engine.cpp",
 				"../core/src/Context.cpp",
@@ -34,6 +35,7 @@
 				"../core/src/ResLoader.cpp",
 				"../core/src/Camera.cpp",
 				"../core/src/LZMACodec.cpp",
+				"../core/src/ResourcePlugin.cpp",
 				
 				"../rendersystem/include/RenderFactory.h",
 				"../rendersystem/include/RenderEngine.hpp",

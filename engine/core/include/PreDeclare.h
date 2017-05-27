@@ -6,11 +6,12 @@ namespace Air
 
 {
 	struct ConfextCfg;
-	class Context;
+	class Engine;
 
 
 	class SceneManager;
 	class RenderFactory;
+	class ResourcePlugin;
 
 	class App3DFramework;
 	class Window;

@@ -34,11 +34,14 @@ namespace
 
 namespace Air
 {
-	std::unique_ptr<Context> Context::mContextInstance;
+	std::unique_ptr<Engine> Engine::mEngineInstance;
 	typedef void(*makeRenderFactoryFunc)(std::unique_ptr<RenderFactory>& ptr);
 	typedef void(*makeSceneManagerFunc)(std::unique_ptr<SceneManager>& ptr);
+	typedef void(*makeResourcePluginFunc)(std::unique_ptr<ResourcePlugin>& ptr);
 
-	Context::Context()
+
+
+	Engine::Engine()
 		: mApp(nullptr)
 	{
 		//∫Û–¯∂¡≈‰÷√
@@ -58,46 +61,53 @@ namespace Air
 		mCfg.mRenderFactoryName = "D3D11";
 		mCfg.mSceneManagerName = "OCTree";
 
+		mCfg.mAssetsPlugins.push_back(AssetsPluginCfg("fbxPlugin", "fbx"));
+
+		
+
+
+
+
 		mGTPInstance = MakeUniquePtr<thread_pool>(1, 16);
 	}
 
-	Context::~Context()
+	Engine::~Engine()
 	{
 
 	}
 
-	void Context::destoryAll()
+	void Engine::destoryAll()
 	{
 		mSceneMgr.reset();
 		mRenderFactory.reset();
 		mApp = nullptr;
 	}
 
-	Context& Context::getInstance()
+	Engine& Engine::getInstance()
 	{
-		if (!mContextInstance)
+		if (!mEngineInstance)
 		{
 			std::lock_guard<std::mutex> lock(singleton_mutex);
-			if (!mContextInstance)
+			if (!mEngineInstance)
 			{
-				mContextInstance = MakeUniquePtr<Context>();
+				mEngineInstance = MakeUniquePtr<Engine>();
 			}
 		}
-		return *mContextInstance;
+		return *mEngineInstance;
 	}
 
-	void Context::destroy()
+	void Engine::destroy()
 	{
 		std::lock_guard<std::mutex> lock(singleton_mutex);
-		if (mContextInstance)
+		if (mEngineInstance)
 		{
-			mContextInstance->destoryAll();
-			mContextInstance.reset();
+			mEngineInstance->destoryAll();
+			mEngineInstance.reset();
 		}
 
 	}
 
-	void Context::loadCfg(std::string const & cfg_file)
+	void Engine::loadCfg(std::string const & cfg_file)
 	{
 // 		int width = 800;
 // 		int height = 600;
@@ -120,31 +130,55 @@ namespace Air
 		//}
 	}
 
-	void Context::setConfig(ContextCfg const & cfg)
+	void Engine::setConfig(ContextCfg const & cfg)
 	{
 		mCfg = cfg;
 		
 	}
 
-	ContextCfg const& Context::getConfig() const
+	ContextCfg const& Engine::getConfig() const
 	{
 		return mCfg;
 	}
 
 
-	void Context::setAppInstance(App3DFramework& app)
+	void Engine::setAppInstance(App3DFramework& app)
 	{
 		mApp = &app;
 	}
 
-	App3DFramework& Context::getAppInstance()
+	App3DFramework& Engine::getAppInstance()
 	{
 		BOOST_ASSERT(mApp);
 		AIR_ASSUME(mApp);
 		return *mApp;
 	}
 
-	SceneManager& Context::getSceneManangerInstance()
+	void Engine::loadResourcePlugins(std::vector<AssetsPluginCfg> const &rp_cfg)
+	{
+		for (const AssetsPluginCfg& acf : rp_cfg)
+		{
+			std::string resource_plugins_path = ResLoader::getInstance().locate("resource_plugin");
+			std::string full_name = AIR_DLL_PREFIX"ResourcePlugins" + acf.mName + DLL_SUFFIX;
+			std::string path = resource_plugins_path + "/" + full_name;
+			DllLoader loader;
+			loader.load(ResLoader::getInstance().locate(path));
+			makeResourcePluginFunc mrpf = (makeResourcePluginFunc)loader.getProcAddress("makeResourcePlugin");
+			if (mrpf != nullptr)
+			{
+				mResourcePlugins.emplace(acf.mName, std::unique_ptr<ResourcePlugin>());
+				mrpf(mResourcePlugins[acf.mName]);
+				mResourceLoaders.emplace(acf.mName, loader);
+			}
+			else
+			{
+				logError("loading %s failed", path.c_str());
+				loader.free();
+			}
+		}
+	}
+
+	SceneManager& Engine::getSceneManangerInstance()
 	{
 		if (!mSceneMgr)
 		{
@@ -157,7 +191,7 @@ namespace Air
 		return *mSceneMgr;
 	}
 
-	void Context::loadSceneManager(std::string const & sm_name)
+	void Engine::loadSceneManager(std::string const & sm_name)
 	{
 		mSceneMgr.reset();
 		mSceneManagerLoader.free();
@@ -177,7 +211,7 @@ namespace Air
 		}
 	}
 
-	void Context::loadRenderFactory(std::string const &rf_name)
+	void Engine::loadRenderFactory(std::string const &rf_name)
 	{
 		mRenderFactory.reset();
 		mRenderLoader.free();
@@ -198,7 +232,7 @@ namespace Air
 	}
 
 
-	RenderFactory& Context::getRenderFactoryInstance()
+	RenderFactory& Engine::getRenderFactoryInstance()
 	{
 		if (!mRenderFactory)
 		{

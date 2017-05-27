@@ -23,7 +23,7 @@ namespace Air
 		mSyncInterval = settings.mSyncInterval;
 		ElementFormat format = settings.mColorFmt;
 
-		WindowPtr const & main_wnd = Context::getInstance().getAppInstance().getMainWnd();
+		WindowPtr const & main_wnd = Engine::getInstance().getAppInstance().getMainWnd();
 		mHwnd = main_wnd->getHWnd();
 		mOnExitSizeMoveConnect = main_wnd->onExitSizeMove().connect(std::bind(&D3D11RenderWindow::onExitSizeMove, this, std::placeholders::_1));
 		mOnSizeConnect = main_wnd->onSize().connect(std::bind(&D3D11RenderWindow::onSize, this, std::placeholders::_1, std::placeholders::_2));
@@ -48,7 +48,7 @@ namespace Air
 		mViewport->mWidth = mWidth;
 		mViewport->mHeight = mHeight;
 
-		RenderFactory& rf = Context::getInstance().getRenderFactoryInstance();
+		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
 		D3D11RenderEngine& d3d11_re = *checked_cast<D3D11RenderEngine*>(&rf.getRenderEngineInstance());
 		ID3D11Device* d3d_device = d3d11_re.getD3DDevice();
 		ID3D11DeviceContext* d3d_imm_context = nullptr;
@@ -156,7 +156,7 @@ namespace Air
 				if (SUCCEEDED(hr))
 				{
 					d3d11_re.setD3DDevice(d3d_device, d3d_imm_context, out_feature_level);
-					if (Context::getInstance().getAppInstance().confirmDevice())
+					if (Engine::getInstance().getAppInstance().confirmDevice())
 					{
 						if (dev_type != D3D_DRIVER_TYPE_HARDWARE)
 						{
@@ -367,7 +367,7 @@ namespace Air
 
 	void D3D11RenderWindow::updateSurfacesPtrs()
 	{
-		RenderFactory& rf = Context::getInstance().getRenderFactoryInstance();
+		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
 #if defined AIR_PLATFORM_WINDOWS_DESKTOP
 		if (mDXGIAllowTearing)
 #endif
@@ -376,7 +376,7 @@ namespace Air
 			if (d3d11RenderEngine.getDXGISubVer() >= 2)
 			{
 				BOOST_ASSERT(mSwapChain1);
-				WindowPtr const & main_wnd = Context::getInstance().getAppInstance().getMainWnd();
+				WindowPtr const & main_wnd = Engine::getInstance().getAppInstance().getMainWnd();
 				Window::WindowRotation const rotation = main_wnd->getRotation();
 
 				DXGI_MODE_ROTATION dxgi_rotation;
@@ -406,7 +406,7 @@ namespace Air
 		TIF(mSwapChain1->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&back_buffer)));
 		mBackBuffer = MakeSharedPtr<D3D11Texture2D>(MakeComPtr(back_buffer));
 		mRenderTargetView = rf.Make2DRenderView(*mBackBuffer, 0, 1, 0);
-		bool stereo = (STM_LCDShutter == Context::getInstance().getConfig().mGraphicsCfg.mStereoMethod) && mDXGIStereoSupport;
+		bool stereo = (STM_LCDShutter == Engine::getInstance().getConfig().mGraphicsCfg.mStereoMethod) && mDXGIStereoSupport;
 		if (stereo)
 		{
 			mRenderTargetViewRightEye = rf.Make2DRenderView(*mBackBuffer, 1, 1, 0);
@@ -431,7 +431,7 @@ namespace Air
 
 	void D3D11RenderWindow::createSwapChain(ID3D11Device* d3d_device)
 	{
-		RenderFactory& rf = Context::getInstance().getRenderFactoryInstance();
+		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
 		D3D11RenderEngine& d3d11_re = *checked_cast<D3D11RenderEngine*>(&rf.getRenderEngineInstance());
 		if (d3d11_re.getDXGISubVer() >= 2)
 		{
@@ -493,7 +493,7 @@ namespace Air
 			UINT const present_flags = (mDXGIAllowTearing && !mIsFullScreen) ? DXGI_PRESENT_ALLOW_TEARING : 0;
 			TIF(mSwapChain->Present(mSyncInterval, present_flags));
 
-			RenderFactory& rf = Context::getInstance().getRenderFactoryInstance();
+			RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
 			D3D11RenderEngine& d3d11_re = *checked_cast<D3D11RenderEngine*>(&rf.getRenderEngineInstance());
 			if (d3d11_re.getDXGISubVer() >= 2)
 			{

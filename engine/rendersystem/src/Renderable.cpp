@@ -36,7 +36,7 @@ namespace Air
 	void Renderable::render()
 	{
 		this->updateInstanceStream();
-		RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		RenderLayout const & layout = this->getRenderLayout();
 
 	}

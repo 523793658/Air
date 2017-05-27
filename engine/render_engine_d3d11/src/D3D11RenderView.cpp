@@ -8,7 +8,7 @@ namespace Air
 {
 	D3D11RenderView::D3D11RenderView()
 	{
-		D3D11RenderEngine& renderEngine(*checked_cast<D3D11RenderEngine*>(&Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance()));
+		D3D11RenderEngine& renderEngine(*checked_cast<D3D11RenderEngine*>(&Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance()));
 		mD3DDevice = renderEngine.getD3DDevice();
 		mD3DImmContext = renderEngine.getD3DDeviceContext();
 		mD3DImmContext1 = renderEngine.getD3DDeviceContext1();
@@ -16,7 +16,7 @@ namespace Air
 
 	D3D11RenderView::D3D11RenderView(Texture* texture)
 	{
-		D3D11RenderEngine& renderEngine(*checked_cast<D3D11RenderEngine*>(&Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance()));
+		D3D11RenderEngine& renderEngine(*checked_cast<D3D11RenderEngine*>(&Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance()));
 		mD3DDevice = renderEngine.getD3DDevice();
 		mD3DImmContext = renderEngine.getD3DDeviceContext();
 		mD3DImmContext1 = renderEngine.getD3DDeviceContext1();
@@ -53,7 +53,7 @@ namespace Air
 
 	void D3D11RenderTargetRenderView::bindDiscardFunc()
 	{
-		D3D11RenderEngine& re = *checked_cast<D3D11RenderEngine*>(&Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance());
+		D3D11RenderEngine& re = *checked_cast<D3D11RenderEngine*>(&Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance());
 		if (re.getD3D11RuntimeSubVer() >= 1)
 		{
 			mDiscardFunc = std::bind(&D3D11RenderTargetRenderView::HWDiscard, this);
@@ -93,7 +93,7 @@ namespace Air
 
 	void D3D11DepthStencilRenderView::bindDiscardFunc()
 	{
-		D3D11RenderEngine& re = *checked_cast<D3D11RenderEngine*>(&Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance());
+		D3D11RenderEngine& re = *checked_cast<D3D11RenderEngine*>(&Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance());
 		if (re.getD3D11RuntimeSubVer() >= 1)
 		{
 			mDiscardFunc = std::bind(&D3D11DepthStencilRenderView::HWDiscard, this);

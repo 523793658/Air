@@ -69,7 +69,7 @@ namespace Air
 
 #endif
 #endif
-		mLoadingThread = MakeUniquePtr<joiner<void >> (Context::getInstance().getThreadPool()(
+		mLoadingThread = MakeUniquePtr<joiner<void >> (Engine::getInstance().getThreadPool()(
 			std::bind(&ResLoader::loadingThreadFunc, this)));
 	}
 

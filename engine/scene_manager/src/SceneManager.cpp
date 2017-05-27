@@ -28,7 +28,7 @@ namespace Air
 
 	void SceneManager::update()
 	{
-		RenderEngine& renderEngine = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& renderEngine = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		renderEngine.beginFrame();
 		this->flushScene();
 	}
@@ -37,8 +37,8 @@ namespace Air
 	{
 		std::lock_guard<std::mutex> lock(mUpdateMutex);
 		mURT = urt;
-		RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
-		App3DFramework& app = Context::getInstance().getAppInstance();
+		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		App3DFramework& app = Engine::getInstance().getAppInstance();
 		float const app_time = app.getAppTime();
 		float const frame_time = app.getFrameTime();
 
@@ -186,7 +186,7 @@ namespace Air
 
 	void SceneManager::clipScene()
 	{
-		App3DFramework& app = Context::getInstance().getAppInstance();
+		App3DFramework& app = Engine::getInstance().getAppInstance();
 		Camera& camera = app.getActiveCamera();
 		float4x4 viewProjMat = camera.getViewProjMatrix();
 		for (auto const & obj : mSceneObjs)
@@ -227,10 +227,10 @@ namespace Air
 
 	void SceneManager::flushScene()
 	{
-		RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		mVisibleMarksMap.clear();
 		uint32_t urt;
-		App3DFramework& app = Context::getInstance().getAppInstance();
+		App3DFramework& app = Engine::getInstance().getAppInstance();
 		for (uint32_t pass = 0; ; ++pass)
 		{
 			re.beginPass();
@@ -265,7 +265,7 @@ namespace Air
 
 	void SceneManager::addSceneObjectLocked(SceneObjectPtr const & obj)
 	{
-		App3DFramework& app = Context::getInstance().getAppInstance();
+		App3DFramework& app = Engine::getInstance().getAppInstance();
 		float const app_time = app.getAppTime();
 		float const frame_time = app.getFrameTime();
 

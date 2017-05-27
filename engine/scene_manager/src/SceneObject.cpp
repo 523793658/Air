@@ -67,7 +67,7 @@ namespace Air
 
 	void SceneObject::addToSceneManager()
 	{
-		Context::getInstance().getSceneManangerInstance().addSceneObject(this->shared_from_this());
+		Engine::getInstance().getSceneManangerInstance().addSceneObject(this->shared_from_this());
 		for (auto const & child : mChildren)
 		{
 			child->addToSceneManager();
@@ -76,7 +76,7 @@ namespace Air
 
 	void SceneObject::addToSceneManagerLocked()
 	{
-		Context::getInstance().getSceneManangerInstance().addSceneObjectLocked(this->shared_from_this());
+		Engine::getInstance().getSceneManangerInstance().addSceneObjectLocked(this->shared_from_this());
 		for (auto const & child : mChildren)
 		{
 			child->addToSceneManagerLocked();

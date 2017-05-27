@@ -24,7 +24,7 @@ namespace Air
 			}
 		}
 		mNumMipMaps = num_mip_maps;
-		D3D11RenderEngine const & re = *checked_cast<D3D11RenderEngine const *>(&Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance());
+		D3D11RenderEngine const & re = *checked_cast<D3D11RenderEngine const *>(&Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance());
 		if (re.getDeviceFeatureLevel() <= D3D_FEATURE_LEVEL_9_3)
 		{
 			if (!re.getDeviceCaps().mFullNoptTextureSupport && (mNumMipMaps > 1) && (((width & (width - 1)) != 0 || ((height & (height - 1)) != 0))))

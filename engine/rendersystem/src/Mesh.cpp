@@ -195,7 +195,7 @@ namespace Air
 
 	void StaticMesh::addVertexStream(void const * buf, uint32_t size, VertexElement const & ve, uint32_t access_hint)
 	{
-		RenderFactory& rf = Context::getInstance().getRenderFactoryInstance();
+		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
 		GraphicsBufferPtr vb = rf.makeVertex
 	}
 

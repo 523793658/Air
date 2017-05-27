@@ -15,7 +15,7 @@ namespace Air
 	Camera::Camera()
 		:mViewProjMatDirty(true), mViewProjMatrixWoAdjustDirty(true), mFrustumDirty(true), mMode(0), mCurJitterIndex(0)
 	{
-		RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		uint32_t num_motion_frames = re.getNumMotionFrames();
 		mPrevProjMats.resize(num_motion_frames);
 		mPrevProjMats.resize(num_motion_frames);
@@ -47,7 +47,7 @@ namespace Air
 		mProjectMatrix = float4x4::createPerspectiveFOVLH(fov, aspect, near_plane, far_plane);
 		mProjectMatrixWoAdjust = mProjectMatrix;
 
-		RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		re.adjustProjectionMatrix(mProjectMatrix);
 		mInvProjectMatrix = mProjectMatrix.inverse();
 		mInvProjectMatrixWoAdjust = mProjectMatrixWoAdjust.inverse();
@@ -65,7 +65,7 @@ namespace Air
 
 		mProjectMatrix = float4x4::createOrthoLH(w, h, near_plane, far_plane);
 		mProjectMatrixWoAdjust = mProjectMatrix;
-		RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		re.adjustProjectionMatrix(mProjectMatrix);
 		mInvProjectMatrix = mProjectMatrix.inverse();
 		mInvProjectMatrixWoAdjust = mProjectMatrixWoAdjust.inverse();
@@ -83,7 +83,7 @@ namespace Air
 		mProjectMatrix = float4x4::createOrthoCenterLH(left, right, bottom, top, near_plane, far_plane);
 		mProjectMatrixWoAdjust = mProjectMatrix;
 
-		RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		re.adjustProjectionMatrix(mProjectMatrix);
 		mInvProjectMatrix = mProjectMatrix.inverse();
 		mInvProjectMatrixWoAdjust = mProjectMatrixWoAdjust.inverse();
