@@ -52,23 +52,42 @@ namespace Air
 
 	uint64_t LZMACodec::decode(std::ostream& os, ResIdentifierPtr const & res, uint64_t len, uint64_t original_len)
 	{
-
+		std::vector<uint8_t> in_data(static_cast<size_t>(len));
+		res->read(&in_data[0], len);
+		std::vector<uint8_t> output;
+		this->decode(output, &in_data[0], len, original_len);
+		os.write(reinterpret_cast<char*>(&output[0]), static_cast<std::streamsize>(output.size()));
+		return output.size();
 	}
 	uint64_t LZMACodec::decode(std::ostream& os, void const * input, uint64_t len, uint64_t original_len)
 	{
-
+		std::vector<uint8_t> output(static_cast<uint32_t>(original_len));
+		this->decode(&output[0], input, len, original_len);
+		os.write(reinterpret_cast<char*>(&output[0]), original_len);
+		return output.size();
 	}
 	void LZMACodec::decode(std::vector<uint8_t>& output, ResIdentifierPtr const & res, uint64_t len, uint64_t original_len)
 	{
+		std::vector<uint8_t> input_data(static_cast<uint32_t>(len));
+		res->read(&input_data[0], static_cast<uint32_t>(len));
+		this->decode(output, &input_data[0], len, original_len);
 
 	}
 	void LZMACodec::decode(std::vector<uint8_t>& output, void const * input, uint64_t len, uint64_t original_len)
 	{
-
+		output.resize(static_cast<uint32_t>(original_len));
+		this->decode(&output[0], input, len, original_len);
 	}
 	void LZMACodec::decode(void* output, void const * input, uint64_t len, uint64_t original_len)
 	{
+		uint8_t const *p = static_cast<uint8_t const *>(input);
+		std::vector<uint8_t> in_data(static_cast<size_t>(len));
+		std::memcpy(&in_data[0], p, static_cast<std::streamsize>(in_data.size()));
 
+		SizeT out_len = static_cast<SizeT>(original_len);
+		SizeT src_len = static_cast<SizeT>(len - LZMA_PROPS_SIZE);
+
+		LzmaUncompress(static_cast<Byte*>(output), &out_len, &in_data[LZMA_PROPS_SIZE], &src_len, &in_data[0], LZMA_PROPS_SIZE);
 	}
 
 

@@ -9,6 +9,14 @@
 
 namespace Air
 {
+	class AIR_CORE_API Mesh
+	{
+	public:
+		Mesh();
+
+	};
+	
+
 	class AIR_CORE_API StaticMesh : public Renderable
 	{
 	public:
@@ -243,6 +251,9 @@ namespace Air
 
 
 	AIR_CORE_API RenderModelPtr syncLoadModel(std::string const & meshml_name, uint32_t access_hint, std::function<RenderModelPtr(std::wstring const &)> createModelFactoryFunc = CreateModelFactory<RenderModel>(), std::function<StaticMeshPtr(RenderModelPtr const &, std::wstring const &)> createMeshFactoryFunc = CreateMeshFactory<StaticMesh>());
+
+
+
 
 }
 #endif

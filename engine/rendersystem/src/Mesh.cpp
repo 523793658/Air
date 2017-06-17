@@ -8,6 +8,7 @@
 #include "rendersystem/include/RenderMaterial.hpp"
 #include "rendersystem/include/RenderLayout.hpp"
 #include "rendersystem/include/Mesh.hpp"
+#include "packing_system/include/LZMACodec.h"
 
 namespace
 {
@@ -246,10 +247,9 @@ namespace Air
 
 		//解码
 		//LZMACodec
-
+		LZMACodec lzma;
+		lzma.decode(*ss, lzma_file, len, original_len);
 		ResIdentifierPtr decoded = MakeSharedPtr<ResIdentifier>(lzma_file->getResName(), lzma_file->getTimestamp(), ss);
-
-
 
 		//模型数量
 		uint32_t num_meshes;
