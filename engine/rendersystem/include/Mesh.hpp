@@ -236,17 +236,13 @@ namespace Air
 	};
 	typedef std::vector<AABBKeyFrames> AABBKeyFramesType;
 
-	AIR_CORE_API void loadModel(std::string const & meshml_name, std::vector<RenderMaterialPtr>& mtls,
+	AIR_CORE_API void loadModel(std::string const & meshml_name,
 		std::vector<VertexElement> & merged_ves, char& all_is_index_16_bit,
 		std::vector<std::vector<uint8_t>>& merged_buff, std::vector<uint8_t>& merged_indices,
 		std::vector<std::string>& mesh_names, std::vector<int32_t>& mtl_ids,
 		std::vector<AABBox> & pos_bbs, std::vector<AABBox>& tc_bbs,
 		std::vector<uint32_t> & mesh_num_vertices, std::vector<uint32_t>& mesh_base_vertices,
-		std::vector<uint32_t> & mesh_num_indices, std::vector<uint32_t>& mesh_base_indices,
-
-		std::vector<Joint> & joints, std::shared_ptr<AnimationActionsType> & actions,
-		std::shared_ptr<KeyFramesType> & kfs, uint32_t & num_frame, uint32_t & frame_rate,
-		std::vector<std::shared_ptr<AABBKeyFrames>>& frame_pos_bbs);
+		std::vector<uint32_t> & mesh_num_indices, std::vector<uint32_t>& mesh_base_indices);
 
 
 

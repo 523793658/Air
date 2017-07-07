@@ -9,6 +9,9 @@
 #include "rendersystem/include/RenderLayout.hpp"
 #include "rendersystem/include/Mesh.hpp"
 #include "packing_system/include/LZMACodec.h"
+#include "rendersystem/include/RenderDeviceCaps.hpp"
+#include "rendersystem/include/RenderFactory.h"
+#include "rendersystem/include/RenderEngine.hpp"
 
 namespace
 {
@@ -70,7 +73,17 @@ namespace
 
 		void subThreadStage()
 		{
-
+			loadModel(mModelDesc.mResName, mModelDesc.mModelData->mMergedVes, mModelDesc.mModelData->mAllIsIndex16Bit, 
+				mModelDesc.mModelData->mMergedBuffer, mModelDesc.mModelData->mMergedIndex, mModelDesc.mModelData->mMeshNames, 
+				mModelDesc.mModelData->mMaterialIds, mModelDesc.mModelData->mPosBox, mModelDesc.mModelData->mTexcoordBox, 
+				mModelDesc.mModelData->mMeshNumVertices, mModelDesc.mModelData->mMeshBaseVertices, 
+				mModelDesc.mModelData->mMeshNumIndices, mModelDesc.mModelData->mMeshBaseVertices);
+			RenderFactory&rf = Engine::getInstance().getRenderFactoryInstance();
+			RenderDeviceCaps const & caps = rf.getRenderEngineInstance().getDeviceCaps();
+			if (caps.mMultithreadResCreatingSupport)
+			{
+				this->mainThreadStage();
+			}
 		}
 		std::shared_ptr<void> mainThreadStage()
 		{
@@ -84,7 +97,6 @@ namespace
 					mModelDesc.mModelData->mMergedVBs[i]->createHWResouce(&mModelDesc.mModelData->mMergedBuffer[i][0]);
 				}
 				mModelDesc.mModelData->mMergedIB->createHWResouce(&mModelDesc.mModelData->mMergedIndex[0]);
-				this->addsSubPath();
 				model->buildModelInfo();
 				for (uint32_t i = 0; i < model->getNumSubRenderables(); ++i)
 				{
@@ -175,9 +187,18 @@ namespace
 	private:
 		void fillModel()
 		{
-		}
-		void addsSubPath()
-		{
+			RenderModelPtr const & model = *mModelDesc.mModel;
+			RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+			mModelDesc.mModelData->mMergedVBs.resize(mModelDesc.mModelData->mMergedBuffer.size());
+			for (size_t i = 0; i < mModelDesc.mModelData->mMergedVBs.size(); ++i)
+			{
+				mModelDesc.mModelData->mMergedVBs[i] = rf.makeDelayCreationVertexBuffer(BU_Static, mModelDesc.mAccessHint, static_cast<uint32_t>(mModelDesc.mModelData->mMergedBuffer[i].size()));
+			}
+			mModelDesc.mModelData->mMergedIB = rf.makeDelayCreationIndexBuffer(BU_Static, mModelDesc.mAccessHint, static_cast<uint32_t>(mModelDesc.mModelData->mMergedIndex.size()));
+
+
+
+
 		}
 	private:
 		ModelDesc mModelDesc;
@@ -209,17 +230,13 @@ namespace Air
 
 	std::string const jit_ext_name = ".model_bin";
 
-	void loadModel(std::string const & path, std::vector<RenderMaterialPtr>& mtls,
+	void loadModel(std::string const & path,
 		std::vector<VertexElement> & merged_ves, char& all_is_index_16_bit,
 		std::vector<std::vector<uint8_t>>& merged_buff, std::vector<uint8_t>& merged_indices,
 		std::vector<std::string>& mesh_names, std::vector<int32_t>& mtl_ids,
 		std::vector<AABBox> & pos_bbs, std::vector<AABBox>& tc_bbs,
 		std::vector<uint32_t> & mesh_num_vertices, std::vector<uint32_t>& mesh_base_vertices,
-		std::vector<uint32_t> & mesh_num_indices, std::vector<uint32_t>& mesh_base_indices,
-
-		std::vector<Joint> & joints, std::shared_ptr<AnimationActionsType> & actions,
-		std::shared_ptr<KeyFramesType> & kfs, uint32_t & num_frame, uint32_t & frame_rate,
-		std::vector<std::shared_ptr<AABBKeyFrames>>& frame_pos_bbs)
+		std::vector<uint32_t> & mesh_num_indices, std::vector<uint32_t>& mesh_base_indices)
 	{
 		ResIdentifierPtr lzma_file;
 		std::string absPath = ResLoader::getInstance().getAbsPath(path + ".asset");
@@ -258,7 +275,89 @@ namespace Air
 
 
 		//¶ÁÒ»¸ö¶Ì×Ö·û´® readShortString();
+		uint32_t num_merged_ves;
+		decoded->read(&num_merged_ves, sizeof(num_merged_ves));
+		merged_ves.resize(num_merged_ves);
+		for (size_t i = 0; i < num_merged_ves; ++i)
+		{
+			decoded->read(&merged_ves[i], sizeof(merged_ves[i]));
+			merged_ves[i].mUsage = LE2Native(merged_ves[i].mUsage);
+			merged_ves[i].mFormat = LE2Native(merged_ves[i].mFormat);
+		}
+
+		uint32_t all_num_vertices;
+		uint32_t all_num_indices;
+
+		decoded->read(&all_num_vertices, sizeof(all_num_vertices));
+		all_num_vertices = LE2Native(all_num_vertices);
+
+		decoded->read(&all_num_indices, sizeof(all_num_indices));
+		all_num_indices = LE2Native(all_num_indices);
+
+		decoded->read(&all_is_index_16_bit, sizeof(all_is_index_16_bit));
+
+		int const index_elem_size = all_is_index_16_bit ? 2 : 4;
+
+		merged_buff.resize(merged_ves.size());
+		for (size_t i = 0; i < merged_buff.size(); ++i)
+		{
+			merged_buff[i].resize(all_num_vertices * merged_ves[i].getElementSize());
+			decoded->read(&merged_buff[i][0], merged_buff[i].size() * sizeof(merged_buff[i][0]));
+		}
+
+		merged_indices.resize(all_num_indices * index_elem_size);
+		decoded->read(&merged_indices[0], merged_indices.size() * sizeof(merged_indices[0]));
+
+		mesh_names.resize(num_meshes);
+		mtl_ids.resize(num_meshes);
+		pos_bbs.resize(num_meshes);
+		tc_bbs.resize(num_meshes);
+		mesh_num_vertices.resize(num_meshes);
+		mesh_base_vertices.resize(num_meshes);
+		mesh_num_indices.resize(num_meshes);
+		mesh_base_indices.resize(num_meshes);
+		for (uint32_t mesh_index = 0; mesh_index < num_meshes; ++mesh_index)
+		{
+			mesh_names[mesh_index] = readShortString(decoded);
+			decoded->read(&mtl_ids[mesh_index], sizeof(mtl_ids[mesh_index]));
+
+			float3 min_bb, max_bb;
+			decoded->read(&min_bb, sizeof(min_bb));
+			min_bb.x = LE2Native(min_bb.x);
+			min_bb.y = LE2Native(min_bb.y);
+			min_bb.z = LE2Native(min_bb.z);
+
+			decoded->read(&max_bb, sizeof(max_bb));
+			max_bb.x = LE2Native(max_bb.x);
+			max_bb.y = LE2Native(max_bb.y);
+			max_bb.z = LE2Native(max_bb.z);
+
+			pos_bbs[mesh_index] = AABBox(min_bb, max_bb);
+
+			decoded->read(&min_bb[0], sizeof(min_bb[0]));
+			decoded->read(&min_bb[1], sizeof(min_bb[1]));
+
+			min_bb.x() = LE2Native(min_bb.x);
+			min_bb.y() = LE2Native(min_bb.y);
+			min_bb.z() = 0;
+
+			decoded->read(&max_bb[0], sizeof(max_bb[0]));
+			decoded->read(&max_bb[1], sizeof(max_bb[1]));
+			max_bb.x() = LE2Native(max_bb.x);
+			max_bb.y() = LE2Native(max_bb.y);
+			max_bb.z() = 0;
+			tc_bbs[mesh_index] = AABBox(min_bb, max_bb);
+
+			decoded->read(&mesh_num_vertices[mesh_index], sizeof(mesh_num_vertices[mesh_index]));
+			mesh_num_vertices[mesh_index] = LE2Native(mesh_num_vertices[mesh_index]);
+			decoded->read(&mesh_base_vertices[mesh_index], sizeof(mesh_base_vertices[mesh_index]));
+			mesh_base_vertices[mesh_index] = LE2Native(mesh_base_vertices[mesh_index]);
 
 
+			decoded->read(&mesh_num_indices[mesh_index], sizeof(mesh_num_indices[mesh_index]));
+			mesh_num_indices[mesh_index] = LE2Native(mesh_num_indices[mesh_index]);
+			decoded->read(&mesh_base_indices[mesh_index], sizeof(mesh_base_indices[mesh_index]));
+			mesh_base_indices[mesh_index] = LE2Native(mesh_base_indices[mesh_index]);
+		}
 	}
 }
