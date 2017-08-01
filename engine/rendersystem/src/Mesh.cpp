@@ -17,6 +17,7 @@ namespace
 {
 	using namespace Air;
 	uint32_t const MODEL_BIN_VERSION = 1;
+
 	class RenderModelLoadingDesc : public ResLoadingDesc
 	{
 	private:
@@ -29,14 +30,13 @@ namespace
 			std::function<StaticMeshPtr(RenderModelPtr const &, std::wstring const &)> mCreateMeshFactoryFunc;
 
 			struct ModelData {
-				std::vector<RenderMaterialPtr> mMaterials;
 				std::vector<VertexElement> mMergedVes;
 				char mAllIsIndex16Bit;
 				std::vector<std::vector<uint8_t>> mMergedBuffer;
 				std::vector<uint8_t> mMergedIndex;
 				std::vector<GraphicsBufferPtr> mMergedVBs;
 				GraphicsBufferPtr mMergedIB;
-				std::vector<std::string> mMeshNames;
+				std::vector<std::wstring> mMeshNames;
 				std::vector<int32_t> mMaterialIds;
 				std::vector<AABBox> mPosBox;
 				std::vector<AABBox> mTexcoordBox;
@@ -55,7 +55,7 @@ namespace
 			std::shared_ptr<RenderModelPtr> mModel;
 		};
 	public:
-		RenderModelLoadingDesc(std::string const &resName, uint32_t accessHint, std::function<RenderModelPtr(std::wstring const &)> createModelFactoryFunc, std::function<StaticMeshPtr(RenderModelPtr const &, std::wstring const &)> createMeshFactoryFunc)
+		RenderModelLoadingDesc(std::wstring const &resName, uint32_t accessHint, std::function<RenderModelPtr(std::wstring const &)> createModelFactoryFunc, std::function<StaticMeshPtr(RenderModelPtr const &, std::wstring const &)> createMeshFactoryFunc)
 		{
 
 		}
@@ -171,7 +171,6 @@ namespace
 				}
 				model->assignSubrenderable(meshes.begin(), meshes.end());
 			}
-			this->addsSubPath();
 			model->buildModelInfo();
 			for (uint32_t i = 0; i < model->getNumSubRenderables(); ++i)
 			{
@@ -196,9 +195,26 @@ namespace
 			}
 			mModelDesc.mModelData->mMergedIB = rf.makeDelayCreationIndexBuffer(BU_Static, mModelDesc.mAccessHint, static_cast<uint32_t>(mModelDesc.mModelData->mMergedIndex.size()));
 
+			std::vector<StaticMeshPtr> meshes(mModelDesc.mModelData->mMeshNames.size());
+			for (uint32_t mesh_index = 0; mesh_index < mModelDesc.mModelData->mMeshNames.size(); ++mesh_index)
+			{
+				meshes[mesh_index] = mModelDesc.mCreateMeshFactoryFunc(model, mModelDesc.mModelData->mMeshNames[mesh_index]);
+				StaticMeshPtr& mesh = meshes[mesh_index];
 
-
-
+				mesh->setMaterialID(mModelDesc.mModelData->mMaterialIds[mesh_index]);
+				mesh->setPosAABB(mModelDesc.mModelData->mPosBox[mesh_index]);
+				mesh->setTexcoordAABB(mModelDesc.mModelData->mTexcoordBox[mesh_index]);
+				for (uint32_t ve_index = 0; ve_index < mModelDesc.mModelData->mMergedBuffer.size(); ++ve_index)
+				{
+					mesh->addVertexStream(mModelDesc.mModelData->mMergedVBs[ve_index], mModelDesc.mModelData->mMergedVes[ve_index]);
+				}
+				mesh->addIndexStream(mModelDesc.mModelData->mMergedIB, mModelDesc.mModelData->mAllIsIndex16Bit ? EF_R16UI : EF_R32UI);
+				mesh->setNumVertices(mModelDesc.mModelData->mMeshNumVertices[mesh_index]);
+				mesh->setNumIndices(mModelDesc.mModelData->mMeshNumIndices[mesh_index]);
+				mesh->setStartVertexLocation(mModelDesc.mModelData->mMeshBaseVertices[mesh_index]);
+				mesh->setStartIndexLocation(mModelDesc.mModelData->mMeshStartIndices[mesh_index]);
+			}
+			model->assignSubrenderable(meshes.begin(), meshes.end());
 		}
 	private:
 		ModelDesc mModelDesc;
@@ -207,6 +223,30 @@ namespace
 }
 namespace Air
 {
+
+	RenderModel::RenderModel(std::wstring const & name) : mName(name), mHWResourceReady(false)
+	{
+
+	}
+
+	void RenderModel::updateAABB()
+	{
+		mPosAABB = AABBox(float3(0, 0, 0), float3(0, 0, 0));
+		mTexcoordAABB = AABBox(float3(0, 0, 0), float3(0, 0, 0));
+		for (auto const & mesh : mSubRenderables)
+		{
+			mPosAABB |= mesh->getPosAABB();
+			mTexcoordAABB |= mesh->getTexcoordAABB();
+		}
+	}
+
+	StaticMesh::StaticMesh(RenderModelPtr const & model, std::wstring const & name)
+		:mName(name), mModel(model), mHWResReady(false)
+	{
+		mRenderLayout = Engine::getInstance().getRenderFactoryInstance().MakeRenderLayout();
+		mRenderLayout->setTopologyType(RenderLayout::TT_TriangleList);
+	}
+
 	StaticMesh::~StaticMesh()
 	{
 	}
@@ -218,10 +258,31 @@ namespace Air
 	void StaticMesh::addVertexStream(void const * buf, uint32_t size, VertexElement const & ve, uint32_t access_hint)
 	{
 		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
-		GraphicsBufferPtr vb = rf.makeVertex
+		GraphicsBufferPtr vb = rf.makeVertexBuffer(BU_Static, access_hint, size, buf);
+		this->addVertexStream(vb, ve);
 	}
 
-	RenderModelPtr syncLoadModel(std::string const & meshml_name, uint32_t access_hint, std::function<RenderModelPtr(std::wstring const &)> createModelFactoryFunc, std::function<StaticMeshPtr(RenderModelPtr const &, std::wstring const &)> createMeshFactoryFunc)
+	void StaticMesh::addVertexStream(GraphicsBufferPtr const & buffer, VertexElement const & ve)
+	{
+		mRenderLayout->bindVertexStream(buffer, std::make_tuple(ve));
+	}
+	void StaticMesh::addIndexStream(void const * buf, uint32_t size, ElementFormat format, uint32_t access_hint)
+	{
+		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+		GraphicsBufferPtr ib = rf.makeIndexBuffer(BU_Static, access_hint, size, buf);
+		this->addIndexStream(ib, format);
+	}
+
+	void StaticMesh::addIndexStream(GraphicsBufferPtr const & index_stream, ElementFormat format)
+	{
+		mRenderLayout->bindIndexStream(index_stream, format);
+	}
+
+	
+
+
+
+	RenderModelPtr syncLoadModel(std::wstring const & meshml_name, uint32_t access_hint, std::function<RenderModelPtr(std::wstring const &)> createModelFactoryFunc, std::function<StaticMeshPtr(RenderModelPtr const &, std::wstring const &)> createMeshFactoryFunc)
 	{
 		BOOST_ASSERT(createModelFactoryFunc);
 		BOOST_ASSERT(createMeshFactoryFunc);
@@ -230,10 +291,14 @@ namespace Air
 
 	std::string const jit_ext_name = ".model_bin";
 
+
+
+
+
 	void loadModel(std::string const & path,
 		std::vector<VertexElement> & merged_ves, char& all_is_index_16_bit,
 		std::vector<std::vector<uint8_t>>& merged_buff, std::vector<uint8_t>& merged_indices,
-		std::vector<std::string>& mesh_names, std::vector<int32_t>& mtl_ids,
+		std::vector<std::wstring>& mesh_names, std::vector<int32_t>& mtl_ids,
 		std::vector<AABBox> & pos_bbs, std::vector<AABBox>& tc_bbs,
 		std::vector<uint32_t> & mesh_num_vertices, std::vector<uint32_t>& mesh_base_vertices,
 		std::vector<uint32_t> & mesh_num_indices, std::vector<uint32_t>& mesh_base_indices)
@@ -318,33 +383,33 @@ namespace Air
 		mesh_base_indices.resize(num_meshes);
 		for (uint32_t mesh_index = 0; mesh_index < num_meshes; ++mesh_index)
 		{
-			mesh_names[mesh_index] = readShortString(decoded);
+			mesh_names[mesh_index] = readShortWString(decoded);
 			decoded->read(&mtl_ids[mesh_index], sizeof(mtl_ids[mesh_index]));
 
 			float3 min_bb, max_bb;
 			decoded->read(&min_bb, sizeof(min_bb));
-			min_bb.x = LE2Native(min_bb.x);
-			min_bb.y = LE2Native(min_bb.y);
-			min_bb.z = LE2Native(min_bb.z);
+			min_bb.x() = LE2Native(min_bb.x());
+			min_bb.y() = LE2Native(min_bb.y());
+			min_bb.z() = LE2Native(min_bb.z());
 
 			decoded->read(&max_bb, sizeof(max_bb));
-			max_bb.x = LE2Native(max_bb.x);
-			max_bb.y = LE2Native(max_bb.y);
-			max_bb.z = LE2Native(max_bb.z);
+			max_bb.x() = LE2Native(max_bb.x());
+			max_bb.y() = LE2Native(max_bb.y());
+			max_bb.z() = LE2Native(max_bb.z());
 
 			pos_bbs[mesh_index] = AABBox(min_bb, max_bb);
 
 			decoded->read(&min_bb[0], sizeof(min_bb[0]));
 			decoded->read(&min_bb[1], sizeof(min_bb[1]));
 
-			min_bb.x() = LE2Native(min_bb.x);
-			min_bb.y() = LE2Native(min_bb.y);
+			min_bb.x() = LE2Native(min_bb.x());
+			min_bb.y() = LE2Native(min_bb.y());
 			min_bb.z() = 0;
 
 			decoded->read(&max_bb[0], sizeof(max_bb[0]));
 			decoded->read(&max_bb[1], sizeof(max_bb[1]));
-			max_bb.x() = LE2Native(max_bb.x);
-			max_bb.y() = LE2Native(max_bb.y);
+			max_bb.x() = LE2Native(max_bb.x());
+			max_bb.y() = LE2Native(max_bb.y());
 			max_bb.z() = 0;
 			tc_bbs[mesh_index] = AABBox(min_bb, max_bb);
 

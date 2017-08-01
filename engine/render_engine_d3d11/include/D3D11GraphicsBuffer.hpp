@@ -33,8 +33,8 @@ namespace Air
 	protected:
 		void getD3DFlags(D3D11_USAGE& usage, UINT& cpu_access_flags, UINT& bind_flags, UINT& misc_flags);
 	private:
-		virtual void * map(BufferAccess ba) = 0;
-		virtual void unmap() = 0;
+		void * map(BufferAccess ba);
+		void unmap();
 	private:
 		ID3D11Device* mD3DDevice;
 		ID3D11DeviceContext* mD3DImmCtx;

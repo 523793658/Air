@@ -179,7 +179,11 @@ namespace Air
 		mBuffer.reset();
 	}
 
-	void* D3D11GraphicsBuffer::map(BufferAccess ba)
+	void D3D11GraphicsBuffer::updateSubResource(uint32_t offset, uint32_t size, void const * data)
+	{
+
+	}
+	void * D3D11GraphicsBuffer::map(BufferAccess ba)
 	{
 		BOOST_ASSERT(mBuffer);
 		D3D11_MAP type;

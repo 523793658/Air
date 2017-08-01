@@ -8,6 +8,9 @@
 			"include_dirs":[
 				'../c',
 			],
+			"includes":[
+				"../../../tools/gyp/external.gypi",
+			],
 			'variables': {
 				'outputSubDir': '',
 			},
@@ -35,7 +38,6 @@
 				
 					"OS == 'win'",
 					{
-						"msvs_postbuild":'copy /Y "$(OutDir)lib\\Air$(ProjectName)$(TargetExt)" "..\\..\..\lib\\$(Platform)\\$(Configuration)"',
 						"msbuild_configuration_attributes":{
 							"CharacterSet": "1",
 						}, 
@@ -64,9 +66,6 @@
 						},
 					},
 				],
-			],
-			'includes': [
-				'../../../tools/gyp/common.gypi',
 			],
 		}
 	],

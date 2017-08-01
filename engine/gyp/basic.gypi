@@ -12,6 +12,7 @@
 			],
 			"includes":[
 				"../../tools/gyp/common.gypi",
+				"./common.gypi",
 			],
 			'variables': {
 				'outputSubDir': '',

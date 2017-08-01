@@ -6,6 +6,7 @@
 #include "D3D11Texture.hpp"
 #include "render_engine_d3d11/include/D3D11RenderFactory.hpp"
 #include "render_engine_d3d11/include/D3D11RenderFactoryInternal.hpp"
+#include "D3D11GraphicsBuffer.hpp"
 namespace Air
 {
 	D3D11RenderFactory::D3D11RenderFactory()
@@ -58,15 +59,15 @@ namespace Air
 
 	GraphicsBufferPtr D3D11RenderFactory::makeDelayCreationVertexBuffer(BufferUsage usage, uint32_t access_hint, uint32_t size_in_byte, ElementFormat fmt)
 	{
-		return MakeSharedPtr(D3D11gr)
+		return MakeSharedPtr<D3D11GraphicsBuffer>(usage, access_hint, D3D11_BIND_VERTEX_BUFFER, size_in_byte, fmt);
 	}
 	GraphicsBufferPtr D3D11RenderFactory::makeDelayCreationIndexBuffer(BufferUsage usage, uint32_t access_hint, uint32_t size_in_byte, ElementFormat fmt)
 	{
-
+		return MakeSharedPtr<D3D11GraphicsBuffer>(usage, access_hint, D3D11_BIND_INDEX_BUFFER, size_in_byte, fmt);
 	}
 	GraphicsBufferPtr D3D11RenderFactory::makeDelayCreationConstantBuffer(BufferUsage usage, uint32_t access_hint, uint32_t size_in_byte, ElementFormat fmt)
 	{
-
+		return MakeSharedPtr<D3D11GraphicsBuffer>(usage, access_hint, D3D11_BIND_CONSTANT_BUFFER, size_in_byte, fmt);
 	}
 }
 

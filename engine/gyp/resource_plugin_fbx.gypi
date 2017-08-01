@@ -20,6 +20,7 @@
 			],
 			"includes":[
 				"../../tools/gyp/common.gypi",
+				"./common.gypi",
 			],
 			"sources":[
 				"../resource_plugin_fbx/include/ResourcePluginFBX.h",

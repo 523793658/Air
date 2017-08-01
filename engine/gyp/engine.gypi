@@ -18,6 +18,7 @@
 			],
 			"includes":[
 				"../../tools/gyp/common.gypi",
+				"./common.gypi",
 			],
 			"sources":[
 				"../core/include/Context.h",
@@ -50,6 +51,7 @@
 				"../rendersystem/include/RenderEffect.hpp",
 				"../rendersystem/include/GraphicsBuffer.hpp",
 				"../rendersystem/include/RenderMaterial.hpp",
+				"../rendersystem/include/SimpleMeshFactory.hpp",
 				
 				"../rendersystem/src/RenderSettings.cpp",
 				"../rendersystem/src/RenderFactory.cpp",
@@ -65,6 +67,7 @@
 				"../rendersystem/src/RenderEffect.cpp",
 				"../rendersystem/src/GraphicsBuffer.cpp",
 				"../rendersystem/src/RenderMaterial.cpp",
+				"../rendersystem/src/SimpleMeshFactory.cpp",
 				
 				"../scene_manager/include/SceneManager.hpp",
 				"../scene_manager/include/SceneObject.hpp",
@@ -92,6 +95,11 @@
 							"ClCompile":{
 								'PreprocessorDefinitions': [
 									"AIR_CORE_SOURCE",
+								],
+							},
+							'Link': {
+								'AdditionalDependencies':[
+									"lzma.lib",
 								],
 							},
 						},

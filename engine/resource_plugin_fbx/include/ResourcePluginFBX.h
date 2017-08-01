@@ -7,7 +7,7 @@
 #include "Engine.h"
 
 
-#include "ResourcePlugin.h"
+#include "core/include/ResourcePlugin.h"
 #ifdef AIR_FBX_SOURCE
 #define AIR_FBX_API AIR_SYMBOL_EXPORT
 #else

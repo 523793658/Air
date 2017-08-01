@@ -179,6 +179,17 @@ namespace Air
 			return n;
 		}
 
+		template<typename tuple_type>
+		void bindVertexStream(GraphicsBufferPtr const & buffer, tuple_type const & vertex_elems, StreamType type = ST_Geometry, uint32_t freq = 1)
+		{
+			this->bindVertexStream(buffer, Tuple2Vector<tuple_type, std::tuple_size<tuple_type>::value>::_do(vertex_elems), type, freq);
+		}
+
+		void bindVertexStream(GraphicsBufferPtr const & buffer, VertexElementsType const & vet, StreamType type = ST_Geometry, uint32_t freq = 1);
+
+
+		void bindIndexStream(GraphicsBufferPtr const & buffer, ElementFormat format);
+
 		void setStartVertexLocation(uint32_t location)
 		{
 			mStartVertexLocation = location;
@@ -236,6 +247,7 @@ namespace Air
 		};
 
 		std::vector<StreamUnit> mVertexStreams;
+		StreamUnit mInstanceStream;
 
 		GraphicsBufferPtr mIndexStream;
 		ElementFormat mIndexFormat;

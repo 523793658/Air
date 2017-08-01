@@ -26,19 +26,19 @@ namespace Air
 
 	GraphicsBufferPtr RenderFactory::makeVertexBuffer(BufferUsage usage, uint32_t access_hint, uint32_t size_in_byte, void const * init_data, ElementFormat fmt)
 	{
-		GraphicsBufferPtr ret = this->makeDelayCreationVertexBuffer(usage, access_hint, size_in_byte, init_data, fmt);
+		GraphicsBufferPtr ret = this->makeDelayCreationVertexBuffer(usage, access_hint, size_in_byte, fmt);
 		ret->createHWResouce(init_data);
 		return ret;
 	}
 	GraphicsBufferPtr RenderFactory::makeIndexBuffer(BufferUsage usage, uint32_t access_hint, uint32_t size_in_byte, void const * init_data, ElementFormat fmt)
 	{
-		GraphicsBufferPtr ret = this->makeDelayCreationIndexBuffer(usage, access_hint, size_in_byte, init_data, fmt);
+		GraphicsBufferPtr ret = this->makeDelayCreationIndexBuffer(usage, access_hint, size_in_byte, fmt);
 		ret->createHWResouce(init_data);
 		return ret;
 	}
 	GraphicsBufferPtr RenderFactory::makeConstantBuffer(BufferUsage usage, uint32_t access_hint, uint32_t size_in_byte, void const * init_data, ElementFormat fmt)
 	{
-		GraphicsBufferPtr ret = this->makeDelayCreationConstantBuffer(usage, access_hint, size_in_byte, init_data, fmt);
+		GraphicsBufferPtr ret = this->makeDelayCreationConstantBuffer(usage, access_hint, size_in_byte, fmt);
 		ret->createHWResouce(init_data);
 		return ret;
 	}

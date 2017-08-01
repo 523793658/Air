@@ -1,5 +1,6 @@
 #include "ResourcePluginFBX.h"
 #include "basic/include/Log.hpp"
+#include "core/include/ResourcePlugin.h"
 namespace Air
 {
 

@@ -1,3 +1,8 @@
+#include "boost/assert.hpp"
+
+
+
+
 #include "Engine.h"
 #include "basic/include/Util.h"
 #include "basic/include/Math.hpp"
@@ -7,7 +12,7 @@
 #include "scene_manager/include/SceneManager.hpp"
 #include "basic/include/Thread.h"
 #include "ResLoader.h"
-#include "boost/assert.hpp"
+#include "core/include/ResourcePlugin.h"
 
 #include <memory>
 

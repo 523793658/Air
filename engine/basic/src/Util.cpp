@@ -92,5 +92,18 @@ namespace Air
 		}
 		return tmp;
 	}
+
+	std::wstring readShortWString(ResIdentifierPtr const & res)
+	{
+		uint8_t len;
+		res->read(&len, sizeof(len));
+		std::wstring tmp;
+		if (len > 0)
+		{
+			tmp.resize(len);
+			res->read(&tmp[0], len * sizeof(tmp[0]));
+		}
+		return tmp;
+	}
 }
 

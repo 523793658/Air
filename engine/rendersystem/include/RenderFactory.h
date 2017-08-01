@@ -5,6 +5,7 @@
 #include "PreDeclare.h"
 #include "rendersystem/include/Texture.hpp"
 #include "rendersystem/include/GraphicsBuffer.hpp"
+#include "rendersystem/include/RenderEngine.hpp"
 
 namespace Air
 {

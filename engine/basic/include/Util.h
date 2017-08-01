@@ -45,6 +45,8 @@ namespace Air
 
 	std::string readShortString(ResIdentifierPtr const & res);
 
+	std::wstring readShortWString(ResIdentifierPtr const & res);
+
 
 	// EndianµÄ×ª»»
 	template <int size>

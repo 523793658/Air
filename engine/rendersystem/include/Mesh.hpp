@@ -9,13 +9,6 @@
 
 namespace Air
 {
-	class AIR_CORE_API Mesh
-	{
-	public:
-		Mesh();
-
-	};
-	
 
 	class AIR_CORE_API StaticMesh : public Renderable
 	{
@@ -72,6 +65,13 @@ namespace Air
 
 		void addVertexStream(void const * buf, uint32_t size, VertexElement const & ve, uint32_t access_hint);
 		void addVertexStream(GraphicsBufferPtr const & buffer, VertexElement const & ve);
+
+		template<typename tuple_type>
+		void addVertexStream(GraphicsBufferPtr const & buffer, tuple_type const & vertex_elems)
+		{
+			mRenderLayout->bindVertexStream(buffer, vertex_elems);
+		}
+
 		void addIndexStream(void const * buf, uint32_t size, ElementFormat format, uint32_t access_hint);
 		void addIndexStream(GraphicsBufferPtr const & index_stream, ElementFormat format);
 
@@ -178,7 +178,7 @@ namespace Air
 
 	struct AIR_CORE_API Joint
 	{
-		std::string mName;
+		std::wstring mName;
 		Quaternion mBindReal;
 		Quaternion mBindDual;
 		float mBindScale;
@@ -193,7 +193,7 @@ namespace Air
 
 	struct AIR_CORE_API AnimationAction
 	{
-		std::string mName;
+		std::wstring mName;
 		uint32_t mStartFrame;
 		uint32_t mEndFrame;
 	};
@@ -236,17 +236,17 @@ namespace Air
 	};
 	typedef std::vector<AABBKeyFrames> AABBKeyFramesType;
 
-	AIR_CORE_API void loadModel(std::string const & meshml_name,
+	AIR_CORE_API 	void loadModel(std::string const & path,
 		std::vector<VertexElement> & merged_ves, char& all_is_index_16_bit,
 		std::vector<std::vector<uint8_t>>& merged_buff, std::vector<uint8_t>& merged_indices,
-		std::vector<std::string>& mesh_names, std::vector<int32_t>& mtl_ids,
+		std::vector<std::wstring>& mesh_names, std::vector<int32_t>& mtl_ids,
 		std::vector<AABBox> & pos_bbs, std::vector<AABBox>& tc_bbs,
 		std::vector<uint32_t> & mesh_num_vertices, std::vector<uint32_t>& mesh_base_vertices,
 		std::vector<uint32_t> & mesh_num_indices, std::vector<uint32_t>& mesh_base_indices);
 
 
 
-	AIR_CORE_API RenderModelPtr syncLoadModel(std::string const & meshml_name, uint32_t access_hint, std::function<RenderModelPtr(std::wstring const &)> createModelFactoryFunc = CreateModelFactory<RenderModel>(), std::function<StaticMeshPtr(RenderModelPtr const &, std::wstring const &)> createMeshFactoryFunc = CreateMeshFactory<StaticMesh>());
+	AIR_CORE_API RenderModelPtr syncLoadModel(std::wstring const & meshml_name, uint32_t access_hint, std::function<RenderModelPtr(std::wstring const &)> createModelFactoryFunc = CreateModelFactory<RenderModel>(), std::function<StaticMeshPtr(RenderModelPtr const &, std::wstring const &)> createMeshFactoryFunc = CreateMeshFactory<StaticMesh>());
 
 
 

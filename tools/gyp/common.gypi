@@ -77,7 +77,7 @@
 							'Link': {
 								'GenerateDebugInformation': 'true',
 								'AdditionalLibraryDirectories':[
-									'../../external/x86/Debug',
+									'../../external/lib/Win32/Debug',
 								],
 								'AdditionalDependencies':[
 									"AirFlameMath.lib",
@@ -104,7 +104,7 @@
 								'AdditionalDependencies':[
 								],
 								'AdditionalLibraryDirectories':[
-									'../../external/x64/Debug',
+									'../../external/lib/x64/Debug',
 								],
 							},
 						},
@@ -129,7 +129,7 @@
 								'AdditionalDependencies':[
 								],
 								'AdditionalLibraryDirectories':[
-									'../../external/x86/Release',
+									'../../external/lib/Win32/Release',
 								],
 								'GenerateDebugInformation': 'true',		
 							},
@@ -154,7 +154,7 @@
 								'AdditionalDependencies':[
 								],
 								'AdditionalLibraryDirectories':[
-									'../../external/x64/Debug',
+									'../../external/lib/x64/Debug',
 								],
 								'GenerateDebugInformation': 'true',		
 							},
