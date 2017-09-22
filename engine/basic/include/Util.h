@@ -2,7 +2,10 @@
 #define _UTIL_H_
 #include "basic/include/PreDeclare.h"
 #include <string>
+#include <basic/include/cpp17.h>
 #include "boost/assert.hpp"
+
+
 
 
 #define AIR_UNUSED(x) (void)(x)
@@ -46,6 +49,8 @@ namespace Air
 	std::string readShortString(ResIdentifierPtr const & res);
 
 	std::wstring readShortWString(ResIdentifierPtr const & res);
+
+	void writeShortString(std::ostream& os, std::string_view str);
 
 
 	// EndianµÄ×ª»»

@@ -30,7 +30,7 @@
 
 #include "Context.h"
 
-#define AIR_DLL_PREFIX DLL_PREFIX KFL_STRINGIZE(AIR_NAME)
+#define AIR_DLL_PREFIX DLL_PREFIX AIR_STRINGIZE(AIR_NAME)
 
 namespace
 {

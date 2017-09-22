@@ -1,6 +1,7 @@
 #ifndef _PreDeclare_H_
 #define _PreDeclare_H_
 #include <memory>
+#include <basic\include\PreDeclare.h>
 
 namespace Air
 
@@ -50,6 +51,11 @@ namespace Air
 	class RenderEffect;
 	typedef std::shared_ptr<RenderEffect> RenderEffectPtr;
 
+	class RenderEffectTemplate;
+	typedef std::shared_ptr<RenderEffectTemplate> RenderEffectTemplatePtr;
+
+	class RenderEffectParameter;
+
 	struct Viewport;
 	typedef std::shared_ptr<Viewport> ViewportPtr;
 
@@ -61,8 +67,21 @@ namespace Air
 	class RenderModel;
 	typedef std::shared_ptr<RenderModel> RenderModelPtr;
 
+	class ShaderObject;
+	typedef std::shared_ptr<ShaderObject> ShaderObjectPtr;
+
+	class RenderPass;
+	typedef std::shared_ptr<RenderPass> RenderPassPtr;
+
+	class RenderEffectAnnotation;
+	typedef std::shared_ptr<RenderEffectAnnotation> RenderEffectAnnotationPtr;
+
+	class RenderShaderFragment;
+
 	struct RenderMaterial;
 	typedef std::shared_ptr<RenderMaterial> RenderMaterialPtr;
+
+
 
 
 	struct VertexElement;

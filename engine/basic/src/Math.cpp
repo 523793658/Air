@@ -308,6 +308,203 @@ namespace Air
 			}
 			return true;
 		}
+		
+		template void decompose(float3 & scale, Quaternion& rotate, float3& trans, float4x4 const & rhs) AIR_NOEXCEPT;
+		
+		template <typename T>
+		void decompose(Vector_T<T, 3> & scale, Quaternion_T<T> & rot, Vector_T<T, 3>& trans, Matrix4_T<T> const & rhs) AIR_NOEXCEPT
+		{
+			scale.x() = sqrt(rhs(0, 0) * rhs(0, 0) + rhs(0, 1) * rhs(0, 1) + rhs(0, 2) * rhs(0, 2));
+			scale.y() = sqrt(rhs(1, 0) * rhs(1, 0) + rhs(1, 1) * rhs(1, 1) + rhs(1, 2) * rhs(1, 2));
+			scale.z() = sqrt(rhs(2, 0) * rhs(2, 0) + rhs(2, 1) * rhs(2, 1) + rhs(2, 2) * rhs(2, 2));
+
+			trans = Vector_T<T, 3>(rhs(3, 0), rhs(3, 1), rhs(3, 2));
+
+			Matrix4_T<T> rot_mat;
+			rot_mat(0, 0) = rhs(0, 0) / scale.x();
+			rot_mat(0, 1) = rhs(0, 1) / scale.x();
+			rot_mat(0, 2) = rhs(0, 2) / scale.x();
+			rot_mat(0, 3) = 0;
+			rot_mat(1, 0) = rhs(1, 0) / scale.y();
+			rot_mat(1, 1) = rhs(1, 1) / scale.y();
+			rot_mat(1, 2) = rhs(1, 2) / scale.y();
+			rot_mat(1, 3) = 0;
+			rot_mat(2, 0) = rhs(2, 0) / scale.z();
+			rot_mat(2, 1) = rhs(2, 1) / scale.z();
+			rot_mat(2, 2) = rhs(2, 2) / scale.z();
+			rot_mat(2, 3) = 0;
+			rot_mat(3, 0) = 0;
+			rot_mat(3, 1) = 0;
+			rot_mat(3, 2) = 0;
+			rot_mat(3, 3) = 1;
+			rot = to_quaternion(rot_mat);
+		}
+
+		template Quaternion to_quaternion(float4x4 const & mat) AIR_NOEXCEPT;
+
+		template <typename T>
+		Quaternion_T<T> to_quaternion(Matrix4_T<T> const & mat) AIR_NOEXCEPT
+		{
+			Quaternion_T<T> quat;
+			T s;
+			T const tr = mat(0, 0) + mat(1, 1) + mat(2, 2) + 1;
+
+			// check the diagonal
+			if (tr > 1)
+			{
+				s = sqrt(tr);
+				quat.w() = s * T(0.5);
+				s = T(0.5) / s;
+				quat.x() = (mat(1, 2) - mat(2, 1)) * s;
+				quat.y() = (mat(2, 0) - mat(0, 2)) * s;
+				quat.z() = (mat(0, 1) - mat(1, 0)) * s;
+			}
+			else
+			{
+				int maxi = 0;
+				T maxdiag = mat(0, 0);
+				for (int i = 1; i < 3; ++i)
+				{
+					if (mat(i, i) > maxdiag)
+					{
+						maxi = i;
+						maxdiag = mat(i, i);
+					}
+				}
+
+				switch (maxi)
+				{
+				case 0:
+					s = sqrt((mat(0, 0) - (mat(1, 1) + mat(2, 2))) + 1);
+
+					quat.x() = s * T(0.5);
+
+					if (!equal<T>(s, 0))
+					{
+						s = T(0.5) / s;
+					}
+
+					quat.w() = (mat(1, 2) - mat(2, 1)) * s;
+					quat.y() = (mat(1, 0) + mat(0, 1)) * s;
+					quat.z() = (mat(2, 0) + mat(0, 2)) * s;
+					break;
+
+				case 1:
+					s = sqrt((mat(1, 1) - (mat(2, 2) + mat(0, 0))) + 1);
+					quat.y() = s * T(0.5);
+
+					if (!equal<T>(s, 0))
+					{
+						s = T(0.5) / s;
+					}
+
+					quat.w() = (mat(2, 0) - mat(0, 2)) * s;
+					quat.z() = (mat(2, 1) + mat(1, 2)) * s;
+					quat.x() = (mat(0, 1) + mat(1, 0)) * s;
+					break;
+
+				case 2:
+				default:
+					s = sqrt((mat(2, 2) - (mat(0, 0) + mat(1, 1))) + 1);
+
+					quat.z() = s * T(0.5);
+
+					if (!equal<T>(s, 0))
+					{
+						s = T(0.5) / s;
+					}
+
+					quat.w() = (mat(0, 1) - mat(1, 0)) * s;
+					quat.x() = (mat(0, 2) + mat(2, 0)) * s;
+					quat.y() = (mat(1, 2) + mat(2, 1)) * s;
+					break;
+				}
+			}
+
+			return normalize(quat);
+		}
+
+		template int1 minimize(int1 const & lhs, int1 const & rhs) AIR_NOEXCEPT;
+		template int2 minimize(int2 const & lhs, int2 const & rhs) AIR_NOEXCEPT;
+		template int3 minimize(int3 const & lhs, int3 const & rhs) AIR_NOEXCEPT;
+		template int4 minimize(int4 const & lhs, int4 const & rhs) AIR_NOEXCEPT;
+		template uint1 minimize(uint1 const & lhs, uint1 const & rhs) AIR_NOEXCEPT;
+		template uint2 minimize(uint2 const & lhs, uint2 const & rhs) AIR_NOEXCEPT;
+		template uint3 minimize(uint3 const & lhs, uint3 const & rhs) AIR_NOEXCEPT;
+		template uint4 minimize(uint4 const & lhs, uint4 const & rhs) AIR_NOEXCEPT;
+		template float1 minimize(float1 const & lhs, float1 const & rhs) AIR_NOEXCEPT;
+		template float2 minimize(float2 const & lhs, float2 const & rhs) AIR_NOEXCEPT;
+		template float3 minimize(float3 const & lhs, float3 const & rhs) AIR_NOEXCEPT;
+		template float4 minimize(float4 const & lhs, float4 const & rhs) AIR_NOEXCEPT;
+
+		template <typename T>
+		T minimize(T const & lhs, T const & rhs) AIR_NOEXCEPT
+		{
+			T ret;
+			detail::max_miniminze_helper<typename T::value_type,
+				T::elem_num>::doMin(&ret[0], &lhs[0], &rhs[0]);
+			return ret;
+		}
+
+
+		template int1 maximize(int1 const & lhs, int1 const & rhs) AIR_NOEXCEPT;
+		template int2 maximize(int2 const & lhs, int2 const & rhs) AIR_NOEXCEPT;
+		template int3 maximize(int3 const & lhs, int3 const & rhs) AIR_NOEXCEPT;
+		template int4 maximize(int4 const & lhs, int4 const & rhs) AIR_NOEXCEPT;
+		template uint1 maximize(uint1 const & lhs, uint1 const & rhs) AIR_NOEXCEPT;
+		template uint2 maximize(uint2 const & lhs, uint2 const & rhs) AIR_NOEXCEPT;
+		template uint3 maximize(uint3 const & lhs, uint3 const & rhs) AIR_NOEXCEPT;
+		template uint4 maximize(uint4 const & lhs, uint4 const & rhs) AIR_NOEXCEPT;
+		template float1 maximize(float1 const & lhs, float1 const & rhs) AIR_NOEXCEPT;
+		template float2 maximize(float2 const & lhs, float2 const & rhs) AIR_NOEXCEPT;
+		template float3 maximize(float3 const & lhs, float3 const & rhs) AIR_NOEXCEPT;
+		template float4 maximize(float4 const & lhs, float4 const & rhs) AIR_NOEXCEPT;
+		template <typename T>
+		T maximize(T const & lhs, T const & rhs) AIR_NOEXCEPT
+		{
+			T ret;
+			detail::max_miniminze_helper<typename T::value_type, T::elem_num>::doMax(&ret[0], &lhs[0], &rhs[0]);
+			return ret;
+		}
+
+		template AABBox transform_aabb(AABBox const & aabb, float4x4 const & matrix) AIR_NOEXCEPT;
+
+		template <typename T>
+		AABBox_T<T> transform_aabb(AABBox_T<T> const & aabb, Matrix4_T<T> const & matrix) AIR_NOEXCEPT
+		{
+			Vector_T<T, 3> scale, trans;
+			Quaternion_T<T> rot;
+			decompose(scale, rot, trans, matrix);
+			return transform_aabb(aabb, scale, rot, trans);
+		}
+
+		template AABBox transform_aabb(AABBox const & aabb, float3 const & scale, Quaternion const & rot, float3 const & trans) AIR_NOEXCEPT;
+
+		template <typename T>
+		AABBox_T<T> transform_aabb(AABBox_T<T> const & aabb, Vector_T<T, 3> const & scale, Quaternion_T<T> const & rot, Vector_T<T, 3> const & trans) AIR_NOEXCEPT
+		{
+			Vector_T<T, 3> min, max;
+			min = max = transform_quat(aabb.getCorner(0) * scale, rot) + trans;
+			for (size_t j = 1; j < 8; ++j)
+			{
+				Vector_T<T, 3> const vec = transform_quat(aabb.getCorner(j) * scale, rot) + trans;
+				min = minimize(min, vec);
+				max = maximize(max, vec);
+			}
+
+			return AABBox_T<T>(min, max);
+		}
+
+
+
+
+		template float3 transform_quat(float3 const & v, Quaternion const & quat) AIR_NOEXCEPT;
+
+		template <typename T>
+		Vector_T<T, 3> transform_quat(Vector_T<T, 3> const & v, Quaternion_T<T> const & quat) AIR_NOEXCEPT
+		{
+			return v + cross(quat.v(), cross(quat.v(), v) + quat.w() * v) * T(2);
+		}
 
 		template bool intersect_aabb_aabb(AABBox const & lhs, AABBox const & aabb) AIR_NOEXCEPT;
 

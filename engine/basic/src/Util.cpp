@@ -105,5 +105,15 @@ namespace Air
 		}
 		return tmp;
 	}
+
+	void writeShortString(std::ostream& os, std::string_view str)
+	{
+		uint8_t len = static_cast<uint8_t>(std::min(str.size(), static_cast<size_t>(255)));
+		os.write(reinterpret_cast<char*>(&len), sizeof(len));
+		if (len > 0)
+		{
+			os.write(str.data(), len * sizeof(str[0]));
+		}
+	}
 }
 

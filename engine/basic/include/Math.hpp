@@ -3,7 +3,6 @@
 #pragma once
 #include <algorithm>
 #include <functional>
-#include "PreDeclare.h"
 
 namespace Air
 {
@@ -268,9 +267,28 @@ namespace Air
 		BoundOverlap intersect_aabb_frustum(AABBox_T<T> const & lhs, Frustum_T<T> const & frustum) AIR_NOEXCEPT;
 
 		template <typename T>
+		AABBox_T<T> transform_aabb(AABBox_T<T> const & aabb, Matrix4_T<T> const & matrix) AIR_NOEXCEPT;
+
+		template <typename T>
+		AABBox_T<T> transform_aabb(AABBox_T<T> const & aabb, Vector_T<T, 3> const & scale, Quaternion_T<T> const & rot, Vector_T<T, 3> const & trans) AIR_NOEXCEPT;
+
+		template <typename T>
+		Vector_T<T, 3> transform_quat(Vector_T<T, 3> const & v, Quaternion_T<T> const & quat) AIR_NOEXCEPT;
+
+		template <typename T>
+		T minimize(T const & lhs, T const & rhs) AIR_NOEXCEPT;
+
+		template <typename T>
+		T maximize(T const & lhs, T const & rhs) AIR_NOEXCEPT;
+
+		template <typename T>
 		BoundOverlap intersect_frustum_frustum(Frustum_T<T> const & lhs, Frustum_T<T> const & frustum) AIR_NOEXCEPT;
 
+		template <typename T>
+		void decompose(Vector_T<T, 3> & scale, Quaternion_T<T> & rot, Vector_T<T, 3>& trans, Matrix4_T<T> const & rhs) AIR_NOEXCEPT;
 
+		template <typename T>
+		Quaternion_T<T> to_quaternion(Matrix4_T<T> const & mat) AIR_NOEXCEPT;
 
 		template<typename T>
 		Color_T<T>	negative(Color_T<T> const & rhs) AIR_NOEXCEPT;
@@ -331,6 +349,7 @@ namespace Air
 #include "basic/include/AABBBox.hpp"
 #include "basic/include/Frustum.hpp"
 #include "basic/include/Matrix.hpp"
+#include "basic/include/Quaternion.hpp"
 
 
 

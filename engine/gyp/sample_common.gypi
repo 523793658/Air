@@ -14,6 +14,7 @@
 	],
 	'dependencies': [
 		'RenderEngineD3D11',
+		"basic",
 		'engine',
 	],
 	'conditions': [

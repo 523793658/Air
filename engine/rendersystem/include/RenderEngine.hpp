@@ -22,7 +22,7 @@ namespace Air
 		virtual void beginFrame();
 		virtual void beginPass();
 
-		//void render()
+		void render(RenderEffect const &effect, RenderTechnique const & tech, RenderLayout const & rl);
 
 		virtual void endPass();
 		virtual void endFrame();
@@ -75,6 +75,7 @@ namespace Air
 		virtual void doBindFrameBuffer(FrameBufferPtr const & fb) = 0;
 		virtual void doSuspend() = 0;
 		virtual void doResume() = 0;
+		virtual void doRender(RenderEffect const &effect, RenderTechnique const & tech, RenderLayout const & rl) = 0;
 
 	protected:
 		FrameBufferPtr mCurrenFrameBuffer;

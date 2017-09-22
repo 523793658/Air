@@ -1,3 +1,4 @@
+#include "PreDeclare.h"
 #include "core/include/Engine.h"
 #include "rendersystem/include/RenderFactory.h"
 #include "rendersystem/include/FrameBuffer.hpp"
@@ -6,7 +7,7 @@
 #include "scene_manager/include/SceneObjectHelper.hpp"
 #include "rendersystem/include/SimpleMeshFactory.hpp"
 #include "sample/include/RenderOneBall.hpp"
-
+#include "rendersystem/include/Mesh.hpp"
 using namespace Air;
 
 namespace
@@ -18,7 +19,7 @@ namespace
 			:SceneObjectHelper(SOA_Cullable)
 		{
 			//º”‘ÿrenderableObj
-			mRenderable = SimpleMeshFactory::createStaticShpere(1.0);
+			mRenderable = SimpleMeshFactory::createStaticShpere(1.0);;
 		}
 
 		void setRenderingType(int type)

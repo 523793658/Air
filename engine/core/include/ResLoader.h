@@ -37,7 +37,7 @@ namespace Air
 		//virtual std::shared_ptr<void> createResource();
 
 		virtual void subThreadStage() = 0;
-		virtual std::shared_ptr<void> mainThreadStage() = 0;
+		virtual void mainThreadStage() = 0;
 
 		virtual std::shared_ptr<void> createResource()
 		{

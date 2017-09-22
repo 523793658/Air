@@ -153,6 +153,11 @@ namespace Air
 
 	}
 
+	void RenderEngine::render(RenderEffect const &effect, RenderTechnique const & tech, RenderLayout const & rl)
+	{
+		this->doRender(effect, tech, rl);
+	}
+
 	void RenderEngine::endPass()
 	{
 

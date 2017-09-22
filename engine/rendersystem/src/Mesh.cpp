@@ -6,7 +6,6 @@
 #include "basic/include/Log.hpp"
 #include "rendersystem/include/GraphicsBuffer.hpp"
 #include "rendersystem/include/RenderMaterial.hpp"
-#include "rendersystem/include/RenderLayout.hpp"
 #include "rendersystem/include/Mesh.hpp"
 #include "packing_system/include/LZMACodec.h"
 #include "rendersystem/include/RenderDeviceCaps.hpp"
@@ -85,9 +84,14 @@ namespace
 				this->mainThreadStage();
 			}
 		}
-		std::shared_ptr<void> mainThreadStage()
+		void mainThreadStage()
 		{
 			std::lock_guard<std::mutex> lock(mMainThreadStateMutex);
+			this->mainThreadStageNoLock();
+		}
+
+		void mainThreadStageNoLock()
+		{
 			RenderModelPtr const & model = *mModelDesc.mModel;
 			if (!model || !model->isHWResourceReady())
 			{
@@ -104,8 +108,6 @@ namespace
 				}
 				mModelDesc.mModelData.reset();
 			}
-			return std::static_pointer_cast<void>(model);
-
 		}
 
 		bool hasSubThreadStage() const
@@ -278,7 +280,10 @@ namespace Air
 		mRenderLayout->bindIndexStream(index_stream, format);
 	}
 
-	
+	void StaticMesh::setNumVertices(uint32_t n)
+	{
+		mRenderLayout->setNumVertices(n);
+	}
 
 
 

@@ -8,7 +8,6 @@
 			"include_dirs":[
 				"..",
 				"../../external/boost",
-				"../../external/FlameMath",
 			],
 			"includes":[
 				"../../tools/gyp/common.gypi",
@@ -20,6 +19,7 @@
 			"sources":[
 				"../basic/include/Thread.h",
 				"../basic/include/CPP11.h",
+				"../basic/include/cpp17.h",
 				"../basic/include/Config.h",
 				"../basic/include/Basic.h",
 				"../basic/include/Types.h",
@@ -41,6 +41,8 @@
 				"../basic/include/MathHelper.hpp",
 				"../basic/include/Matrix.hpp",
 				"../basic/include/Quaternion.hpp",
+				"../basic/include/XMLDom.hpp",
+				"../basic/include/ErrorHanding.hpp",
 				
 				"../basic/src/Thread.cpp",
 				"../basic/src/CPP11.cpp",
@@ -60,9 +62,11 @@
 				"../basic/src/Plane.cpp",
 				"../basic/src/AABBBox.cpp",
 				"../basic/src/Vector.cpp",
+				"../basic/src/XMLDom.cpp",
 				"../basic/src/MathHelper.cpp",
 				"../basic/src/Matrix.cpp",
 				"../basic/src/Quaternion.cpp",
+				"../basic/src/ErrorHanding.cpp",
 			],
 			"conditions":[
 				[

@@ -52,6 +52,8 @@
 				"../rendersystem/include/GraphicsBuffer.hpp",
 				"../rendersystem/include/RenderMaterial.hpp",
 				"../rendersystem/include/SimpleMeshFactory.hpp",
+				"../rendersystem/include/ShaderObject.hpp",
+				"../rendersystem/include/RenderStateObject.hpp",
 				
 				"../rendersystem/src/RenderSettings.cpp",
 				"../rendersystem/src/RenderFactory.cpp",
@@ -68,6 +70,8 @@
 				"../rendersystem/src/GraphicsBuffer.cpp",
 				"../rendersystem/src/RenderMaterial.cpp",
 				"../rendersystem/src/SimpleMeshFactory.cpp",
+				"../rendersystem/src/ShaderObject.cpp",
+				"../rendersystem/src/RenderStateObject.cpp",
 				
 				"../scene_manager/include/SceneManager.hpp",
 				"../scene_manager/include/SceneObject.hpp",

@@ -199,6 +199,10 @@ namespace Air
 		{
 			return true;
 		}
+		bool selectMode() const
+		{
+			return false;
+		}
 
 
 		bool isAllHWResourceReady() const;
@@ -210,10 +214,22 @@ namespace Air
 
 		virtual bool getHWResourceReady() const;
 
+		virtual bool isTransparencyBackFace() const;
+
+		virtual bool isTransparencyFrontFace() const;
+
+
 	protected:
 		virtual void updateAABB();
 
 		virtual void updateInstanceStream();
+
+		virtual void updateTechniques();
+
+		virtual void bindEffect(RenderEffectPtr const & effect);
+
+		virtual RenderTechnique* getPassTechnique(PassType type) const;
+
 
 	protected:
 		std::vector<SceneObject const *> mInstances;
@@ -221,9 +237,25 @@ namespace Air
 		RenderEffectPtr mEffect;
 		RenderTechnique* mTechnique;
 
+		RenderTechnique* mSelectModeTech;
+		RenderEffectParameter* mSelectModeObjectIdParam;
 		float4 mSelectModeObjectId;
-		float4x4 mModelMat;
+		bool mSelectModeOn{ false };
+		float4x4 mModelMat{ float4x4::identify() };
 		std::vector<RenderablePtr> mSubRenderables;
+		uint32_t mEffectAttrs{ 0 };
+
+		RenderEffectPtr mDeferredEffect;
+		RenderTechnique* mSimpleForwardTech;
+		RenderMaterialPtr mMaterial;
+
+		//²ÎÊý
+		RenderEffectParameter* mMVPParam;
+		RenderEffectParameter* mMVParam;
+
+	protected:
+		
+
 	};
 }
 

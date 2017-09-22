@@ -5,13 +5,18 @@
 #include "rendersystem/include/RenderEngine.hpp"
 #include "rendersystem/include/Viewport.hpp"
 #include "Camera.hpp"
+#include "rendersystem/include/RenderLayout.hpp"
+#include "scene_manager/include/SceneManager.hpp"
+#include "rendersystem/include/RenderEffect.hpp"
+#include "rendersystem/include/RenderMaterial.hpp"
 #include "rendersystem/include/Renderable.hpp"
 
 namespace Air
 {
 	Renderable::Renderable()
 	{
-
+		RenderEffectPtr effect = syncLoadRenderEffect("simpleforward");
+		
 	}
 	Renderable::~Renderable()
 	{
@@ -22,6 +27,16 @@ namespace Air
 		return true;
 	}
 
+	bool Renderable::isTransparencyBackFace() const
+	{
+		return mEffectAttrs & EA_TransparencyBack ? true : false;
+	}
+
+	bool Renderable::isTransparencyFrontFace() const
+	{
+		return mEffectAttrs & EA_TransparencyFront ? true : false;
+	}
+
 
 	void Renderable::addInstance(SceneObject const * obj)
 	{
@@ -30,7 +45,7 @@ namespace Air
 
 	void Renderable::addToRenderQueue()
 	{
-
+		Engine::getInstance().getSceneManangerInstance().addRenderable(this);
 	}
 
 	void Renderable::render()
@@ -38,17 +53,46 @@ namespace Air
 		this->updateInstanceStream();
 		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		RenderLayout const & layout = this->getRenderLayout();
-
+		GraphicsBufferPtr const & inst_stream = layout.getIndexStream();
+		RenderTechnique const & tech = *this->getRenderTechnique();
+		auto const & effect = *this->getRenderEffect();
+		if (inst_stream)
+		{
+			if (layout.getNumIndices() > 0)
+			{
+				this->onRenderBegin();
+				re.render(effect, tech, layout);
+				this->onRenderEnd();
+			}
+		}
+		else
+		{
+			this->onRenderBegin();
+			if (mInstances.empty())
+			{
+				re.render(effect, tech, layout);
+			}
+			else
+			{
+				for (uint32_t i = 0; i < mInstances.size(); ++i)
+				{
+					this->onInstanceBegin(i);
+					re.render(effect, tech, layout);
+					this->onInstanceEnd(i);
+				}
+			}
+			this->onRenderEnd();
+		}
 	}
 
 	void Renderable::onRenderBegin()
 	{
-// 		RenderEngine& re = Context::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
-// 		Camera const & camera = *re.getCurrentFrameBuffer()->getViewport()->mCamera;
-// 		float4x4 const & vp = camera.getViewProjMatrix();
-// 		float4x4 mvp = mModelMat * vp;
-// 		AABBox const & pos_bb = this->getPosAABB();
-// 		AABBox const & tc_bb = this->getTexcoordAABB();
+		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		Camera const & camera = *re.getCurrentFrameBuffer()->getViewport()->mCamera;
+		float4x4 const & vp = camera.getViewProjMatrix();
+		float4x4 mvp = mModelMat * vp;
+		AABBox const & pos_bb = this->getPosAABB();
+		AABBox const & tc_bb = this->getTexcoordAABB();
 	}
 
 	void Renderable::onRenderEnd()
@@ -85,4 +129,102 @@ namespace Air
 
 	}
 
+	void Renderable::bindEffect(RenderEffectPtr const & effect)
+	{
+		mEffect = effect;
+		this->updateTechniques();
+	}
+	RenderTechnique* Renderable::getPassTechnique(PassType type) const
+	{
+		switch (type)
+		{
+		case Air::PT_OpaqueDepth:
+			break;
+		case Air::PT_TransparencyBackDepth:
+			break;
+		case Air::PT_TransparencyFrontDepth:
+			break;
+		case Air::PT_OpaqueGBufferRT0:
+			break;
+		case Air::PT_TransparencyBackGBufferRT0:
+			break;
+		case Air::PT_TransparencyFrontGBufferRT0:
+			break;
+		case Air::PT_OpaqueGBufferRT1:
+			break;
+		case Air::PT_TransparencyBackGBufferRT1:
+			break;
+		case Air::PT_TransparencyFrontGBufferRT1:
+			break;
+		case Air::PT_OpaqueGBufferMRT:
+			break;
+		case Air::PT_TransparencyBackGBufferMRT:
+			break;
+		case Air::PT_TransparencyFrontGBufferMRT:
+			break;
+		case Air::PT_GenShadowMap:
+			break;
+		case Air::PT_GenShadowMapWODepthTexture:
+			break;
+		case Air::PT_GenCascadedShadowMap:
+			break;
+		case Air::PT_GenReflectiveShadowMap:
+			break;
+		case Air::PT_Shadowing:
+			break;
+		case Air::PT_IndirectLighting:
+			break;
+		case Air::PT_OpaqueShading:
+			break;
+		case Air::PT_TransparencyBackShading:
+			break;
+		case Air::PT_TransparencyFrontShading:
+			break;
+		case Air::PT_OpaqueReflection:
+			break;
+		case Air::PT_TransparencyBackReflection:
+			break;
+		case Air::PT_TransparencyFrontReflection:
+			break;
+		case Air::PT_OpaqueSpecialShading:
+			break;
+		case Air::PT_TransparencyBackSpecialShading:
+			break;
+		case Air::PT_TransparencyFrontSpecialShading:
+			break;
+		case Air::PT_SimpleForward:
+			return mSimpleForwardTech;
+			break;
+		default:
+			break;
+		}
+		return mSimpleForwardTech;
+	}
+
+	void Renderable::updateTechniques()
+	{
+		RenderMaterial::SurfaceDetailMode sdm;
+		if (mMaterial)
+		{
+			sdm = mMaterial->mDetailMode;
+		}
+		else
+		{
+			sdm = RenderMaterial::SDM_Parallax;
+		}
+		switch (sdm)
+		{
+		case Air::RenderMaterial::SDM_Parallax:
+			break;
+		case Air::RenderMaterial::SDM_FlatTessellation:
+			break;
+		case Air::RenderMaterial::SDM_SmoothTessellation:
+			break;
+		default:
+			break;
+		}
+
+		mSimpleForwardTech = mEffect->getTechniqueByName("simpleForward");
+
+	}
 }

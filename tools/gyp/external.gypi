@@ -11,7 +11,7 @@
 					4505,		# 警告：未引用的本地函数已移除(局部函数定义了，但未使用)
 					4800,		# 警告：将值强制为布尔值“true”或“false”(性能警告)
 				], 
-				"msvs_postbuild":'copy /Y "$(OutDir)lib\\$(ProjectName)$(TargetExt)" "..\\..\\..\\lib\\$(Platform)\\$(Configuration)"',
+				"msvs_postbuild":'copy /Y "$(OutDir)lib\\$(ProjectName)$(TargetExt)" "$(SolutionDir)..\\..\\..\\lib\\$(Platform)\\$(Configuration)"',
 				'msbuild_configuration_attributes': {
 						'CharacterSet': '1',												# unicode字符集
 						'OutputDirectory': '$(SolutionDir)$(Platform)\\$(Configuration)',

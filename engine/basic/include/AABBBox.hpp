@@ -2,7 +2,7 @@
 #define _AABBBox_H_
 #pragma once
 
-#include "PreDeclare.h"
+#include "basic/include/PreDeclare.h"
 #include "boost/operators.hpp"
 #include "Bound.hpp"
 
@@ -19,10 +19,7 @@ namespace Air
 		public Bound_T<T>
 	{
 		public:
-			AABBox_T() AIR_NOEXCEPT
-			{
-
-			}
+			AABBox_T() AIR_NOEXCEPT;
 
 			AABBox_T(Vector_T<T,3> const & vMin, Vector_T<T,3> const & vMax) AIR_NOEXCEPT;
 			AABBox_T(Vector_T<T,3> && vMin, Vector_T<T,3> && vMax) AIR_NOEXCEPT;
@@ -68,6 +65,10 @@ namespace Air
 			bool Intersect(Frustum_T<T> const & frustum) AIR_NOEXCEPT;
 
 			Vector_T<T, 3> getCorner(size_t index) const AIR_NOEXCEPT;
+
+			void join(Vector_T<T, 3> const & point) AIR_NOEXCEPT;
+
+			void join(AABBox_T const & aabb) AIR_NOEXCEPT;
 
 
 			virtual bool isEmpty() const AIR_NOEXCEPT override;

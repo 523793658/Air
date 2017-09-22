@@ -2,6 +2,7 @@
 #include "Context.h"
 #include "scene_manager/include/SceneManager.hpp"
 #include "scene_manager/include/SceneObject.hpp"
+#include "rendersystem/include/Renderable.hpp"
 namespace Air
 {
 	SceneObject::SceneObject(uint32_t attrib)
@@ -106,6 +107,17 @@ namespace Air
 		if (mParent)
 		{
 			mWorldMatrix = mParent->getWorldMatrix() * mLocalMatrix;
+		}
+		else
+		{
+			mWorldMatrix = mLocalMatrix;
+		}
+		if (mRenderable)
+		{
+			if (mAABB)
+			{
+				*mAABB = MathLib::transform_aabb(mRenderable->getPosAABB(), mWorldMatrix);
+			}
 		}
 	}
 

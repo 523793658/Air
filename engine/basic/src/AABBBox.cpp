@@ -9,6 +9,7 @@ namespace Air{
 	template AABBox::AABBox_T(float3 && vMin, float3 && vMax) AIR_NOEXCEPT;
 	template AABBox::AABBox_T(AABBox const & rhs) AIR_NOEXCEPT;
 	template AABBox::AABBox_T(AABBox && rh) AIR_NOEXCEPT;
+	template AABBox::AABBox_T() AIR_NOEXCEPT;
 
 	template AABBox& AABBox::operator += (float3 const & rhs) AIR_NOEXCEPT;
 	template AABBox& AABBox::operator -= (float3 const & rhs) AIR_NOEXCEPT;
@@ -55,6 +56,18 @@ namespace Air{
 	template float AABBox::getMaxRadiusSq() const AIR_NOEXCEPT;
 	template bool AABBox::contains(float3 const & v) const AIR_NOEXCEPT;
 
+	template void AABBox::join(float3 const & point) AIR_NOEXCEPT;
+
+	template void AABBox::join(AABBox const & aabb) AIR_NOEXCEPT;
+
+
+
+	template<typename T>
+	AABBox_T<T>::AABBox_T() AIR_NOEXCEPT
+	{
+		mMax = Vector_T<T, 3>::getMinVector();
+		mMin = Vector_T<T, 3>::getMaxVector();
+	}
 
 	template<typename T>
 	AABBox_T<T>::AABBox_T(Vector_T<T, 3> const & vMin, Vector_T<T, 3> const & vMax) AIR_NOEXCEPT
@@ -317,5 +330,20 @@ namespace Air{
 		return Vector_T<T, 3>((index & 1UL) ? mMax.x() : mMin.x(),
 			(index & 2UL) ? mMax.y() : mMin.y(),
 			(index & 4UL) ? mMax.z() : mMin.z());
+	}
+
+	template<typename T>
+	void AABBox_T<T>::join(Vector_T<T, 3> const & point) AIR_NOEXCEPT
+	{
+		mMin = MathLib::minimize(mMin, point);
+		mMax = MathLib::maximize(mMax, point);
+	}
+
+
+	template<typename T>
+	void AABBox_T<T>::join(AABBox_T<T> const & aabb) AIR_NOEXCEPT
+	{
+		mMin = MathLib::minimize(mMin, aabb.getMin());
+		mMax = MathLib::maximize(mMax, aabb.getMax());
 	}
 }

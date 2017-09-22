@@ -2,6 +2,7 @@
 #define _Vector_H_
 
 #include <array>
+#include <limits>
 #include "boost/operators.hpp"
 #include "basic/include/MathHelper.hpp"
 
@@ -83,14 +84,14 @@ namespace Air
 		}
 		Vector_T(T const & x, T const & y, T const & z) AIR_NOEXCEPT
 		{
-			static_assert(3 == elem_num, "Must be 2D vector.");
+			static_assert(3 == elem_num, "Must be 3D vector.");
 			mVec[0] = x;
 			mVec[1] = y;
 			mVec[2] = z;
 		}
 		Vector_T(T && x, T && y, T && z) AIR_NOEXCEPT
 		{
-			static_assert(3 == elem_num, "Must be 2D vector.");
+			static_assert(3 == elem_num, "Must be 3D vector.");
 			mVec[0] = std::move(x);
 			mVec[1] = std::move(y);
 			mVec[2] = std::move(z);
@@ -98,7 +99,7 @@ namespace Air
 
 		Vector_T(T const & x, T const & y, T const & z, T const & w) AIR_NOEXCEPT
 		{
-			static_assert(4 == elem_num, "Must be 2D vector.");
+			static_assert(4 == elem_num, "Must be 4D vector.");
 			mVec[0] = x;
 			mVec[1] = y;
 			mVec[2] = z;
@@ -106,11 +107,23 @@ namespace Air
 		}
 		Vector_T(T && x, T && y, T && z, T && w) AIR_NOEXCEPT
 		{
-			static_assert(4 == elem_num, "Must be 2D vector.");
+			static_assert(4 == elem_num, "Must be 4D vector.");
 			mVec[0] = std::move(x);
 			mVec[1] = std::move(y);
 			mVec[2] = std::move(z);
 			mVec[3] = std::move(w);
+		}
+
+		static Vector_T const & getMaxVector() AIR_NOEXCEPT
+		{
+			static Vector_T<T, N> const maxP(std::numeric_limits<T>::max());
+			return maxP;
+		}
+
+		static Vector_T const & getMinVector() AIR_NOEXCEPT
+		{
+			static Vector_T<T, N> const minP(std::numeric_limits<T>::min());
+			return minP;
 		}
 
 		static size_t size() AIR_NOEXCEPT

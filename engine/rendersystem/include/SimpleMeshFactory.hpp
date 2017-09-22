@@ -5,7 +5,7 @@
 
 namespace Air
 {
-	class SimpleMeshFactory {
+	class AIR_CORE_API SimpleMeshFactory {
 	public:
 		struct VertexData 
 		{

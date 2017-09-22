@@ -2,6 +2,13 @@
 #define _RenderMaterial_H_
 namespace Air
 {
+	enum LightingTechnique
+	{
+		LT_Forward,
+		LT_Deferred
+	};
+
+
 	struct AIR_CORE_API RenderMaterial
 	{
 		enum TextureSlot

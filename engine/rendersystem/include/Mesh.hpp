@@ -3,10 +3,7 @@
 #pragma once
 #include "PreDeclare.h"
 #include "rendersystem/include/Renderable.hpp"
-#include "rendersystem/include/RenderLayout.hpp"
-#include "scene_manager/include/SceneManager.hpp"
-#include "basic/include/Math.hpp"
-
+#include "rendersystem\include\RenderLayout.hpp"
 namespace Air
 {
 
@@ -72,13 +69,16 @@ namespace Air
 			mRenderLayout->bindVertexStream(buffer, vertex_elems);
 		}
 
+		virtual std::wstring const & getName() const
+		{
+			return mName;
+		}
+
+
 		void addIndexStream(void const * buf, uint32_t size, ElementFormat format, uint32_t access_hint);
 		void addIndexStream(GraphicsBufferPtr const & index_stream, ElementFormat format);
 
-		void setNumVertices(uint32_t n)
-		{
-			mRenderLayout->setNumVertices(n);
-		}
+		void setNumVertices(uint32_t n);
 		uint32_t getNumVertices() const
 		{
 			return mRenderLayout->getNumVertices();

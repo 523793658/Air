@@ -367,7 +367,8 @@ namespace Air
 				}
 				else
 				{
-					res = res_desc->mainThreadStage();
+					res_desc->mainThreadStage();
+					res = res_desc->getResource();
 					this->addLoadedResource(res_desc, res);
 				}
 			}
@@ -452,7 +453,8 @@ namespace Air
 				}
 				else
 				{
-					res = res_desc->mainThreadStage();
+					res_desc->mainThreadStage();
+					res = res_desc->getResource();
 					this->addLoadedResource(res_desc, res);
 				}
 				*lrq.second = LS_CanBeRemoved;

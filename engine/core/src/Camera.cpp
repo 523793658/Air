@@ -98,7 +98,7 @@ namespace Air
 	{
 		if (mFrustumDirty)
 		{
-			mFrustum.clipMatrix(mViewProjectMatrixWOAdjust, mInvViewProjectMatrixWOAdjust);
+			mFrustum.clipMatrix(getViewProjMatrixWOAdjust(), getInverseViewProjMatrixWOAdjust());
 			mFrustumDirty = false;
 		}
 		return mFrustum;
@@ -169,5 +169,16 @@ namespace Air
 		}
 		return mViewProjectMatrixWOAdjust;
 
+	}
+
+	float4x4 const & Camera::getInverseViewProjMatrixWOAdjust() const
+	{
+		if (mViewProjMatrixWoAdjustDirty)
+		{
+			mViewProjectMatrixWOAdjust = mViewMatrix * mProjectMatrixWoAdjust;
+			mInvViewProjectMatrixWOAdjust = mInvProjectMatrixWoAdjust * mInvViewMatrix;
+			mViewProjMatrixWoAdjustDirty = false;
+		}
+		return mInvProjectMatrixWoAdjust;
 	}
 }

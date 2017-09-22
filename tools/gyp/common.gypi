@@ -23,9 +23,6 @@
 					'IntermediateDirectory': '$(Configuration)\\$(ProjectName)\\obj\\',   #ÖÐ¼äÄ¿Â¼
 					'CharacterSet': '1',
 				},
-				'include_dirs':[
-					"../../external/FlameMath",
-				],
 				'product_name': 'Air$(ProjectName)',
 				'msbuild_settings': {
 					'ClCompile': {
@@ -80,7 +77,6 @@
 									'../../external/lib/Win32/Debug',
 								],
 								'AdditionalDependencies':[
-									"AirFlameMath.lib",
 								],
 								
 							},

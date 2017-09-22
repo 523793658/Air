@@ -257,6 +257,57 @@ namespace Air
 		mNumDispatchCalls = re.getNumDispatchesJustCalled();
 	}
 
+	void SceneManager::addRenderable(Renderable* obj)
+	{
+		if (obj->isHWResourceReady())
+		{
+			bool add;
+			if (obj->selectMode())
+			{
+				add = true;
+			}
+			else
+			{
+				if (mURT & App3DFramework::URV_OpaqueOnly)
+				{
+					add = !(obj->isTransparencyBackFace() || obj->isTransparencyFrontFace());
+				}
+				else if (mURT & App3DFramework::URV_TransparencyBackOnly)
+				{
+					add = obj->isTransparencyBackFace();
+				}
+				else if (mURT & App3DFramework::URV_TransparencyFrontOnly)
+				{
+					add = obj->isTransparencyFrontFace();
+				}
+				else
+				{
+					add = true;
+				}
+
+			}
+			if (add)
+			{
+				RenderTechnique const * objTech = obj->getRenderTechnique();
+				BOOST_ASSERT(objTech);
+				bool found = false;
+				for (auto & items : mRenderQueue)
+				{
+					if (items.first == objTech)
+					{
+						items.second.push_back(obj);
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+				{
+					mRenderQueue.emplace_back(objTech, std::vector<Renderable*>(1, obj));
+				}
+			}
+		}
+	}
+
 	void SceneManager::addSceneObject(SceneObjectPtr const & obj)
 	{
 		std::lock_guard<std::mutex> lock(mUpdateMutex);

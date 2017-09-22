@@ -49,6 +49,7 @@ namespace Air
 		float4x4 const & getProjMatrixWOAdjust() const;
 		float4x4 const & getViewProjMatrix() const;
 		float4x4 const & getViewProjMatrixWOAdjust() const;
+		float4x4 const & getInverseViewProjMatrixWOAdjust() const;
 
 		bool getOmniDirectionalMode() const;
 
