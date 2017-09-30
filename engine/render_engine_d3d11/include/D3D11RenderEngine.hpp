@@ -10,10 +10,47 @@
 
 #include "render_engine_d3d11/include/D3D11Typedefs.hpp"
 
+#include "rendersystem/include/ShaderObject.hpp"
+
 #include "rendersystem/include/RenderEngine.hpp"
 
 namespace Air
 {
+	struct D3D11RenderEngineCache 
+	{
+		ID3D11RasterizerState* mRasterizerState;
+		ID3D11DepthStencilState* mDepthStencilState;
+		uint16_t mStencilRef;
+		ID3D11BlendState* mBlendState;
+		Color mBlendFactor;
+		uint32_t mSampleMask;
+		ID3D11VertexShader* mVertexShader;
+		ID3D11PixelShader* mPixelShader;
+		ID3D11GeometryShader* mGeometryShader;
+		ID3D11ComputeShader* mComputeShader;
+		ID3D11HullShader* mHullShader;
+		ID3D11DomainShader* mDomainShader;
+		RenderLayout::TopologyType mTopologyType;
+		ID3D11InputLayout* mInputLayout;
+		D3D11_VIEWPORT mViewport;
+		uint32_t mNumSoBuffs;
+		std::vector<ID3D11Buffer*> mVB;
+		std::vector<UINT> mVBStride;
+		std::vector<UINT> mVBOffset;
+		ID3D11Buffer* mIB;
+
+		std::array<std::vector<std::tuple<void*, uint32_t, uint32_t>>, ShaderObject::ST_NumShaderTypes> mShaderSrvSrc;
+		std::array<std::vector<ID3D11ShaderResourceView*>, ShaderObject::ST_NumShaderTypes> mShaderSRVPtr;
+		std::array<std::vector<ID3D11SamplerState*>, ShaderObject::ST_NumShaderTypes> mShaderSamplerPrt;
+		std::array<std::vector<ID3D11Buffer*>, ShaderObject::ST_NumShaderTypes> mShaderCBPtr;
+		std::vector<ID3D11UnorderedAccessView*> mRenderUAVPrt;
+		std::vector<uint32_t> mRenderUavInitCount;
+		std::vector<ID3D11UnorderedAccessView*> mComputeUavPtr;
+		std::vector<uint32_t> mComputeUavInitCount;
+		std::vector<ID3D11RenderTargetView*> mRTVPtr;
+		ID3D11DepthStencilView* mDSVPtr;
+	};
+
 	class D3D11RenderEngine : public RenderEngine
 	{
 	public:
@@ -72,6 +109,54 @@ namespace Air
 		bool isFullScreen() const;
 		void setFullScreen(bool fs);
 
+
+		void setVertexShader(ID3D11VertexShader* shader);
+		void setPixelShader(ID3D11PixelShader* shader);
+		void setGeometryShader(ID3D11GeometryShader* shader);
+		void setComputeShader(ID3D11ComputeShader* shader);
+		void setHullShader(ID3D11HullShader* shader);
+		void setDomainShader(ID3D11DomainShader* shader);
+
+		void setShaderResources(ShaderObject::ShaderType st, std::vector<std::tuple<void*, uint32_t, uint32_t>> const & srv_srcs, std::vector<ID3D11ShaderResourceView*> const & srvs);
+
+		void setSamplers(ShaderObject::ShaderType st, std::vector<ID3D11SamplerState*> const & samplers);
+
+
+
+		void setConstantBuffers(ShaderObject::ShaderType st, std::vector<ID3D11Buffer*> const & cbs);
+
+		void detachSRV(void* rtv_src, uint32_t rt_frist_subres, uint32_t rt_num_subres);
+
+		void csSetUnorderedAccessViews(UINT start_slot, UINT num_uavs, ID3D11UnorderedAccessView* const * uavs, UINT const * uav_init_counts);
+
+		void setRasterizerState(ID3D11RasterizerState* ras);
+		void setDepthStencilState(ID3D11DepthStencilState* dss, uint16_t stencil_ref);
+		void setBlendState(ID3D11BlendState* bs, Color const & blend_factor, uint32_t sample_mask);
+
+		char const * getVertexShaderProfile() const
+		{
+			return mVSProfile;
+		}
+		char const * getPixelShaderProfile() const
+		{
+			return mVSProfile;
+		}
+		char const * getGeometryShaderProfile() const
+		{
+			return mGSProfile;
+		}
+		char const * getComputeShaderProfile() const
+		{
+			return mCSProfile;
+		}
+		char const * getHullShaderProfile() const
+		{
+			return mHSProfile;
+		}
+		char const * getDomainShaderProfile() const
+		{
+			return mDSProfile;
+		}
 	private:
 		bool isVertexFormatSupport(ElementFormat elem_fmt);
 		bool isTextureFormatSupport(ElementFormat elem_fmt);
@@ -80,6 +165,7 @@ namespace Air
 		void doBindFrameBuffer(FrameBufferPtr const & fb);
 		D3D11AdapterPtr const & getActiveAdapter() const;
 		void resetRenderStates();
+		virtual void doRender(RenderEffect const &effect, RenderTechnique const & tech, RenderLayout const & rl) override;
 		void doSuspend();
 		void doResume();
 
@@ -142,6 +228,9 @@ namespace Air
 		
 		StereoMethod mStereoMethod;
 		double mInvTimestampFreq;
+
+		D3D11RenderEngineCache mRenderCache;
+
 
 		char const * mVSProfile;
 		char const * mPSProfile;

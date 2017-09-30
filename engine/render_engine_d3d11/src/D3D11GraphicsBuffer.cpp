@@ -1,6 +1,6 @@
 #include "Engine.h"
 #include "Context.h"
-#include "basic/include/ThrowErr.hpp"
+#include "basic/include/ErrorHanding.hpp"
 #include "rendersystem/include/RenderFactory.h"
 #include "D3D11Mapping.hpp"
 #include "D3D11RenderEngine.hpp"
@@ -30,7 +30,7 @@ namespace Air
 			desc.Buffer.ElementWidth = this->getSize() / getNumFormatBytes(mFmtAsShaderRes);
 
 			ID3D11RenderTargetView* rt_view;
-			TIF(mD3DDevice->CreateRenderTargetView(mBuffer.get(), &desc, &rt_view));
+			TIFHR(mD3DDevice->CreateRenderTargetView(mBuffer.get(), &desc, &rt_view));
 			mD3DRTView = MakeComPtr(rt_view);
 		}
 		return mD3DRTView;
@@ -123,7 +123,7 @@ namespace Air
 		desc.ByteWidth = mSizeInByte;
 		desc.StructureByteStride = getNumFormatBytes(mFmtAsShaderRes);
 		ID3D11Buffer* buffer;
-		TIF(mD3DDevice->CreateBuffer(&desc, p_subres, &buffer));
+		TIFHR(mD3DDevice->CreateBuffer(&desc, p_subres, &buffer));
 		mBuffer = MakeComPtr(buffer);
 		if ((mAccessHint & EAH_GPU_Read) && (mFmtAsShaderRes != EF_Unknown))
 		{
@@ -133,7 +133,7 @@ namespace Air
 			sr_desc.Buffer.ElementOffset = 0;
 			sr_desc.Buffer.ElementWidth = mSizeInByte / desc.StructureByteStride;
 			ID3D11ShaderResourceView* d3d_sr_view;
-			TIF(mD3DDevice->CreateShaderResourceView(mBuffer.get(), &sr_desc, &d3d_sr_view));
+			TIFHR(mD3DDevice->CreateShaderResourceView(mBuffer.get(), &sr_desc, &d3d_sr_view));
 			mD3DShaderResourceView = MakeComPtr(d3d_sr_view);
 		}
 		if ((mAccessHint & EAH_GPU_Unordered) && (mFmtAsShaderRes != EF_Unknown))
@@ -168,7 +168,7 @@ namespace Air
 				uav_desc.Buffer.Flags |= D3D11_BUFFER_UAV_FLAG_COUNTER;
 			}
 			ID3D11UnorderedAccessView* d3d_ua_view;
-			TIF(mD3DDevice->CreateUnorderedAccessView(mBuffer.get(), &uav_desc, &d3d_ua_view));
+			TIFHR(mD3DDevice->CreateUnorderedAccessView(mBuffer.get(), &uav_desc, &d3d_ua_view));
 			mD3DUAView = MakeComPtr(d3d_ua_view);
 		}
 	}
@@ -214,7 +214,7 @@ namespace Air
 			break;
 		}
 		D3D11_MAPPED_SUBRESOURCE mapped;
-		TIF(mD3DImmCtx->Map(mBuffer.get(), 0, type, 0, &mapped));
+		TIFHR(mD3DImmCtx->Map(mBuffer.get(), 0, type, 0, &mapped));
 		return mapped.pData;
 	}
 	void D3D11GraphicsBuffer::unmap()

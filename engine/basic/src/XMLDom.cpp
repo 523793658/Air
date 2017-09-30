@@ -228,7 +228,7 @@ namespace Air
 	uint32_t XMLNode::getAttribUInt(std::string const & name, uint32_t default_val)
 	{
 		XMLAttributePtr attr = this->getAttrib(name);
-		return attr ? attr->getValueUint() : default_val;
+		return attr ? attr->getValueUInt() : default_val;
 	}
 	float XMLNode::getAttribFloat(std::string const & name, float default_val)
 	{
@@ -241,22 +241,22 @@ namespace Air
 		return attr ? attr->getValueString() : default_val;
 	}
 
-	XMLNodePtr XMLNode::getFirstNode(std::string const & name)
+	XMLNodePtr XMLNode::getFirstNode(std::string_view name) const
 	{
 		rapidxml::xml_node<>* node = static_cast<rapidxml::xml_node<>*>(mNode)->first_node(name.data());
 		return node ? MakeSharedPtr<XMLNode>(node) : XMLNodePtr();
 	}
-	XMLNodePtr XMLNode::getLastNode(std::string const & name)
+	XMLNodePtr XMLNode::getLastNode(std::string const & name) const
 	{
 		rapidxml::xml_node<>* node = static_cast<rapidxml::xml_node<>*>(mNode)->last_node(name.data());
 		return node ? MakeSharedPtr<XMLNode>(node) : XMLNodePtr();
 	}
-	XMLNodePtr XMLNode::getFirstNode()
+	XMLNodePtr XMLNode::getFirstNode() const
 	{
 		rapidxml::xml_node<>* node = static_cast<rapidxml::xml_node<>*>(mNode)->first_node();
 		return node ? MakeSharedPtr<XMLNode>(node) : XMLNodePtr();
 	}
-	XMLNodePtr XMLNode::getLastNode()
+	XMLNodePtr XMLNode::getLastNode() const
 	{
 		rapidxml::xml_node<>* node = static_cast<rapidxml::xml_node<>*>(mNode)->last_node();
 		return node ? MakeSharedPtr<XMLNode>(node) : XMLNodePtr();
@@ -423,7 +423,7 @@ namespace Air
 	{
 		return boost::lexical_cast<int32_t>(mValue);
 	}
-	uint32_t XMLAttribute::getValueUint() const
+	uint32_t XMLAttribute::getValueUInt() const
 	{
 		return boost::lexical_cast<uint32_t>(mValue);
 	}

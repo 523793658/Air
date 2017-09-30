@@ -117,6 +117,8 @@ namespace Air
 			return std::tanh(x);
 		}
 
+		template float4x4 transpose(float4x4 const & rhs) AIR_NOEXCEPT;
+
 		template<typename T>
 		Matrix4_T<T> transpose(Matrix4_T<T> const & rhs) AIR_NOEXCEPT
 		{

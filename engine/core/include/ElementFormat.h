@@ -396,6 +396,64 @@ namespace Air
 	{
 		return getNumFormatBits(format) / 8;
 	}
+
+	template<int c>
+	inline ElementChannelType
+		channelType(ElementFormat ef)
+	{
+		return static_cast<ElementChannelType>((static_cast<uint64_t>(ef) >> (40 + 4 * c)) & 0xF);
+	}
+	template<int c>
+	inline ElementFormat
+		channelType(ElementFormat ef, ElementChannelType new_c)
+	{
+		uint64_t ef64 = static_cast<uint64_t>(ef);
+		ef64 &= ~(0xFULL << (40 + 4 * c));
+		ef64 |= (static_cast<uint64_t>(new_c) << (40 + 4 * c));
+		return static_cast<ElementFormat>(ef64);
+	}
+
+	inline ElementFormat
+		makeSRGB(ElementFormat format)
+	{
+		if (ECT_UNorm == channelType<0>(format))
+		{
+			format = channelType<0>(format, ECT_UNorm_SRGB);
+		}
+		if (getChannel<0>(format) != EC_BC)
+		{
+			if (ECT_UNorm == channelType<1>(format))
+			{
+				format = channelType<1>(format, ECT_UNorm_SRGB);
+			}
+			if (getChannel<0>(format) != EC_ETC)
+			{
+				if (ECT_UNorm == getChannel<2>(format))
+				{
+					format = channelType<2>(format, ECT_UNorm_SRGB);
+				}
+				if (ECT_UNorm == channelType<3>(format))
+				{
+					format = channelType<3>(format, ECT_UNorm_SRGB);
+				}
+			}
+		}
+		return format;
+	}
+
+
+
+
+	inline bool
+		isSRGB(ElementFormat format)
+	{
+		return (ECT_UNorm_SRGB == channelType<0>(format));
+	}
+	inline bool
+		isSigned(ElementFormat format)
+	{
+		return (ECT_SNorm == channelType<0>(format));
+	}
 }
 
 

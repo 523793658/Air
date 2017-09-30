@@ -19,7 +19,7 @@ namespace Air
 		}
 		ID3D11ShaderResourceViewPtr const & getD3DShaderResourceView() const
 		{
-			mD3DShaderResourceView;
+			return mD3DShaderResourceView;
 		}
 		ID3D11RenderTargetViewPtr const & getD3DRenderTargetView() const;
 		ID3D11UnorderedAccessViewPtr const & getD3DUnorderAccessView() const

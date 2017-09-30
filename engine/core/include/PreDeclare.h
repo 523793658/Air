@@ -61,6 +61,9 @@ namespace Air
 
 	struct RenderSettings;
 
+	class RenderStateObject;
+	typedef std::shared_ptr<RenderStateObject> RenderStateObjectPtr;
+
 	class StaticMesh;
 	typedef std::shared_ptr<StaticMesh> StaticMeshPtr;
 
@@ -78,8 +81,20 @@ namespace Air
 
 	class RenderShaderFragment;
 
+	class RenderEffectConstantBuffer;
+
+	class SamplerStateObject;
+	typedef std::shared_ptr<SamplerStateObject> SamplerStateObjectPtr;
+
+	struct TextureSubresource;
+
 	struct RenderMaterial;
 	typedef std::shared_ptr<RenderMaterial> RenderMaterialPtr;
+
+	struct SamplerStateDesc;
+	struct RasterizerStateDesc;
+	struct DepthStencilStateDesc;
+	struct BlendStateDesc;
 
 
 

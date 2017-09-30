@@ -29,7 +29,7 @@ namespace Air
 
 #define TIFERRC(x)		TIFEC(std::make_error_code(x))
 
-#define TIFHR(x)		{if(static_cast<HRESULT>(x) < 0 { TMSG(Air::combineFileLine(__FILE__, __LINE__));}}
+#define TIFHR(x)		{if(static_cast<HRESULT>(x) < 0) { TMSG(Air::combineFileLine(__FILE__, __LINE__));}}
 
 #ifdef AIR_DEBUG
 #define AIR_UNREACHABLE(msg) Air::AIRUnreachableInternal(msg, __FILE__, __LINE__)

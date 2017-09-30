@@ -338,6 +338,9 @@ namespace Air
 		Matrix4_T<T> ortho_off_center_lh(T const & left, T const & right, T const & bottom, T const & top,
 			T const & nearPlane, T const & farPlane) AIR_NOEXCEPT;
 
+		template<typename T>
+		Matrix4_T<T> transpose(Matrix4_T<T> const & lhs) AIR_NOEXCEPT;
+
 		template <typename T>
 		T perspective_area(Vector_T<T, 3> const & view_pos, Matrix4_T<T> const & view_proj, AABBox_T<T> const & aabbox) AIR_NOEXCEPT;
 	}

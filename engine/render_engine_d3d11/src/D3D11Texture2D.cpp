@@ -1,7 +1,7 @@
 #include "Engine.h"
 #include <boost/assert.hpp>
 #include "ElementFormat.h"
-#include "basic/include/ThrowErr.hpp"
+#include "basic/include/ErrorHanding.hpp"
 #include "D3D11RenderEngine.hpp"
 #include "D3D11RenderFactory.hpp"
 #include "D3D11Mapping.hpp"
@@ -255,7 +255,7 @@ namespace Air
 		return this->retriveD3DSRV(desc);
 	}
 
-	void D3D11Texture2D::createHWResource(ElementInitData const * init_data)
+	void D3D11Texture2D::createHWResource(ArrayRef<ElementInitData> init_data)
 	{
 		D3D11_TEXTURE2D_DESC desc;
 		desc.Width = mWidth;
@@ -280,7 +280,7 @@ namespace Air
 		desc.SampleDesc.Quality = mSampleQuality;
 		this->getD3DFlags(desc.Usage, desc.BindFlags, desc.CPUAccessFlags, desc.MiscFlags);
 		std::vector<D3D11_SUBRESOURCE_DATA> subres_data(mArraySize * mNumMipMaps);
-		if (init_data != nullptr)
+		if (!init_data.empty())
 		{
 			for (uint32_t j = 0; j < mArraySize; ++j)
 			{
@@ -293,13 +293,83 @@ namespace Air
 			}
 		}
 		ID3D11Texture2D* d3d_tex;
-		HRESULT r = mD3DDevice->CreateTexture2D(&desc, (init_data != nullptr) ? &subres_data[0] : nullptr, &d3d_tex);
-		TIF(r);
+		HRESULT r = mD3DDevice->CreateTexture2D(&desc, (init_data.empty()) ? nullptr : &subres_data[0], &d3d_tex);
+		TIFHR(r);
 		mD3DTexture = MakeComPtr(d3d_tex);
 		//TODO shader×ÊÔ´
 		if ((mAccessHint & (EAH_GPU_Read | EAH_Generate_Mips)) && (mNumMipMaps > 1))
 		{
 			/*this->*/
 		}
+	}
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC  D3D11Texture2D::fillSRVDesc(uint32_t first_array_index, uint32_t num_items,
+		uint32_t first_level, uint32_t num_levels) const
+	{
+		D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+		switch (mFormat)
+		{
+		case EF_D16:
+			desc.Format = DXGI_FORMAT_R16_UNORM;
+			break;
+		case EF_D24S8:
+			desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+			break;
+		case EF_D32F:
+			desc.Format = DXGI_FORMAT_R32_FLOAT;
+			break;
+
+		default:
+			desc.Format = mDXGIFormat;
+			break;
+		}
+		if (mArraySize > 1)
+		{
+			if (mSampleCount > 1)
+			{
+				desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMSARRAY;
+			}
+			else
+			{
+				desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+			}
+			desc.Texture2DArray.MostDetailedMip = first_level;
+			desc.Texture2DArray.MipLevels = num_levels;
+			desc.Texture2DArray.FirstArraySlice = first_array_index;
+			desc.Texture2DArray.ArraySize = num_items;
+		}
+		else
+		{
+			if (mSampleCount > 1)
+			{
+				desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+			}
+			else
+			{
+				desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			}
+			desc.Texture2D.MostDetailedMip = first_level;
+			desc.Texture2D.MipLevels = num_levels;
+		}
+		return desc;
+	}
+
+	D3D11_UNORDERED_ACCESS_VIEW_DESC D3D11Texture2D::fillUAVDesc(uint32_t first_array_index, uint32_t num_items, uint32_t level) const
+	{
+		D3D11_UNORDERED_ACCESS_VIEW_DESC desc;
+		desc.Format = mDXGIFormat;
+		if (mArraySize > 1)
+		{
+			desc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2DARRAY;
+			desc.Texture2DArray.ArraySize = num_items;
+			desc.Texture2DArray.FirstArraySlice = first_array_index;
+			desc.Texture2DArray.MipSlice = level;
+		}
+		else
+		{
+			desc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+			desc.Texture2D.MipSlice = level;
+		}
+		return desc;
 	}
 }

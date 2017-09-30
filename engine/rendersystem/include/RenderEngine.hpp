@@ -69,6 +69,23 @@ namespace Air
 		float getDefaultFov() const;
 		void setDefaultFov(float fov) ;
 
+		uint32_t getNativeShaderFourCC() const
+		{
+			return mNativeShaderFourCC;
+		}
+
+		uint32_t getNativeShaderdVersion() const
+		{
+			return mNativeShaderVersion;
+		}
+
+		std::string_view getNativeShaderPlatformName() const
+		{
+			return mNativeShaderPlatformName;
+		}
+
+		void setStateObject(RenderStateObjectPtr const & rs_obj);
+
 	private:
 		virtual void checkConfig(RenderSettings& settings);
 		virtual void doCreateRenderWindow(std::string const & name, RenderSettings const & settings) = 0;
@@ -101,7 +118,13 @@ namespace Air
 		RenderLayoutPtr mPPRenderLayout;
 
 		std::string mNativeShaderPlatformName;
+		std::uint32_t mNativeShaderFourCC;
+		std::uint32_t mNativeShaderVersion;
 
+		RenderStateObjectPtr mCurrentRenderStateObject;
+		RenderStateObjectPtr mCurrentLineRenderStateObject;
+
+		bool mForceLineMode;
 	};
 
 

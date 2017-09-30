@@ -105,7 +105,7 @@ namespace Air
 		}
 	};
 
-	class AIR_CORE_API ShaderObject //: boost::noncopyable
+	class AIR_CORE_API ShaderObject : boost::noncopyable
 	{
 	public:
 		enum ShaderType
@@ -116,35 +116,65 @@ namespace Air
 			ST_ComputeShader,
 			ST_HullShader,
 			ST_DomainShader,
-			ST_NumShadeTypes
+			ST_NumShaderTypes
 		};
 
 	public:
-		ShaderObject();
+		ShaderObject()
+		{
+
+		}
 		virtual ~ShaderObject()
 		{
 
 		}
 
-		virtual bool attachNativeShader(ShaderType type, RenderEffect const & effect, std::array<uint32_t, ST_NumShadeTypes> const & shader_desc_ids, std::vector<uint8_t> const & native_shader_block) = 0;
+		virtual bool attachNativeShader(ShaderType type, RenderEffect const & effect, std::array<uint32_t, ST_NumShaderTypes> const & shader_desc_ids, std::vector<uint8_t> const & native_shader_block) = 0;
 
-		virtual bool streamIn(ResIdentifierPtr const & res, ShaderType type, RenderEffect const & effect, std::array<uint32_t, ST_NumShadeTypes> const & shader_desc_ids) = 0;
+		virtual bool streamIn(ResIdentifierPtr const & res, ShaderType type, RenderEffect const & effect, std::array<uint32_t, ST_NumShaderTypes> const & shader_desc_ids) = 0;
 
 		virtual void streamOut(std::ostream & os, ShaderType type)= 0;
 
-		virtual void attachShader(ShaderType type, RenderEffect const & effect, RenderTechnique const & tech, RenderPass const & pass, std::array<uint32_t, ST_NumShadeTypes> const & shader_desc_ids) = 0;
+		virtual void attachShader(ShaderType type, RenderEffect const & effect, RenderTechnique const & tech, RenderPass const & pass, std::array<uint32_t, ST_NumShaderTypes> const & shader_desc_ids) = 0;
 
+		virtual void attachShader(ShaderType type, RenderEffect const & effect, RenderTechnique const & tech, RenderPass const & pass, ShaderObjectPtr const & shared_so) = 0;
+
+		virtual void linkShaders(RenderEffect const & effect) = 0;
+
+		bool hasDiscard() const
+		{
+			return mHasDiscard;
+		}
+
+		bool isvalidate() const
+		{
+			return mIsvalidate;
+		}
+		bool hasTessellation() const
+		{
+			return mHasTessellation;
+		}
+
+
+		virtual ShaderObjectPtr clone(RenderEffect const & effect) = 0;
+
+		virtual void bind() = 0;
+		virtual void unbind() = 0;
 
 	protected:
-		std::array<bool, ST_NumShadeTypes> mIsShaderValidate;
-		bool mIsvalidate;
-		bool mHasDiscard;
-		bool mHasTessellation;
-		uint32_t mCSBlockSizeX;
-		uint32_t mCSBlockSizeY;
-		uint32_t mCSBlockSizeZ;
+		std::vector<uint8_t> compileToDXBC(ShaderType type, RenderEffect const & effect, RenderTechnique const & tech, RenderPass const & pass, std::vector<std::pair<char const *, char const *>> const & api_special_macros, char const * func_name, char const * shader_profile, uint32_t flags);
 
+		void reflectionDXBC(std::vector<uint8_t> const & code, void** reflector);
 
+		std::vector<uint8_t> stripDXBC(std::vector<uint8_t> const & code, uint32_t strip_flags);
+	protected:
+		std::array<bool, ST_NumShaderTypes> mIsShaderValidate;
+		bool mIsvalidate{ false };
+		bool mHasDiscard{ false };
+		bool mHasTessellation{ false };
+		uint32_t mCSBlockSizeX{ 0 };
+		uint32_t mCSBlockSizeY{ 0 };
+		uint32_t mCSBlockSizeZ{ 0 };
 	};
 }
 

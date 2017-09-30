@@ -61,14 +61,14 @@ namespace Air
 		bool tryConvertAttrib(std::string const & name, float& val, float default_val);
 
 		int32_t getAttribInt(std::string const & name, int32_t default_val);
-		uint32_t getAttribUInt(std::string const & name, uint32_t default_val);
-		float getAttribFloat(std::string const & name, float default_val);
+		uint32_t getAttribUInt(std::string const & name, uint32_t default_val = 0);
+		float getAttribFloat(std::string const & name, float default_val = 0.0);
 		std::string getAttribString(std::string const & name, std::string default_val = "");
 
-		XMLNodePtr getFirstNode(std::string const & name);
-		XMLNodePtr getLastNode(std::string const & name);
-		XMLNodePtr getFirstNode();
-		XMLNodePtr getLastNode();
+		XMLNodePtr getFirstNode(std::string_view name) const;
+		XMLNodePtr getLastNode(std::string const & name) const;
+		XMLNodePtr getFirstNode() const;
+		XMLNodePtr getLastNode() const;
 
 		XMLNodePtr getPrevSibling(std::string const & name);
 		XMLNodePtr getNextSibling(std::string const & name);
@@ -116,7 +116,7 @@ namespace Air
 		bool tryConvert(float& val) const;
 
 		int32_t getValueInt() const;
-		uint32_t getValueUint() const;
+		uint32_t getValueUInt() const;
 		float getValueFloat() const;
 		std::string const & getValueString() const;
 	private:

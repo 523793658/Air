@@ -102,9 +102,19 @@ namespace Air
 			ST_Instance
 		};
 
+		RenderLayout()
+		{
+			mVertexStreams.reserve(4);
+		}
+		virtual ~RenderLayout() = 0;
+
 		void setTopologyType(TopologyType type)
 		{
 			mTopologyType = type;
+		}
+
+		TopologyType getTopologyType() const {
+			return mTopologyType;
 		}
 
 		GraphicsBufferPtr const & getVertexStream(uint32_t index) const
@@ -157,6 +167,21 @@ namespace Air
 			}
 			return n;
 		}
+		uint32_t getVertexSize(uint32_t index) const
+		{
+			return mVertexStreams[index].mVertexSize;
+		}
+
+		std::vector<VertexElement> const & getInstanceStreamFormat() const
+		{
+			return mInstanceStream.mFormat;
+		}
+
+		uint32_t getInstanceSize() const
+		{
+			return mInstanceStream.mVertexSize;
+		}
+
 		void setNumIndices(uint32_t n)
 		{
 			mForceNumIndices = n;
@@ -177,6 +202,11 @@ namespace Air
 				}
 			}
 			return n;
+		}
+
+		uint32_t getNumInstances() const 
+		{
+			return 1;
 		}
 
 		template<typename tuple_type>
@@ -201,6 +231,7 @@ namespace Air
 			return mStartVertexLocation;
 		}
 
+
 		void setStartIndexLocation(uint32_t location)
 		{
 			mStartIndexLocation = location;
@@ -212,6 +243,24 @@ namespace Air
 			return mStartIndexLocation;
 		}
 
+
+		uint32_t getStartInstanceLocation() const
+		{
+			return 0;
+		}
+
+		bool useIndices() const;
+
+		GraphicsBufferPtr const & getInstanceStream() const
+		{
+			return mInstanceStream.mStream;
+		}
+
+		void setInstanceStream(GraphicsBufferPtr buffer)
+		{
+			mInstanceStream.mStream = buffer;
+			mStreamsDirty = true;
+		}
 
 	private:
 		template <typename tuple_type, int N>
@@ -235,7 +284,7 @@ namespace Air
 	protected:
 
 
-		TopologyType mTopologyType;
+		TopologyType mTopologyType{ TT_TriangleList };
 
 		struct StreamUnit
 		{
@@ -250,13 +299,17 @@ namespace Air
 		StreamUnit mInstanceStream;
 
 		GraphicsBufferPtr mIndexStream;
-		ElementFormat mIndexFormat;
+		ElementFormat mIndexFormat{ EF_Unknown };
 		uint32_t mForceNumVertices{ 0xffffffff };
 		uint32_t mForceNumIndices{ 0xffffffff };
+		uint32_t mForceNumInstances{ 0xffffffff };
 		mutable bool mStreamsDirty{ true };
+
+		int32_t mBaseVertexLocation{ 0 };
 
 		uint32_t mStartVertexLocation{ 0 };
 		uint32_t mStartIndexLocation{ 0 };
+		uint32_t mStartInstanceLocation{ 0 };
 	};
 }
 

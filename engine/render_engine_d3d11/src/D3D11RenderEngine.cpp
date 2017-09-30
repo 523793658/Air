@@ -1,11 +1,54 @@
 #include <dxgi1_5.h>
 #include "Engine.h"
 #include "basic/include/Util.h"
-#include "basic/include/ThrowErr.hpp"
+#include "basic/include/ErrorHanding.hpp"
 #include "D3D11Typedefs.hpp"
+#include "boost/assert.hpp"
+
+#include "rendersystem/include/RenderEffect.hpp"
+
+#include "D3D11Mapping.hpp"
 #include "D3D11RenderFactory.hpp"
 #include "D3D11RenderWindow.hpp"
+#include "D3D11GraphicsBuffer.hpp"
+#include "D3D11RenderLayout.hpp"
 #include "D3D11RenderEngine.hpp"
+namespace
+{
+	using namespace Air;
+	std::function<void(ID3D11DeviceContext*, UINT, UINT, ID3D11ShaderResourceView* const *)> ShaderSetShaderResource[ShaderObject::ST_NumShaderTypes] =
+	{
+		std::mem_fn(&ID3D11DeviceContext::VSSetShaderResources),
+		std::mem_fn(&ID3D11DeviceContext::PSSetShaderResources),
+		std::mem_fn(&ID3D11DeviceContext::GSSetShaderResources),
+		std::mem_fn(&ID3D11DeviceContext::CSSetShaderResources),
+		std::mem_fn(&ID3D11DeviceContext::HSSetShaderResources),
+		std::mem_fn(&ID3D11DeviceContext::DSSetShaderResources)
+	};
+
+	std::function<void(ID3D11DeviceContext*, UINT, UINT, ID3D11SamplerState* const *)>ShaderSetSamplers[ShaderObject::ST_NumShaderTypes] =
+	{
+		std::mem_fn(&ID3D11DeviceContext::VSSetSamplers),
+		std::mem_fn(&ID3D11DeviceContext::PSSetSamplers),
+		std::mem_fn(&ID3D11DeviceContext::GSSetSamplers),
+		std::mem_fn(&ID3D11DeviceContext::CSSetSamplers),
+		std::mem_fn(&ID3D11DeviceContext::HSSetSamplers),
+		std::mem_fn(&ID3D11DeviceContext::DSSetSamplers)
+	};
+
+	std::function<void(ID3D11DeviceContext*, UINT, UINT, ID3D11Buffer* const *)> ShaderSetConstantBuffers[ShaderObject::ST_NumShaderTypes] =
+	{
+		std::mem_fn(&ID3D11DeviceContext::VSSetConstantBuffers),
+		std::mem_fn(&ID3D11DeviceContext::PSSetConstantBuffers),
+		std::mem_fn(&ID3D11DeviceContext::GSSetConstantBuffers),
+		std::mem_fn(&ID3D11DeviceContext::CSSetConstantBuffers),
+		std::mem_fn(&ID3D11DeviceContext::HSSetConstantBuffers),
+		std::mem_fn(&ID3D11DeviceContext::DSSetConstantBuffers)
+	};
+}
+
+
+
 
 namespace Air
 {
@@ -37,7 +80,7 @@ namespace Air
 		mDynamicD3D11CreateDevice = ::D3D11CreateDevice;
 #endif
 		IDXGIFactory1* gi_factory;
-		TIF(mDynamicCreateDXGIFactory1(__uuidof(IDXGIFactory1), reinterpret_cast<void**>(&gi_factory)));
+		TIFHR(mDynamicCreateDXGIFactory1(__uuidof(IDXGIFactory1), reinterpret_cast<void**>(&gi_factory)));
 		mGIFactory1 = MakeComPtr(gi_factory);
 		mDXGISubVersion = 1;
 
@@ -642,6 +685,135 @@ namespace Air
 			&& mCaps.textureFormatSupport(EF_R32F) && mCaps.rendertargetFormatSupport(EF_R32F, 1, 0));
 	}
 
+
+	void D3D11RenderEngine::setVertexShader(ID3D11VertexShader* shader)
+	{
+		if (mRenderCache.mVertexShader != shader)
+		{
+			mD3DIMMContext->VSSetShader(shader, nullptr, 0);
+			mRenderCache.mVertexShader = shader;
+		}
+	}
+	void D3D11RenderEngine::setPixelShader(ID3D11PixelShader* shader)
+	{
+		if (mRenderCache.mPixelShader != shader)
+		{
+			mD3DIMMContext->PSSetShader(shader, nullptr, 0);
+			mRenderCache.mPixelShader = shader;
+		}
+	}
+	void D3D11RenderEngine::setGeometryShader(ID3D11GeometryShader* shader)
+	{
+		if (mRenderCache.mGeometryShader != shader)
+		{
+			mD3DIMMContext->GSSetShader(shader, nullptr, 0);
+			mRenderCache.mGeometryShader = shader;
+		}
+	}
+	void D3D11RenderEngine::setComputeShader(ID3D11ComputeShader* shader)
+	{
+		if (mRenderCache.mComputeShader != shader)
+		{
+			mD3DIMMContext->CSSetShader(shader, nullptr, 0);
+		}
+	}
+	void D3D11RenderEngine::setHullShader(ID3D11HullShader* shader)
+	{
+		if (mRenderCache.mHullShader != shader)
+		{
+			mD3DIMMContext->HSSetShader(shader, nullptr, 0);
+		}
+	}
+
+	void D3D11RenderEngine::setDomainShader(ID3D11DomainShader* shader)
+	{
+		if (mRenderCache.mDomainShader != shader)
+		{
+			mD3DIMMContext->DSSetShader(shader, nullptr, 0);
+		}
+	}
+
+	void D3D11RenderEngine::setShaderResources(ShaderObject::ShaderType st, std::vector<std::tuple<void*, uint32_t, uint32_t>> const & srv_srcs, std::vector<ID3D11ShaderResourceView*> const & srvs)
+	{
+		if (mRenderCache.mShaderSRVPtr[st] != srvs)
+		{
+			size_t const old_size = mRenderCache.mShaderSRVPtr[st].size();
+			mRenderCache.mShaderSRVPtr[st] = srvs;
+			if (old_size > srvs.size())
+			{
+				mRenderCache.mShaderSRVPtr[st].resize(old_size, nullptr);
+			}
+			ShaderSetShaderResource[st](mD3DIMMContext.get(), 0, static_cast<UINT>(mRenderCache.mShaderSRVPtr[st].size()), &mRenderCache.mShaderSRVPtr[st][0]);
+			mRenderCache.mShaderSrvSrc[st] = srv_srcs;
+			mRenderCache.mShaderSRVPtr[st].resize(srvs.size());
+		}
+	}
+
+	void D3D11RenderEngine::setSamplers(ShaderObject::ShaderType st, std::vector<ID3D11SamplerState*> const & samplers)
+	{
+		if (mRenderCache.mShaderSamplerPrt[st] != samplers)
+		{
+			ShaderSetSamplers[st](mD3DIMMContext.get(), 0, static_cast<UINT>(samplers.size()), &samplers[0]);
+			mRenderCache.mShaderSamplerPrt[st] = samplers;
+		}
+	}
+
+	void D3D11RenderEngine::setConstantBuffers(ShaderObject::ShaderType st, std::vector<ID3D11Buffer*> const & cbs)
+	{
+		if (mRenderCache.mShaderCBPtr[st] != cbs)
+		{
+			ShaderSetConstantBuffers[st](mD3DIMMContext.get(), 0, static_cast<UINT>(cbs.size()), &cbs[0]);
+			mRenderCache.mShaderCBPtr[st] = cbs;
+		}
+	}
+
+
+	void D3D11RenderEngine::detachSRV(void* rtv_src, uint32_t rt_frist_subres, uint32_t rt_num_subres)
+	{
+		for (uint32_t st = 0; st < ShaderObject::ST_NumShaderTypes; ++st)
+		{
+			bool cleared = false;
+			for (uint32_t i = 0; i < mRenderCache.mShaderSrvSrc.size(); ++i)
+			{
+				if (std::get<0>(mRenderCache.mShaderSrvSrc[st][i]))
+				{
+					if (std::get<0>(mRenderCache.mShaderSrvSrc[st][i]) == rtv_src)
+					{
+						uint32_t const first = std::get<1>(mRenderCache.mShaderSrvSrc[st][i]);
+						uint32_t const last = first + std::get<2>(mRenderCache.mShaderSrvSrc[st][i]);
+						uint32_t const rt_first = rt_frist_subres;
+						uint32_t const rt_last = rt_frist_subres + rt_num_subres;
+						if (((first > rt_first) && (first < rt_last)) || ((last >= rt_first) && (last < rt_last)) || ((rt_first >= first) && (rt_first < last)) || ((rt_last >= first) && (rt_last < last)))
+						{
+							mRenderCache.mShaderSRVPtr[st][i] = nullptr;
+							cleared = true;
+						}
+
+					}
+				}
+			}
+			if (cleared)
+			{
+				ShaderSetShaderResource[st](mD3DIMMContext.get(), 0, static_cast<UINT>(mRenderCache.mShaderSRVPtr.size()), &mRenderCache.mShaderSRVPtr[st][0]);
+			}
+		}
+	}
+
+	void D3D11RenderEngine::csSetUnorderedAccessViews(UINT start_slot, UINT num_uavs, ID3D11UnorderedAccessView* const * uavs, UINT const * uav_init_counts)
+	{
+		if ((mRenderCache.mComputeUavPtr.size() < start_slot + num_uavs) || (memcmp(&mRenderCache.mComputeUavPtr[start_slot], uavs, num_uavs * sizeof(uavs[0])) != 0) || (memcmp(&mRenderCache.mComputeUavInitCount[start_slot], uav_init_counts, num_uavs * sizeof(uav_init_counts[0])) != 0))
+		{
+			mD3DIMMContext->CSSetUnorderedAccessViews(start_slot, num_uavs, uavs, uav_init_counts);
+			if (mRenderCache.mComputeUavPtr.size() < start_slot + num_uavs)
+			{
+				mRenderCache.mComputeUavPtr.resize(start_slot + num_uavs);
+				mRenderCache.mComputeUavInitCount.resize(mRenderCache.mComputeUavPtr.size());
+			}
+			memcpy(&mRenderCache.mComputeUavPtr[start_slot], uavs, num_uavs * sizeof(uavs[0]));
+			memcpy(&mRenderCache.mComputeUavInitCount[start_slot], uav_init_counts, num_uavs * sizeof(uav_init_counts[0]));
+		}
+	}
+
 	bool D3D11RenderEngine::isVertexFormatSupport(ElementFormat elem_fmt)
 	{
 		return mVertexFormats.find(elem_fmt) != mVertexFormats.end();
@@ -799,5 +971,154 @@ namespace Air
 	HRESULT D3D11RenderEngine::d3d11CreateDevice(IDXGIAdapter* pAdapter, D3D_DRIVER_TYPE driver_type, HMODULE Software, UINT flags, D3D_FEATURE_LEVEL const * pFeatureLevels, UINT featureLveleCount, UINT SDKVersion, ID3D11Device** ppDevice, D3D_FEATURE_LEVEL* pFeatureLevel, ID3D11DeviceContext** ppImmediateContext) const
 	{
 		return mDynamicD3D11CreateDevice(pAdapter, driver_type, Software, flags, pFeatureLevels, featureLveleCount, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
+	}
+
+	void D3D11RenderEngine::doRender(RenderEffect const &effect, RenderTechnique const & tech, RenderLayout const & rl)
+	{
+		uint32_t const num_vertex_streams = rl.getNumVertexStreams();
+		uint32_t const all_num_vertex_stream = num_vertex_streams + (rl.getIndexStream() ? 1 : 0);
+		D3D11RenderLayout const & d3d_rl = *checked_cast<D3D11RenderLayout const *>(&rl);
+		d3d_rl.active();
+		auto const & vbs = d3d_rl.getVBs();
+		auto const & strides = d3d_rl.getStrides();
+		auto const & offsets = d3d_rl.getOffsets();
+		if (all_num_vertex_stream != 0)
+		{
+			if ((mRenderCache.mVB.size() != all_num_vertex_stream) || (mRenderCache.mVB != vbs) || (mRenderCache.mVBStride != strides) || (mRenderCache.mVBOffset != offsets))
+			{
+				mD3DIMMContext->IASetVertexBuffers(0, all_num_vertex_stream, &vbs[0], &strides[0], &offsets[0]);
+				mRenderCache.mVB = vbs;
+				mRenderCache.mVBStride = strides;
+				mRenderCache.mVBOffset = offsets;
+			}
+			tech.getPass(0).getShaderObject(effect).get();
+			auto layout = d3d_rl.getInputLayout(tech.getPass(0).getShaderObject(effect).get());
+			if (layout != mRenderCache.mInputLayout)
+			{
+				mD3DIMMContext->IASetInputLayout(layout);
+				mRenderCache.mInputLayout = layout;
+			}
+		}
+		else
+		{
+			if (!mRenderCache.mVB.empty())
+			{
+				mRenderCache.mVB.assign(mRenderCache.mVB.size(), nullptr);
+				mRenderCache.mVBStride.assign(mRenderCache.mVBStride.size(), 0);
+				mRenderCache.mVBOffset.assign(mRenderCache.mVBOffset.size(), 0);
+				mD3DIMMContext->IASetVertexBuffers(0, static_cast<UINT>(mRenderCache.mVB.size()), &mRenderCache.mVB[0], &mRenderCache.mVBStride[0], &mRenderCache.mVBOffset[0]);
+				mRenderCache.mVB.clear();
+				mRenderCache.mVBStride.clear();
+				mRenderCache.mVBOffset.clear();
+			}
+			mRenderCache.mInputLayout = nullptr;
+			mD3DIMMContext->IASetInputLayout(mRenderCache.mInputLayout);
+		}
+		uint32_t const vertex_count = static_cast<uint32_t>(rl.useIndices() ? rl.getNumIndices() : rl.getNumVertices());
+
+		RenderLayout::TopologyType tt = rl.getTopologyType();
+		if (tech.hasTessellation())
+		{
+			switch (tt)
+			{
+			case Air::RenderLayout::TT_PointList:
+				tt = RenderLayout::TT_1_Ctrl_Pt_PatchList;
+				break;
+			case Air::RenderLayout::TT_LineList:
+				tt = RenderLayout::TT_2_Ctrl_Pt_PatchList;
+				break;
+			case Air::RenderLayout::TT_LineStrip:
+				tt = RenderLayout::TT_3_Ctrl_Pt_PatchList;
+				break;
+			default:
+				break;
+			}
+		}
+		if (mRenderCache.mTopologyType != tt)
+		{
+			mD3DIMMContext->IASetPrimitiveTopology(D3D11Mapping::mapping(tt));
+			mRenderCache.mTopologyType = tt;
+		}
+		uint32_t prim_count;
+		switch (tt)
+		{
+		case Air::RenderLayout::TT_PointList:
+			prim_count = vertex_count;
+			break;
+
+		case Air::RenderLayout::TT_LineList:
+		case Air::RenderLayout::TT_LineList_Adj:
+			prim_count = vertex_count / 3;
+			break;
+
+		case Air::RenderLayout::TT_LineStrip:
+		case Air::RenderLayout::TT_LineStrip_Adj:
+			prim_count = vertex_count - 1;
+			break;
+		case Air::RenderLayout::TT_TriangleList:
+		case Air::RenderLayout::TT_TriangleList_Adj:
+
+			prim_count = vertex_count / 3;
+			break;
+		case Air::RenderLayout::TT_TriangleStrip:
+		case Air::RenderLayout::TT_TriangleStrip_Adj:
+			prim_count = vertex_count - 2;
+			break;
+		default:
+			if ((tt >= RenderLayout::TT_1_Ctrl_Pt_PatchList) && (tt <= RenderLayout::TT_32_Ctrl_Pt_PatchList))
+			{
+				prim_count = vertex_count / (tt - RenderLayout::TT_1_Ctrl_Pt_PatchList + 1);
+			}
+			else
+			{
+				AIR_UNREACHABLE("Invalid topology type");
+
+			}
+			break;
+		}
+		uint32_t const num_instance = rl.getNumInstances();
+		mNumPrimitivesJustRendered += num_instance * prim_count;
+		mNumVerticesJustRendered += num_instance * vertex_count;
+
+		if (rl.useIndices())
+		{
+			ID3D11Buffer* d3dib = checked_cast<D3D11GraphicsBuffer*>(rl.getIndexStream().get())->getD3DBuffer();
+			if (mRenderCache.mIB != d3dib)
+			{
+				mD3DIMMContext->IASetIndexBuffer(d3dib, D3D11Mapping::MappingFormat(rl.getIndexStreamFormat()), 0);
+			}
+		}
+		else
+		{
+			if (mRenderCache.mIB)
+			{
+				mD3DIMMContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_R16_UINT, 0);
+				mRenderCache.mIB = nullptr;
+			}
+		}
+		uint32_t const num_passes = tech.getNumPasses();
+		if (rl.useIndices())
+		{
+			uint32_t const num_indices = rl.getNumIndices();
+			for (uint32_t i = 0; i < num_passes; ++i)
+			{
+				auto& pass = tech.getPass(i);
+				pass.bind(effect);
+				mD3DIMMContext->DrawIndexedInstanced(num_indices, num_instance, rl.getStartIndexLocation(), rl.getStartVertexLocation(), rl.getStartInstanceLocation());
+				pass.unbind(effect);
+			}
+		}
+		else
+		{
+			uint32_t const num_vertices = rl.getNumVertices();
+			for (uint32_t i = 0; i < num_passes; ++i)
+			{
+				auto & pass = tech.getPass(i);
+				pass.bind(effect);
+				mD3DIMMContext->DrawInstanced(num_vertices, num_instance, rl.getStartVertexLocation(), rl.getStartInstanceLocation());
+				pass.unbind(effect);
+			}
+		}
+		mNumDrawsJustCalled += num_passes;
 	}
 }

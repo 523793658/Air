@@ -25,6 +25,9 @@ namespace Air
 		virtual ID3D11DepthStencilViewPtr const & retriveD3DDepthStencilView(uint32_t first_array_index, uint32_t array_size, uint32_t level);
 
 		virtual ID3D11ShaderResourceViewPtr const & retriveD3DShaderResourceView(uint32_t first_array_index, uint32_t num_items, uint32_t first_level, uint32_t num_levels);
+
+		virtual ID3D11UnorderedAccessViewPtr const & retriveD3DUnorderedAccessView(uint32_t first_array_index, uint32_t num_items, uint32_t level);
+
 		virtual void deleteHWResource() override;
 		virtual bool isHWResourceReady() const override;
 
@@ -32,11 +35,23 @@ namespace Air
 		{
 			return mD3DTexture.get();
 		}
+
+
 	protected:
 		ID3D11RenderTargetViewPtr const & retriveD3DRTV(D3D11_RENDER_TARGET_VIEW_DESC const & desc);
 		ID3D11DepthStencilViewPtr const & retriveD3DDSV(D3D11_DEPTH_STENCIL_VIEW_DESC const & desc);
 		ID3D11ShaderResourceViewPtr const & retriveD3DSRV(D3D11_SHADER_RESOURCE_VIEW_DESC const & desc);
 		void getD3DFlags(D3D11_USAGE& usage, UINT& bind_flags, UINT& cpu_access_flags, UINT& misc_flags);
+
+	private:
+		virtual D3D11_UNORDERED_ACCESS_VIEW_DESC fillUAVDesc(uint32_t first_array_index, uint32_t num_items, uint32_t level) const;
+		virtual D3D11_UNORDERED_ACCESS_VIEW_DESC fillUAVDesc(uint32_t array_index, uint32_t first_slice, uint32_t num_slices,
+			uint32_t level) const;
+		virtual D3D11_UNORDERED_ACCESS_VIEW_DESC fillUAVDesc(uint32_t first_array_index, uint32_t num_items,
+			CubeFaces first_face, uint32_t num_faces, uint32_t level) const;
+
+		virtual D3D11_SHADER_RESOURCE_VIEW_DESC fillSRVDesc(uint32_t first_array_index, uint32_t num_items,
+			uint32_t first_level, uint32_t num_levels) const;
 	protected:
 		ID3D11Device* mD3DDevice;
 		ID3D11DeviceContext* mD3DImmContext;
@@ -67,11 +82,16 @@ namespace Air
 		virtual ID3D11ShaderResourceViewPtr const & retriveD3DShaderResourceView(uint32_t first_array_index, uint32_t num_items,
 			uint32_t first_level, uint32_t num_levels) override;
 
-		virtual void createHWResource(ElementInitData const * init_data) override;
+		virtual void createHWResource(ArrayRef<ElementInitData> init_data) override;
 
 		uint32_t getWidth(uint32_t level) const;
 		uint32_t getHeight(uint32_t level) const;
 
+	private:
+		virtual D3D11_SHADER_RESOURCE_VIEW_DESC D3D11Texture2D::fillSRVDesc(uint32_t first_array_index, uint32_t num_items,
+			uint32_t first_level, uint32_t num_levels) const override;
+
+		virtual D3D11_UNORDERED_ACCESS_VIEW_DESC fillUAVDesc(uint32_t first_array_index, uint32_t num_items, uint32_t level) const override;
 	private:
 		uint32_t mWidth;
 		uint32_t mHeight;

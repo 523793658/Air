@@ -1,5 +1,5 @@
 #include "Engine.h"
-#include "basic/include/ThrowErr.hpp"
+#include "basic/include/ErrorHanding.hpp"
 #include "rendersystem/include/RenderView.hpp"
 #include "rendersystem/include/RenderFactory.h"
 #include "rendersystem/include/RenderEngine.hpp"
@@ -70,7 +70,7 @@ namespace Air
 			RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 			if (att >= static_cast<uint32_t>(ATT_Color0 + re.getDeviceCaps().mMaxSimultaneousRts))
 			{
-				THR(errc::function_not_supported);
+				TERRC(std::errc::function_not_supported);
 			}
 			uint32_t colorId = att - ATT_Color0;
 			if ((colorId < mColorViews.size()) && mColorViews[colorId])
@@ -123,7 +123,7 @@ namespace Air
 			RenderEngine &re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 			if (att >= static_cast<uint32_t>(ATT_Color0 + re.getDeviceCaps().mMaxSimultaneousRts))
 			{
-				THR(errc::function_not_supported);
+				TERRC(std::errc::function_not_supported);
 			}
 			uint32_t colorId = att - ATT_Color0;
 			if ((mColorViews.size() >= colorId + 1) && mColorViews[colorId])

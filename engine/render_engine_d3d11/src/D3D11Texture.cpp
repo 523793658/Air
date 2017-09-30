@@ -27,6 +27,43 @@ namespace Air
 
 	}
 
+	D3D11_UNORDERED_ACCESS_VIEW_DESC D3D11Texture::fillUAVDesc(uint32_t first_array_index, uint32_t num_items, uint32_t level) const
+	{
+		AIR_UNUSED(first_array_index);
+		AIR_UNUSED(num_items);
+		AIR_UNUSED(level);
+		AIR_UNREACHABLE("invalid invoke");
+	}
+	D3D11_UNORDERED_ACCESS_VIEW_DESC D3D11Texture::fillUAVDesc(uint32_t array_index, uint32_t first_slice, uint32_t num_slices,
+		uint32_t level) const
+	{
+		AIR_UNUSED(array_index);
+		AIR_UNUSED(first_slice);
+		AIR_UNUSED(num_slices);
+		AIR_UNUSED(num_slices);
+		AIR_UNREACHABLE("invalid invoke");
+	}
+	D3D11_UNORDERED_ACCESS_VIEW_DESC D3D11Texture::fillUAVDesc(uint32_t first_array_index, uint32_t num_items,
+		CubeFaces first_face, uint32_t num_faces, uint32_t level) const
+	{
+		AIR_UNUSED(first_array_index);
+		AIR_UNUSED(num_items);
+		AIR_UNUSED(first_face);
+		AIR_UNUSED(num_faces);
+		AIR_UNUSED(level);
+		AIR_UNREACHABLE("invalid invoke");
+	}
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC D3D11Texture::fillSRVDesc(uint32_t first_array_index, uint32_t num_items,
+		uint32_t first_level, uint32_t num_levels) const
+	{
+		AIR_UNUSED(first_array_index);
+		AIR_UNUSED(num_items);
+		AIR_UNUSED(first_level);
+		AIR_UNUSED(num_levels);
+		AIR_UNREACHABLE("invalid invoke");
+	}
+
 	void D3D11Texture::deleteHWResource()
 	{
 		mD3DShaderResourceViews.clear();
@@ -110,6 +147,36 @@ namespace Air
 		}
 	}
 
+	ID3D11UnorderedAccessViewPtr const & D3D11Texture::retriveD3DUnorderedAccessView(uint32_t first_array_index, uint32_t num_items, uint32_t level)
+	{
+		BOOST_ASSERT(this->getAccesshint() & EAH_GPU_Unordered);
+		if (this->isHWResourceReady())
+		{
+			size_t hash_val = boost::hash_value(first_array_index);
+			boost::hash_combine(hash_val, num_items);
+			boost::hash_combine(hash_val, level);
+			boost::hash_combine(hash_val, 0);
+			boost::hash_combine(hash_val, 0);
+			auto iter = mD3DUnorderedAccessViews.find(hash_val);
+			if (iter != mD3DUnorderedAccessViews.end())
+			{
+				return iter->second;
+			}
+			else
+			{
+				auto desc = this->fillUAVDesc(first_array_index, num_items, level);
+				ID3D11UnorderedAccessView* d3d_ua_view;
+				mD3DDevice->CreateUnorderedAccessView(this->getD3D11Resource(), &desc, &d3d_ua_view);
+				return mD3DUnorderedAccessViews.emplace(hash_val, MakeComPtr(d3d_ua_view)).first->second;
+			}
+		}
+		else
+		{
+			static ID3D11UnorderedAccessViewPtr const view;
+			return view;
+		}
+	}
+
 	uint32_t D3D11Texture::getWidth(uint32_t level) const
 	{
 		return 1;
@@ -124,6 +191,7 @@ namespace Air
 		BOOST_ASSERT(level < mNumMipMaps);
 		return 1;
 	}
+
 
 	void D3D11Texture::getD3DFlags(D3D11_USAGE& usage, UINT& bind_flags, UINT& cpu_access_flags, UINT& misc_flags)
 	{

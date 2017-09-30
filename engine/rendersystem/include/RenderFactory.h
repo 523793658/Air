@@ -1,7 +1,7 @@
 #ifndef _RenderFactory_H_
 #define _RenderFactory_H_
 #pragma once
-
+#include <unordered_map>
 #include "PreDeclare.h"
 #include "rendersystem/include/Texture.hpp"
 #include "rendersystem/include/GraphicsBuffer.hpp"
@@ -32,17 +32,26 @@ namespace Air
 
 		virtual RenderViewPtr Make1DRenderView(Texture& texture, int first_array_index, int array_size, int level) = 0;
 		virtual RenderViewPtr Make2DRenderView(Texture& texture, int first_array_index, int array_size, int level) = 0;
-		virtual RenderViewPtr Make2DRenderView(Texture& texture, int array_index, Texture::CubeFace face, int level) = 0;
+		virtual RenderViewPtr Make2DRenderView(Texture& texture, int array_index, Texture::CubeFaces face, int level) = 0;
 		virtual RenderViewPtr Make2DRenderView(Texture& texture, int array_index, uint32_t slice, int level) = 0;
 
 		virtual RenderViewPtr Make2DDepthStencilRenderView(Texture& texture, int first_array_index, int array_size, int level) = 0;
 
-		TexturePtr MakeTexture2D(uint32_t width, uint32_t height, uint32_t num_mip_maps, uint32_t array_size, ElementFormat format, uint32_t sample_count, uint32_t sample_quality, uint32_t access_hint, ElementInitData const * init_data);
+		TexturePtr MakeTexture2D(uint32_t width, uint32_t height, uint32_t num_mip_maps, uint32_t array_size, ElementFormat format, uint32_t sample_count, uint32_t sample_quality, uint32_t access_hint, ArrayRef<ElementInitData> init_data = {});
+
+		SamplerStateObjectPtr MakeSamplerStateObject(SamplerStateDesc const & desc);
+
+		RenderStateObjectPtr RenderFactory::makeRenderStateObject(RasterizerStateDesc const & rs_desc, DepthStencilStateDesc const & dss_desc, BlendStateDesc const & bs_desc);
+
+		virtual ShaderObjectPtr makeShaderObject() = 0;
 	private:
 		virtual std::unique_ptr<RenderEngine> doMakeRenderEngine() = 0;
-
-	private:
+		virtual RenderStateObjectPtr doMakeRenderStateObject(RasterizerStateDesc const & rs_desc, DepthStencilStateDesc const & dss_desc, BlendStateDesc const & bs_desc) = 0;
+		virtual SamplerStateObjectPtr doMakeSamplerStateObject(SamplerStateDesc const & desc) = 0;
+	protected:
 		std::unique_ptr<RenderEngine> mRenderEnginePtr;
+		std::unordered_map<size_t, RenderStateObjectPtr> mRenderStateObjectPool;
+		std::unordered_map<size_t, SamplerStateObjectPtr> mSamplerStateObjectPool;
 	};
 }
 

@@ -1,7 +1,7 @@
 #include "Engine.h"
 #include "D3D11RenderView.hpp"
 #include <boost/lexical_cast.hpp>
-#include "basic/include/ThrowErr.hpp"
+#include "basic/include/ErrorHanding.hpp"
 #include "app/include/App3D.hpp"
 #include "app/include/Window.hpp"
 #include "D3D11FrameBuffer.hpp"
@@ -399,11 +399,11 @@ namespace Air
 					dxgi_rotation = DXGI_MODE_ROTATION_UNSPECIFIED;
 					break;
 				}
-				TIF(mSwapChain1->SetRotation(dxgi_rotation));
+				TIFHR(mSwapChain1->SetRotation(dxgi_rotation));
 			}
 		}
 		ID3D11Texture2D* back_buffer;
-		TIF(mSwapChain1->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&back_buffer)));
+		TIFHR(mSwapChain1->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&back_buffer)));
 		mBackBuffer = MakeSharedPtr<D3D11Texture2D>(MakeComPtr(back_buffer));
 		mRenderTargetView = rf.Make2DRenderView(*mBackBuffer, 0, 1, 0);
 		bool stereo = (STM_LCDShutter == Engine::getInstance().getConfig().mGraphicsCfg.mStereoMethod) && mDXGIStereoSupport;
@@ -413,7 +413,7 @@ namespace Air
 		}
 		if (mDepthStencilFormat != EF_Unknown)
 		{
-			mDepthStencil = rf.MakeTexture2D(mWidth, mHeight, 1, stereo ? 2 : 1, mDepthStencilFormat, mBackBuffer->getSampleCount(), mBackBuffer->getSampleQuality(), EAH_GPU_Read | EAH_GPU_Write, nullptr);
+			mDepthStencil = rf.MakeTexture2D(mWidth, mHeight, 1, stereo ? 2 : 1, mDepthStencilFormat, mBackBuffer->getSampleCount(), mBackBuffer->getSampleQuality(), EAH_GPU_Read | EAH_GPU_Write);
 
 			mDepthStencilView = rf.Make2DDepthStencilRenderView(*mDepthStencil, 0, 1, 0);
 			if (stereo)
@@ -491,7 +491,7 @@ namespace Air
 		if (mSwapChain)
 		{
 			UINT const present_flags = (mDXGIAllowTearing && !mIsFullScreen) ? DXGI_PRESENT_ALLOW_TEARING : 0;
-			TIF(mSwapChain->Present(mSyncInterval, present_flags));
+			TIFHR(mSwapChain->Present(mSyncInterval, present_flags));
 
 			RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
 			D3D11RenderEngine& d3d11_re = *checked_cast<D3D11RenderEngine*>(&rf.getRenderEngineInstance());

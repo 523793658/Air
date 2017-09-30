@@ -5,6 +5,7 @@
 #include "rendersystem/include/RenderLayout.hpp"
 #include "app/include/App3D.hpp"
 #include "app/include/Window.hpp"
+#include "rendersystem/include/RenderStateObject.hpp"
 #include "scene_manager/include/SceneManager.hpp"
 
 #include "rendersystem/include/RenderEngine.hpp"
@@ -243,4 +244,27 @@ namespace Air
 
 		this->bindFrameBuffer(mDefaultFrameBuffers[0]);
 	}
+
+	void RenderEngine::setStateObject(RenderStateObjectPtr const & rs_obj)
+	{
+		if (mCurrentLineRenderStateObject != rs_obj)
+		{
+			if (mForceLineMode)
+			{
+				auto rs_desc = rs_obj->getRasterizerStateDesc();
+				auto const & dds_desc = rs_obj->getDepthStencilStateDesc();
+				auto const & bs_desc = rs_obj->getBlendStateDesc();
+
+				rs_desc.mPolygonMode = PM_Line;
+				mCurrentLineRenderStateObject = Engine::getInstance().getRenderFactoryInstance().makeRenderStateObject(rs_desc, dds_desc, bs_desc);
+				mCurrentLineRenderStateObject->active();
+			}
+			else
+			{
+				rs_obj->active();
+			}
+			mCurrentRenderStateObject = rs_obj;
+		}
+	}
+
 }

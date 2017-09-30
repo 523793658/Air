@@ -12,11 +12,32 @@ namespace Air
 	{
 	public:
 		D3D11RenderLayout();
-		ID3D11InputLayout* getInputLayout(size_t signature, std::vector<uint8_t> const & vs_code) const;
+
+
+		void active() const;
+
+		std::vector<ID3D11Buffer*> const & getVBs() const
+		{
+			return mVBs;
+		}
+
+		std::vector<UINT> const & getStrides() const
+		{
+			return mStrides;
+		}
+
+		std::vector<UINT> const & getOffsets() const
+		{
+			return mOffsets;
+		}
+		ID3D11InputLayout* getInputLayout(ShaderObject const * so) const;
 
 	private:
-		std::vector<D3D11_INPUT_ELEMENT_DESC> mVertexElement;
+		mutable std::vector<D3D11_INPUT_ELEMENT_DESC> mVertexElement;
 		mutable std::vector<std::pair<size_t, ID3D11InputLayoutPtr>> mInputLayput;
+		mutable std::vector<ID3D11Buffer*> mVBs;
+		mutable std::vector<UINT> mStrides;
+		mutable std::vector<UINT> mOffsets;
 	};
 }
 #endif

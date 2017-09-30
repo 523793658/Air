@@ -37,6 +37,8 @@
 				"../render_engine_d3d11/include/D3D11Texture.hpp",
 				"../render_engine_d3d11/include/D3D11RenderView.hpp",
 				"../render_engine_d3d11/include/D3D11GraphicsBuffer.hpp",
+				"../render_engine_d3d11/include/D3D11ShaderObject.hpp",
+				"../render_engine_d3d11/include/D3D11RenderStateObject.hpp",
 				
 				
 				"../render_engine_d3d11/src/D3D11RenderFactory.cpp",
@@ -55,6 +57,8 @@
 				"../render_engine_d3d11/src/D3D11TextureCube.cpp",
 				"../render_engine_d3d11/src/D3D11RenderView.cpp",
 				"../render_engine_d3d11/src/D3D11GraphicsBuffer.cpp",
+				"../render_engine_d3d11/src/D3D11ShaderObject.cpp",
+				"../render_engine_d3d11/src/D3D11RenderStateObject.cpp",
 			],
 			"conditions":[
 				[

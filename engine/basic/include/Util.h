@@ -10,6 +10,8 @@
 
 #define AIR_UNUSED(x) (void)(x)
 
+#define AIR_IMPLICIT
+
 #ifdef AIR_DEBUG
 #define AIR_DBG_SUFFIX "_d"
 #else

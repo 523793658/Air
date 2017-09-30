@@ -1,6 +1,6 @@
 #include "Engine.h"
 #include "basic/include/Util.h"
-#include "basic/include/ThrowErr.hpp"
+#include "basic/include/ErrorHanding.hpp"
 #include "basic/include/COMPtr.hpp"
 #include "D3D11AdapterList.hpp"
 
@@ -35,7 +35,7 @@ namespace Air
 		}
 		if (mAdapters.empty())
 		{
-			THR(errc::function_not_supported);
+			TERRC(std::errc::function_not_supported);
 		}
 	}
 

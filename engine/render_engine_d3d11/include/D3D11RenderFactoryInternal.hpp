@@ -23,12 +23,18 @@ namespace Air
 
 		RenderViewPtr Make1DRenderView(Texture& texture, int first_array_index, int array_size, int level);
 		RenderViewPtr Make2DRenderView(Texture& texture, int first_array_index, int array_size, int level);
-		RenderViewPtr Make2DRenderView(Texture& texture, int array_index, Texture::CubeFace face, int level);
+		RenderViewPtr Make2DRenderView(Texture& texture, int array_index, Texture::CubeFaces face, int level);
 		RenderViewPtr Make2DRenderView(Texture& texture, int array_index, uint32_t slice, int level);
 
 		RenderViewPtr Make2DDepthStencilRenderView(Texture& texture, int first_array_index, int array_size, int level);
+
+		virtual ShaderObjectPtr makeShaderObject();
 	private:
 		virtual std::unique_ptr<RenderEngine> doMakeRenderEngine() override;
+
+		virtual RenderStateObjectPtr doMakeRenderStateObject(RasterizerStateDesc const & rs_desc, DepthStencilStateDesc const & dss_desc, BlendStateDesc const & bs_desc) override;
+
+		virtual SamplerStateObjectPtr doMakeSamplerStateObject(SamplerStateDesc const & desc) override;
 	};
 }
 

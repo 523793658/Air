@@ -28,6 +28,7 @@
 				"../core/include/ResLoader.h",
 				"../core/include/Camera.hpp",
 				"../core/include/ResourcePlugin.h",
+				"../core/include/SALWrapper.hpp",
 				
 				"../core/src/Engine.cpp",
 				"../core/src/Context.cpp",
@@ -54,6 +55,8 @@
 				"../rendersystem/include/SimpleMeshFactory.hpp",
 				"../rendersystem/include/ShaderObject.hpp",
 				"../rendersystem/include/RenderStateObject.hpp",
+				"../rendersystem/include/TexCompression.hpp",
+				"../rendersystem/include/TexCompressionBC.hpp",
 				
 				"../rendersystem/src/RenderSettings.cpp",
 				"../rendersystem/src/RenderFactory.cpp",
@@ -71,7 +74,9 @@
 				"../rendersystem/src/RenderMaterial.cpp",
 				"../rendersystem/src/SimpleMeshFactory.cpp",
 				"../rendersystem/src/ShaderObject.cpp",
+				"../rendersystem/src/TexCompressionBC.cpp",
 				"../rendersystem/src/RenderStateObject.cpp",
+				"../rendersystem/src/TexCompression.cpp",
 				
 				"../scene_manager/include/SceneManager.hpp",
 				"../scene_manager/include/SceneObject.hpp",

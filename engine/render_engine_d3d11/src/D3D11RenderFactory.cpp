@@ -4,8 +4,10 @@
 #include "D3D11RenderLayout.hpp"
 #include "D3D11RenderView.hpp"
 #include "D3D11Texture.hpp"
-#include "render_engine_d3d11/include/D3D11RenderFactory.hpp"
-#include "render_engine_d3d11/include/D3D11RenderFactoryInternal.hpp"
+#include "D3D11ShaderObject.hpp"
+#include "D3D11RenderStateObject.hpp"
+#include "D3D11RenderFactory.hpp"
+#include "D3D11RenderFactoryInternal.hpp"
 #include "D3D11GraphicsBuffer.hpp"
 namespace Air
 {
@@ -43,7 +45,7 @@ namespace Air
 	{
 		return MakeSharedPtr<D3D11RenderTargetRenderView>(texture, first_array_index, array_size, level);
 	}
-	RenderViewPtr D3D11RenderFactory::Make2DRenderView(Texture& texture, int array_index, Texture::CubeFace face, int level)
+	RenderViewPtr D3D11RenderFactory::Make2DRenderView(Texture& texture, int array_index, Texture::CubeFaces face, int level)
 	{
 		//return MakeSharedPtr<D3D11RenderTargetRenderView>()
 		return nullptr;
@@ -69,6 +71,23 @@ namespace Air
 	{
 		return MakeSharedPtr<D3D11GraphicsBuffer>(usage, access_hint, D3D11_BIND_CONSTANT_BUFFER, size_in_byte, fmt);
 	}
+
+	ShaderObjectPtr D3D11RenderFactory::makeShaderObject()
+	{
+		return MakeSharedPtr<D3D11ShaderObject>();
+	}
+
+	RenderStateObjectPtr D3D11RenderFactory::doMakeRenderStateObject(RasterizerStateDesc const & rs_desc, DepthStencilStateDesc const & dss_desc, BlendStateDesc const & bs_desc)
+	{
+		return MakeSharedPtr<D3D11RenderStateObject>(rs_desc, dss_desc, bs_desc);
+	}
+
+	SamplerStateObjectPtr D3D11RenderFactory::doMakeSamplerStateObject(SamplerStateDesc const & desc)
+	{
+		return MakeSharedPtr<D3D11SamplerStateObject>(desc);
+	}
+
+
 }
 
 void makeRenderFactory(std::unique_ptr<Air::RenderFactory>& ptr)

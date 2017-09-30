@@ -2,6 +2,8 @@
 #define _Context_H_
 #include "core/include/PreDeclare.h"
 #include <string>
+#include "basic/include/Log.hpp"
+#include "basic/include/ErrorHanding.hpp"
 #include <boost/assert.hpp>
 #include "rendersystem/include/RenderSettings.hpp"
 #include "basic/include/DllLoader.h"

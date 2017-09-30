@@ -2,6 +2,7 @@
 #define _RenderStateObject_H_
 #pragma once
 #include "boost/noncopyable.hpp"
+#include "boost/limits.hpp"
 #include "PreDeclare.h"
 namespace Air
 {
@@ -154,50 +155,55 @@ namespace Air
 #endif
 	struct AIR_CORE_API RasterizerStateDesc
 	{
-		PolygonMode mPolygonMode;
-		ShadeMode mShadeMode;
-		CullMode	mCullMode;
-		bool		mFrontFaceCCW;
-		float		mPolygonOffsetFactor;
-		float		mPolygonOffsetUnits;
-		bool		mDepthClipEnable;
-		bool		mScissorEnable;
-		bool		mMultiSampleEnabel;
-		RasterizerStateDesc();
+		PolygonMode mPolygonMode{ PM_Fill };
+		ShadeMode mShadeMode{ SM_Gouraud };
+		CullMode	mCullMode{ CM_Back };
+		bool		mFrontFaceCCW{ false };
+		float		mPolygonOffsetFactor{ 0.0f };
+		float		mPolygonOffsetUnits{ 0.0f };
+		bool		mDepthClipEnable{ true };
+		bool		mScissorEnable{ false };
+		bool		mMultiSampleEnabel{ true };
+		RasterizerStateDesc() 
+		{
+		};
 		friend bool operator<(RasterizerStateDesc const & lhs, RasterizerStateDesc const & rhs);
 	};
 
 	struct AIR_CORE_API DepthStencilStateDesc
 	{
-		bool			mDepthEnable;
-		bool			mDepthWriteMask;
-		CompareFunction	mDepthFunc;
-		bool			mFrontStencilEnable;
-		CompareFunction mFrontStencilFunc;
-		uint16_t		mFrontStencilRef;
-		uint16_t		mFrontstenCilReadMask;
-		uint16_t		mFrontStencilWriteMask;
-		StencilOperation mFrontStencilFail;
-		StencilOperation mFrontStencilDepthFail;
-		StencilOperation mFrontStencEnable;
-		bool			mBackStencilEnabel;
-		CompareFunction	mBackStencilFunc;
-		uint16_t		mBackStencilRef;
-		uint16_t		mBackStencilReadMask;
-		uint16_t		mBackStencilWriteMask;
-		StencilOperation mBackStencilFail;
-		StencilOperation mBackStencilDepthFail;
-		StencilOperation mBackStencilPass;
-		DepthStencilStateDesc();
+		bool			mDepthEnable{ true };
+		bool			mDepthWriteMask{ true };
+		CompareFunction	mDepthFunc{ CF_Less };
+		bool			mFrontStencilEnable{ false };
+		CompareFunction mFrontStencilFunc{ CF_AlwaysPass };
+		uint16_t		mFrontStencilRef{ 0 };
+		uint16_t		mFrontstenCilReadMask{ 0xFFFF };
+		uint16_t		mFrontStencilWriteMask{ 0xFFFF };
+		StencilOperation mFrontStencilFail{ SOP_Keep };
+		StencilOperation mFrontStencilDepthFail{ SOP_Keep };
+		StencilOperation mFrontStencilPass{ SOP_Keep };
+		bool			mBackStencilEnable{ false };
+		CompareFunction	mBackStencilFunc{ CF_AlwaysPass };
+		uint16_t		mBackStencilRef{ 0 };
+		uint16_t		mBackStencilReadMask{ 0xFFFF };
+		uint16_t		mBackStencilWriteMask{ 0xFFFF };
+		StencilOperation mBackStencilFail{ SOP_Keep };
+		StencilOperation mBackStencilDepthFail{ SOP_Keep };
+		StencilOperation mBackStencilPass{ SOP_Keep };
+		DepthStencilStateDesc()
+		{
+
+		}
 		friend bool operator<(DepthStencilStateDesc const & lhs, DepthStencilStateDesc const & rhs);
 	};
 
 	struct AIR_CORE_API BlendStateDesc
 	{
-		Color						mBlendFactor;
-		uint32_t					mSampleMask;
-		bool						mAlphaToCoverageEnable;
-		bool						mIndependentBlendEnable;
+		Color						mBlendFactor{ 1, 1, 1, 1, };
+		uint32_t					mSampleMask{ 0xFFFFFFFF };
+		bool						mAlphaToCoverageEnable{ false };
+		bool						mIndependentBlendEnable{ false };
 		std::array<bool, 8>			mBlendEnable;
 		std::array<bool, 8>			mLogicOpEnable;
 		std::array<BlendOperation, 8>	mBlendOp;
@@ -205,7 +211,7 @@ namespace Air
 		std::array<AlphaBlendFactor, 8> mDstBlend;
 		std::array<BlendOperation, 8>	mBlendOpAlpha;
 		std::array<AlphaBlendFactor, 8> mSrcBlendAlpha;
-		std::array<AlphaBlendFactor, 8> mSstdBlendAlpha;
+		std::array<AlphaBlendFactor, 8> mDstBlendAlpha;
 		std::array<LogicOperation, 8>	mLogicOp;
 		std::array<uint8_t, 8>			mColorWriteMask;
 		BlendStateDesc();
@@ -214,16 +220,16 @@ namespace Air
 
 	struct AIR_CORE_API SamplerStateDesc
 	{
-		Color				mBorderColor;
-		TexAddressingMode	mAddrModeU;
-		TexAddressingMode	mAddrModeV;
-		TexAddressingMode	mAddrModeW;
-		TexFilterOp			mFilter;
-		uint8_t				mMaxAnisotropy;
-		float				mMinLod;
+		Color				mBorderColor{ 0, 0, 0, 0 };
+		TexAddressingMode	mAddrModeU{ TAM_Wrap };
+		TexAddressingMode	mAddrModeV{ TAM_Wrap };
+		TexAddressingMode	mAddrModeW{ TAM_Wrap };
+		TexFilterOp			mFilter{ TFO_Min_Mag_Mip_Point };
+		uint8_t				mMaxAnisotropy{ 16 };
+		float				mMinLod{ 0 };
 		float				mMaxLod;
-		float				mMiPMapLoadBias;
-		CompareFunction		mCmpFunc;
+		float				mMiPMapLoadBias{ 0 };
+		CompareFunction		mCmpFunc{ CF_AlwaysFail };
 		SamplerStateDesc();
 		friend bool operator<(SamplerStateDesc const & lhs, SamplerStateDesc const &rhs);
 	};

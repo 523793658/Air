@@ -4,6 +4,11 @@
 
 namespace Air
 {
+	RenderLayout::~RenderLayout()
+	{
+
+	}
+
 	void RenderLayout::bindVertexStream(GraphicsBufferPtr const & buffer, VertexElementsType const & vet, StreamType type, uint32_t freq)
 	{
 		uint32_t size = 0;
@@ -53,7 +58,10 @@ namespace Air
 	}
 
 
-
+	bool RenderLayout::useIndices() const
+	{
+		return this->getNumIndices() != 0;
+	}
 
 
 
