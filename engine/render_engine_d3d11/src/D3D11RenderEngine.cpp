@@ -773,7 +773,7 @@ namespace Air
 		for (uint32_t st = 0; st < ShaderObject::ST_NumShaderTypes; ++st)
 		{
 			bool cleared = false;
-			for (uint32_t i = 0; i < mRenderCache.mShaderSrvSrc.size(); ++i)
+			for (uint32_t i = 0; i < mRenderCache.mShaderSrvSrc[st].size(); ++i)
 			{
 				if (std::get<0>(mRenderCache.mShaderSrvSrc[st][i]))
 				{
@@ -845,7 +845,7 @@ namespace Air
 
 	void D3D11RenderEngine::invalidRTVCache()
 	{
-		mRenderTargetViewPtrChache.clear();
+		mRenderCache.mRTVPtr.clear();
 	}
 
 	void D3D11RenderEngine::doCreateRenderWindow(std::string const & name, RenderSettings const & settings)
@@ -976,7 +976,7 @@ namespace Air
 	void D3D11RenderEngine::doRender(RenderEffect const &effect, RenderTechnique const & tech, RenderLayout const & rl)
 	{
 		uint32_t const num_vertex_streams = rl.getNumVertexStreams();
-		uint32_t const all_num_vertex_stream = num_vertex_streams + (rl.getIndexStream() ? 1 : 0);
+		uint32_t const all_num_vertex_stream = num_vertex_streams + (rl.getInstanceStream() ? 1 : 0);
 		D3D11RenderLayout const & d3d_rl = *checked_cast<D3D11RenderLayout const *>(&rl);
 		d3d_rl.active();
 		auto const & vbs = d3d_rl.getVBs();
@@ -991,7 +991,6 @@ namespace Air
 				mRenderCache.mVBStride = strides;
 				mRenderCache.mVBOffset = offsets;
 			}
-			tech.getPass(0).getShaderObject(effect).get();
 			auto layout = d3d_rl.getInputLayout(tech.getPass(0).getShaderObject(effect).get());
 			if (layout != mRenderCache.mInputLayout)
 			{
@@ -1086,6 +1085,7 @@ namespace Air
 			if (mRenderCache.mIB != d3dib)
 			{
 				mD3DIMMContext->IASetIndexBuffer(d3dib, D3D11Mapping::MappingFormat(rl.getIndexStreamFormat()), 0);
+				mRenderCache.mIB = d3dib;
 			}
 		}
 		else
@@ -1121,4 +1121,64 @@ namespace Air
 		}
 		mNumDrawsJustCalled += num_passes;
 	}
+
+	void D3D11RenderEngine::setRasterizerState(ID3D11RasterizerState* ras)
+	{
+		if (mRenderCache.mRasterizerState != ras)
+		{
+			mD3DIMMContext->RSSetState(ras);
+			mRenderCache.mRasterizerState = ras;
+		}
+	}
+	void D3D11RenderEngine::setDepthStencilState(ID3D11DepthStencilState* dss, uint16_t stencil_ref)
+	{
+		if ((mRenderCache.mDepthStencilState != dss) || (mRenderCache.mStencilRef != stencil_ref))
+		{
+			mD3DIMMContext->OMSetDepthStencilState(dss, stencil_ref);
+			mRenderCache.mDepthStencilState = dss;
+			mRenderCache.mStencilRef = stencil_ref;
+		}
+	}
+	void D3D11RenderEngine::setBlendState(ID3D11BlendState* bs, Color const & blend_factor, uint32_t sample_mask)
+	{
+		if ((mRenderCache.mBlendState != bs) || (mRenderCache.mBlendFactor != blend_factor) || (mRenderCache.mSampleMask != sample_mask))
+		{
+			mD3DIMMContext->OMSetBlendState(bs, &blend_factor.r(), sample_mask);
+			mRenderCache.mBlendState = bs;
+			mRenderCache.mBlendFactor = blend_factor;
+			mRenderCache.mSampleMask = sample_mask;
+		}
+	}
+
+	void D3D11RenderEngine::setRenderTargets(UINT num_rtvs, ID3D11RenderTargetView* const * rtvs, ID3D11DepthStencilView* dsv)
+	{
+		if ((mRenderCache.mRTVPtr.size() != num_rtvs) || (mRenderCache.mDSVPtr != dsv) || (memcmp(&mRenderCache.mRTVPtr[0], rtvs, num_rtvs * sizeof(rtvs[0])) != 0))
+		{
+			mD3DIMMContext->OMSetRenderTargets(num_rtvs, rtvs, dsv);
+			mRenderCache.mRTVPtr.assign(rtvs, rtvs + num_rtvs);
+			mRenderCache.mDSVPtr = dsv;
+		}
+
+	}
+	void D3D11RenderEngine::setViewports(UINT num_viewports, D3D11_VIEWPORT const * pViewports)
+	{
+		if (num_viewports > 1)
+		{
+			mD3DIMMContext->RSSetViewports(num_viewports, pViewports);
+		}
+		else
+		{
+			if (!(MathLib::equal(pViewports->TopLeftX, mRenderCache.mViewport.TopLeftX)
+				&& MathLib::equal(pViewports->TopLeftY, mRenderCache.mViewport.TopLeftY)
+				&& MathLib::equal(pViewports->Width, mRenderCache.mViewport.Width)
+				&& MathLib::equal(pViewports->Height, mRenderCache.mViewport.Height)
+				&& MathLib::equal(pViewports->MinDepth, mRenderCache.mViewport.MinDepth)
+				&& MathLib::equal(pViewports->MaxDepth, mRenderCache.mViewport.MaxDepth)))
+			{
+				mRenderCache.mViewport = *pViewports;
+				mD3DIMMContext->RSSetViewports(num_viewports, pViewports);
+			}
+		}
+	}
+
 }

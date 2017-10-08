@@ -7,6 +7,7 @@
 #include "D3D11Typedefs.hpp"
 #include "rendersystem/include/RenderLayout.hpp"
 #include "rendersystem/include/RenderStateObject.hpp"
+#include "rendersystem/include/ShaderObject.hpp"
 namespace Air
 {
 	class D3D11Mapping

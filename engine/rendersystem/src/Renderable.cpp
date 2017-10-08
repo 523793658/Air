@@ -15,8 +15,10 @@ namespace Air
 {
 	Renderable::Renderable()
 	{
-		RenderEffectPtr effect = syncLoadRenderEffect("simpleforward");
-		
+		RenderEffectPtr effect = syncLoadRenderEffect("assets/material/simpleforward.mtl");
+
+		bindEffect(effect);
+		mTechnique = effect->getTechniqueByIndex(0);
 	}
 	Renderable::~Renderable()
 	{
@@ -93,6 +95,7 @@ namespace Air
 		float4x4 mvp = mModelMat * vp;
 		AABBox const & pos_bb = this->getPosAABB();
 		AABBox const & tc_bb = this->getTexcoordAABB();
+		*mMVPParam = mvp;
 	}
 
 	void Renderable::onRenderEnd()
@@ -133,6 +136,8 @@ namespace Air
 	{
 		mEffect = effect;
 		this->updateTechniques();
+
+		mMVPParam = effect->getParameterByName("mvp");
 	}
 	RenderTechnique* Renderable::getPassTechnique(PassType type) const
 	{

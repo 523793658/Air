@@ -18,20 +18,20 @@ namespace Air
 {
 	struct D3D11RenderEngineCache 
 	{
-		ID3D11RasterizerState* mRasterizerState;
-		ID3D11DepthStencilState* mDepthStencilState;
-		uint16_t mStencilRef;
-		ID3D11BlendState* mBlendState;
+		ID3D11RasterizerState* mRasterizerState{ nullptr };
+		ID3D11DepthStencilState* mDepthStencilState{ nullptr };
+		uint16_t mStencilRef{ 1 };
+		ID3D11BlendState* mBlendState{ nullptr };
 		Color mBlendFactor;
 		uint32_t mSampleMask;
-		ID3D11VertexShader* mVertexShader;
-		ID3D11PixelShader* mPixelShader;
-		ID3D11GeometryShader* mGeometryShader;
-		ID3D11ComputeShader* mComputeShader;
-		ID3D11HullShader* mHullShader;
-		ID3D11DomainShader* mDomainShader;
-		RenderLayout::TopologyType mTopologyType;
-		ID3D11InputLayout* mInputLayout;
+		ID3D11VertexShader* mVertexShader{ nullptr };
+		ID3D11PixelShader* mPixelShader{ nullptr };
+		ID3D11GeometryShader* mGeometryShader{ nullptr };
+		ID3D11ComputeShader* mComputeShader{ nullptr };
+		ID3D11HullShader* mHullShader{ nullptr };
+		ID3D11DomainShader* mDomainShader{ nullptr };
+		RenderLayout::TopologyType mTopologyType{ RenderLayout::TT_UNKNOWN };
+		ID3D11InputLayout* mInputLayout{ nullptr };
 		D3D11_VIEWPORT mViewport;
 		uint32_t mNumSoBuffs;
 		std::vector<ID3D11Buffer*> mVB;
@@ -116,6 +116,8 @@ namespace Air
 		void setComputeShader(ID3D11ComputeShader* shader);
 		void setHullShader(ID3D11HullShader* shader);
 		void setDomainShader(ID3D11DomainShader* shader);
+		void setRenderTargets(UINT num_rtvs, ID3D11RenderTargetView* const * rtvs, ID3D11DepthStencilView* dsv);
+		void setViewports(UINT num_viewports, D3D11_VIEWPORT const * pViewports);
 
 		void setShaderResources(ShaderObject::ShaderType st, std::vector<std::tuple<void*, uint32_t, uint32_t>> const & srv_srcs, std::vector<ID3D11ShaderResourceView*> const & srvs);
 
@@ -139,7 +141,7 @@ namespace Air
 		}
 		char const * getPixelShaderProfile() const
 		{
-			return mVSProfile;
+			return mPSProfile;
 		}
 		char const * getGeometryShaderProfile() const
 		{
@@ -204,8 +206,6 @@ namespace Air
 		std::set<ElementFormat> mVertexFormats;
 		std::set<ElementFormat> mTextureFormats;
 		std::map<ElementFormat, std::vector<std::pair<uint32_t, uint32_t>>> mRendertargetFormats;
-
-		std::vector<ID3D11RenderTargetView*> mRenderTargetViewPtrChache;
 
 
 	private:

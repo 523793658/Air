@@ -84,15 +84,15 @@ namespace Air
 			dev_type_behaviors.emplace_back(D3D_DRIVER_TYPE_REFERENCE, L"REF");
 
 			std::vector<std::pair<char const *, D3D_FEATURE_LEVEL>> available_feature_levels;
-			if (d3d11_re.getDXGISubVer() >= 4)
-			{
-				available_feature_levels.emplace_back("12_1", D3D_FEATURE_LEVEL_12_1);
-				available_feature_levels.emplace_back("12_0", D3D_FEATURE_LEVEL_12_0);
-			}
-			if(d3d11_re.getDXGISubVer() >= 2)
-			{
-				available_feature_levels.emplace_back("11_1", D3D_FEATURE_LEVEL_11_1);
-			}
+// 			if (d3d11_re.getDXGISubVer() >= 4)
+// 			{
+// 				available_feature_levels.emplace_back("12_1", D3D_FEATURE_LEVEL_12_1);
+// 				available_feature_levels.emplace_back("12_0", D3D_FEATURE_LEVEL_12_0);
+// 			}
+// 			if(d3d11_re.getDXGISubVer() >= 2)
+// 			{
+// 				available_feature_levels.emplace_back("11_1", D3D_FEATURE_LEVEL_11_1);
+// 			}
 			available_feature_levels.emplace_back("11_0", D3D_FEATURE_LEVEL_11_0);
 			available_feature_levels.emplace_back("10_1", D3D_FEATURE_LEVEL_10_1);
 			available_feature_levels.emplace_back("10_0", D3D_FEATURE_LEVEL_10_0);

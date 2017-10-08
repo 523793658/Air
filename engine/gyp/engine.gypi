@@ -15,6 +15,7 @@
 				"../../external/boost",
 				"../core/include",
 				"../",
+				"../../external/dxsdk/Include",
 			],
 			"includes":[
 				"../../tools/gyp/common.gypi",
@@ -29,6 +30,8 @@
 				"../core/include/Camera.hpp",
 				"../core/include/ResourcePlugin.h",
 				"../core/include/SALWrapper.hpp",
+				"../core/include/CameraController.hpp",
+				"../core/include/Input.hpp",
 				
 				"../core/src/Engine.cpp",
 				"../core/src/Context.cpp",
@@ -36,6 +39,8 @@
 				"../core/src/ResLoader.cpp",
 				"../core/src/Camera.cpp",
 				"../core/src/ResourcePlugin.cpp",
+				"../core/src/CameraController.cpp",
+				"../core/src/Input.cpp",
 				
 				"../rendersystem/include/RenderFactory.h",
 				"../rendersystem/include/RenderEngine.hpp",

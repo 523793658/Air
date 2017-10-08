@@ -58,15 +58,7 @@ namespace Air
 #endif
 #if defined(AIR_PLATFORM_WINDOWS_DESKTOP)
 		this->addPath("../");
-		this->addPath("../../media/RenderFX/");
-		this->addPath("../../media/Models");
-		this->addPath("../../media/Textures/2D/");
-		this->addPath("../../media/Textures/3D/");
-		this->addPath("../../media/Textures/Cube/");
-		this->addPath("../../media/Textures/Juda/");
-		this->addPath("../../media/Fonts/");
-		this->addPath("../../media/PostProcessors/");
-
+		this->addPath("../../../");
 #endif
 #endif
 		mLoadingThread = MakeUniquePtr<joiner<void >> (Engine::getInstance().getThreadPool()(

@@ -181,7 +181,19 @@ namespace Air
 
 	void D3D11GraphicsBuffer::updateSubResource(uint32_t offset, uint32_t size, void const * data)
 	{
-
+		D3D11_BOX* p = nullptr;
+		D3D11_BOX box;
+		if (!(mBindFlags & D3D11_BIND_CONSTANT_BUFFER))
+		{
+			p = &box;
+			box.left = offset;
+			box.top = 0;
+			box.front = 0;
+			box.right = offset + size;
+			box.bottom = 1;
+			box.back = 1;
+		}
+		mD3DImmCtx->UpdateSubresource(mBuffer.get(), 0, p, data, size, size);
 	}
 	void * D3D11GraphicsBuffer::map(BufferAccess ba)
 	{

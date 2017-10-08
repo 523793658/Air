@@ -35,9 +35,9 @@ namespace Air
 				VertexData& v = data[i * cels + j];
 				v.texCoord.x() = tcdx;
 				v.texCoord.y() = j * tcdy;
-				v.pos.x() = sin((n - i)* dgy) * radius;
-				v.pos.y() = cos((n - i) * dgy) * sin(j * dgx) * radius;
-				v.pos.z() = cos((n - i) * dgy) * cos(j * dgx) * radius;
+				v.pos.x() = sin((i - n)* dgy) * radius;
+				v.pos.y() = cos((i - n) * dgy) * sin(j * dgx) * radius;
+				v.pos.z() = cos((i - n) * dgy) * cos(j * dgx) * radius;
 				aabb.join(v.pos);
 				if (i < rows - 1 && j < cels - 1)
 				{

@@ -8,6 +8,7 @@
 #include "rendersystem/include/SimpleMeshFactory.hpp"
 #include "sample/include/RenderOneBall.hpp"
 #include "rendersystem/include/Mesh.hpp"
+#include "random"
 using namespace Air;
 
 namespace
@@ -18,8 +19,7 @@ namespace
 		SphereObject(float4 const & diff, float4 const &spec, float glossiness)
 			:SceneObjectHelper(SOA_Cullable)
 		{
-			//¼ÓÔØrenderableObj
-			mRenderable = SimpleMeshFactory::createStaticShpere(1.0);;
+			mRenderable = SimpleMeshFactory::createStaticShpere(1.0);
 		}
 
 		void setRenderingType(int type)
@@ -68,7 +68,7 @@ void SampleRenderOneBall::onCreate()
 uint32_t SampleRenderOneBall::doUpdate(uint32_t pass)
 {
 	RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
-	Color c(1.0, 1.0, 0.0, 1.0 );
+	Color c(0.0, 0.0, 0.0, 1.0 );
 	re.getCurrentFrameBuffer()->clear(FrameBuffer::CBM_Color | FrameBuffer::CBM_Depth | FrameBuffer::CBM_Stencil, c, 1.0, 0);
 	return App3DFramework::URV_NeedFlush | App3DFramework::URV_Finished;
 }

@@ -124,7 +124,7 @@ namespace Air
 		RenderStateObjectPtr mCurrentRenderStateObject;
 		RenderStateObjectPtr mCurrentLineRenderStateObject;
 
-		bool mForceLineMode;
+		bool mForceLineMode{ false };
 	};
 
 

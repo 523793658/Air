@@ -27,6 +27,7 @@ namespace Air
 		mBlendOpAlpha.fill(BOP_Add);
 		mSrcBlendAlpha.fill(ABF_One);
 		mDstBlendAlpha.fill(ABF_Zero);
+		mColorWriteMask.fill(CMASK_ALL);
 		mLogicOp.fill(LOP_Noop);
 	}
 

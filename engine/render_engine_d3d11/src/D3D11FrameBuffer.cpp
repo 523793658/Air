@@ -2,6 +2,8 @@
 #define FLAMEMATH
 #endif
 #include "Engine.h"
+#include "rendersystem/include/RenderFactory.h"
+#include "D3D11RenderEngine.hpp"
 #include "D3D11RenderView.hpp"
 #include "D3D11FrameBuffer.hpp"
 namespace Air
@@ -28,18 +30,22 @@ namespace Air
 		{
 			if (mColorViews[n])
 			{
-				
+				return checked_cast<D3D11RenderTargetRenderView*>(mColorViews[n].get())->getD3DRenderTargetView();
 			}
 		}
-		return NULL;
+		return nullptr;
 	}
 	ID3D11DepthStencilView* D3D11FrameBuffer::getD3DDSView() const
 	{
-		return NULL;
+		if (mDepthStencilView)
+		{
+			return checked_cast<D3D11DepthStencilRenderView*>(mDepthStencilView.get())->getD3DDepthStencilView();
+		}
+		return nullptr;
 	}
 	ID3D11UnorderedAccessView* D3D11FrameBuffer::getD3DUAView(uint32_t n) const
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	std::wstring const & D3D11FrameBuffer::getDescription() const
@@ -50,7 +56,44 @@ namespace Air
 
 	void D3D11FrameBuffer::onBind()
 	{
+		D3D11RenderEngine& re = *checked_cast<D3D11RenderEngine*>(&Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance());
+		std::vector<void*> rt_src;
+		std::vector<uint32_t> rt_first_subres;
+		std::vector<uint32_t> rt_num_subres;
+		std::vector<ID3D11RenderTargetView*> rt_view(mColorViews.size());
+		for (uint32_t i = 0; i < mColorViews.size(); ++i)
+		{
+			if (mColorViews[i])
+			{
+				D3D11RenderTargetRenderView* p = checked_cast<D3D11RenderTargetRenderView*>(mColorViews[i].get());
+				rt_src.push_back(p->getRenderTargetSrc());
+				rt_first_subres.push_back(p->getRTFirstSubRes());
+				rt_num_subres.push_back(p->getRTNumSubRes());
+				rt_view[i] = p->getD3DRenderTargetView();
+			}
+			else
+			{
+				rt_view[i] = nullptr;
+			}
+		}
+		if (mDepthStencilView)
+		{
+			D3D11DepthStencilRenderView* p = checked_cast<D3D11DepthStencilRenderView*>(mDepthStencilView.get());
+			rt_src.push_back(p->getRenderTargetSrc());
+			rt_first_subres.push_back(p->getRTFirstSubRes());
+			rt_num_subres.push_back(p->getRTNumSubRes());
+		}
 
+		for (size_t i = 0; i < rt_src.size(); ++i)
+		{
+			re.detachSRV(rt_src[i], rt_first_subres[i], rt_num_subres[i]);
+		}
+		re.setRenderTargets(static_cast<UINT>(rt_view.size()), &rt_view[0], this->getD3DDSView());
+		mD3DViewport.TopLeftX = static_cast<float>(mViewport->mLeft);
+		mD3DViewport.TopLeftY = static_cast<float>(mViewport->mTop);
+		mD3DViewport.Width = static_cast<float>(mViewport->mWidth);
+		mD3DViewport.Height = static_cast<float>(mViewport->mHeight);
+		re.setViewports(1, &mD3DViewport);
 	}
 	void D3D11FrameBuffer::onUnbind()
 	{

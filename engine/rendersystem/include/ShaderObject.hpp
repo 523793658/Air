@@ -69,8 +69,8 @@ namespace Air
 		}
 		std::string mProfile;
 		std::string mFunctionName;
-		uint64_t mMacrosHash;
-		uint32_t mTechPassType;
+		uint64_t mMacrosHash{ 0 };
+		uint32_t mTechPassType{ 0xFFFFFFFF };
 #ifdef AIR_HAS_STRUCT_PACK
 #pragma pack(push, 1)
 #endif

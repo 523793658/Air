@@ -39,6 +39,36 @@ namespace Air
 		void clearDepthStencil(float depth, int32_t stanecil);
 		virtual void discard() override;
 
+		void onAttached(FrameBuffer& fb, uint32_t att)
+		{
+
+		}
+		void onDetached(FrameBuffer& fb, uint32_t att)
+		{
+
+		}
+		ID3D11RenderTargetView* getD3DRenderTargetView() const
+		{
+			return mRenderTargetView.get();
+		}
+
+		void* getRenderTargetSrc() const
+		{
+			return mRenderTargetSrc;
+		}
+
+		uint32_t getRTFirstSubRes() const
+		{
+			return mRenderTargetFirstSubRes;
+		}
+
+		uint32_t getRTNumSubRes() const
+		{
+			return mRenderTargetNumSubRes;
+		}
+
+
+
 	private:
 		void bindDiscardFunc();
 		void HWDiscard();
@@ -59,6 +89,35 @@ namespace Air
 		void clearDepth(float depth);
 		void clearStencil(int32_t stencil);
 		void clearDepthStencil(float depth, int32_t stanecil);
+		void onAttached(FrameBuffer& fb, uint32_t att)
+		{
+
+		}
+		void onDetached(FrameBuffer& fb, uint32_t att)
+		{
+
+		}
+
+		void* getRenderTargetSrc() const
+		{
+			return mRenderTargetSrc;
+		}
+
+		uint32_t getRTFirstSubRes() const
+		{
+			return mRenderTargetFirstSubRes;
+		}
+
+		uint32_t getRTNumSubRes() const
+		{
+			return mRenderTargetNumSubRes;
+		}
+
+
+		ID3D11DepthStencilView* getD3DDepthStencilView() const
+		{
+			return mDepthStencilView.get();
+		}
 
 		virtual void discard() override;
 	private:
@@ -69,7 +128,7 @@ namespace Air
 		ID3D11DepthStencilViewPtr mDepthStencilView;
 		uint32_t mRenderTargetFirstSubRes;
 		uint32_t mRenderTargetNumSubRes;
-
+		void* mRenderTargetSrc;
 		std::function<void()> mDiscardFunc;
 	};
 }

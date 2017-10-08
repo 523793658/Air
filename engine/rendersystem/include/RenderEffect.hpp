@@ -869,6 +869,21 @@ protected:
 #if AIR_IS_DEV_PLATFORM
 		void streamOut(std::ostream& os) const;
 #endif
+
+		ShaderObject::ShaderType getType() const
+		{
+			return mType;
+		}
+		ShaderModel getVersion() const
+		{
+			return mVer;
+		}
+
+		std::string const & getString() const
+		{
+			return mStr;
+		}
+
 		ShaderObject::ShaderType mType;
 		ShaderModel mVer;
 		std::string mStr;

@@ -151,7 +151,7 @@ namespace Air
 
 		T const & operator[](size_t index) const
 		{
-			BOOST_ASSERT_MSG(mSize < mSize, "Invalid index!");
+			BOOST_ASSERT_MSG(index < mSize, "Invalid index!");
 			return mData[index];
 		}
 

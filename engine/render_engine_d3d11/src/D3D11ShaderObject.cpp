@@ -11,6 +11,7 @@
 #include "render_engine_d3d11/include/D3D11RenderEngine.hpp"
 #include "render_engine_d3d11/include/D3D11Texture.hpp"
 #include "render_engine_d3d11/include/D3D11GraphicsBuffer.hpp"
+#include "D3D11RenderStateObject.hpp"
 #include "D3D11Mapping.hpp"
 
 #include "render_engine_d3d11/include/D3D11ShaderObject.hpp"
@@ -178,6 +179,7 @@ namespace Air
 				mIsShaderValidate[type] = true;
 				uint32_t blob_size;
 				std::memcpy(&blob_size, nsbp, sizeof(blob_size));
+				blob_size = LE2Native(blob_size);
 				nsbp += sizeof(blob_size);
 				std::shared_ptr<std::vector<uint8_t>> code_blob = MakeSharedPtr<std::vector<uint8_t>>(blob_size);
 				std::memcpy(&((*code_blob)[0]), nsbp, blob_size);
@@ -497,7 +499,7 @@ namespace Air
 			if (mSoTemplate->mCBufferIndices[type] && !mSoTemplate->mCBufferIndices[type]->empty())
 			{
 				all_cbuff_indices.insert(all_cbuff_indices.end(), mSoTemplate->mCBufferIndices[type]->begin(), mSoTemplate->mCBufferIndices[type]->end());
-				for (size_t i = 0; i < mSoTemplate->mCBufferIndices.size(); ++i)
+				for (size_t i = 0; i < mSoTemplate->mCBufferIndices[type]->size(); ++i)
 				{
 					auto cbuff = effect.getCBufferByIndex((*mSoTemplate->mCBufferIndices[type])[i]);
 					cbuff->resize(mSoTemplate->mShaderDesc[type]->mCBDesc[i].mSize);
@@ -1142,15 +1144,125 @@ return std::shared_ptr<std::vector<uint8_t>>();
 					}
 					break;
 				case Air::ShaderObject::ST_HullShader:
+					if (caps.mHSSupport)
+					{
+						ID3D11HullShader* hs;
+						if (FAILED(d3d_device->CreateHullShader(&((*code_blob)[0]), code_blob->size(), nullptr, &hs)))
+						{
+							mIsShaderValidate[type] = false;
+						}
+						else
+						{
+							mSoTemplate->mHullShader = MakeComPtr(hs);
+							mSoTemplate->mShaderCode[type].first = code_blob;
+							mHasTessellation = true;
+						}
+					}
+					else
+					{
+						mIsShaderValidate[type] = false;
+					}
 					break;
 				case Air::ShaderObject::ST_DomainShader:
-					break;
-				case Air::ShaderObject::ST_NumShaderTypes:
+					if (caps.mDSSupport)
+					{
+						ID3D11DomainShader* ds;
+						if (FAILED(d3d_device->CreateDomainShader(&((*code_blob)[0]), code_blob->size(), nullptr, &ds)))
+						{
+							mIsShaderValidate[type] = false;
+						}
+						else
+						{
+							mSoTemplate->mDomainShader = MakeComPtr(ds);
+							if (!sd.mSODecl.empty())
+							{
+								if (caps.mGSSupport)
+								{
+									std::vector<D3D11_SO_DECLARATION_ENTRY> d3d11_decl(sd.mSODecl.size());
+									for (size_t i = 0; i < sd.mSODecl.size(); ++i)
+									{
+										d3d11_decl[i] = D3D11Mapping::mapping(sd.mSODecl[i]);
+									}
+									UINT rasterized_stream = 0;
+									if ((caps.mMaxShaderModel >= ShaderModel(5, 0)) && (effect.getShaderDesc(shader_desc_ids[ShaderObject::ST_PixelShader]).mFunctionName.empty()))
+									{
+										rasterized_stream = D3D11_SO_NO_RASTERIZED_STREAM;
+									}
+									ID3D11GeometryShader* gs;
+									if (FAILED(d3d_device->CreateGeometryShaderWithStreamOutput(&((*code_blob)[0]), code_blob->size(), &d3d11_decl[0], static_cast<UINT>(d3d11_decl.size()), nullptr, 0, rasterized_stream, nullptr, &gs)))
+									{
+										mIsShaderValidate[type] = false;
+									}
+									else
+									{
+										mSoTemplate->mGeometryShader = MakeComPtr(gs);
+									}
+								}
+								else
+								{
+									mIsShaderValidate[type] = false;
+								}
+							}
+							mSoTemplate->mShaderCode[type].first = code_blob;
+							mHasTessellation = true;
+						}
+					}
+					else
+					{
+						mIsShaderValidate[type] = false;
+					}
 					break;
 				default:
+					mIsShaderValidate[type] = false;
 					break;
 				}
 			}
+			if (!mSoTemplate->mShaderDesc[type]->mCBDesc.empty())
+			{
+				mSoTemplate->mCBufferIndices[type] = MakeSharedPtr<std::vector<uint8_t>>(mSoTemplate->mShaderDesc[type]->mCBDesc.size());
+			}
+			mD3DCBuffers[type].resize(mSoTemplate->mShaderDesc[type]->mCBDesc.size());
+			for (size_t c = 0; c < mSoTemplate->mShaderDesc[type]->mCBDesc.size(); ++c)
+			{
+				uint32_t i = 0;
+				for (; i < effect.getNumCBuffers(); ++i)
+				{
+					if (effect.getCBufferByIndex(i)->getNameHash() == mSoTemplate->mShaderDesc[type]->mCBDesc[c].mNameHash)
+					{
+						(*mSoTemplate->mCBufferIndices[type])[c] = static_cast<uint8_t>(i);
+						break;
+					}
+				}
+				BOOST_ASSERT(i < effect.getNumCBuffers());
+			}
+			mSamplers[type].resize(mSoTemplate->mShaderDesc[type]->mNumSamplers);
+			mSRVSrcs[type].resize(mSoTemplate->mShaderDesc[type]->mNumSrvs, std::make_tuple(static_cast<void*>(nullptr), 0, 0));
+			mSRVS[type].resize(mSoTemplate->mShaderDesc[type]->mNumSrvs);
+			mUAVSRCS.resize(mSoTemplate->mShaderDesc[type]->mNumUAVS, nullptr);
+			mUAVS.resize(mSoTemplate->mShaderDesc[type]->mNumUAVS);
+			for (size_t i = 0; i < mSoTemplate->mShaderDesc[type]->mResDesc.size(); ++i)
+			{
+				RenderEffectParameter* p = effect.getParameterByName(mSoTemplate->mShaderDesc[type]->mResDesc[i].name);
+				BOOST_ASSERT(p);
+				uint32_t offset = mSoTemplate->mShaderDesc[type]->mResDesc[i].bindPoint;
+				if (D3D_SIT_SAMPLER == mSoTemplate->mShaderDesc[type]->mResDesc[i].type)
+				{
+					SamplerStateObjectPtr sampler;
+					p->getValue(sampler);
+					if (sampler)
+					{
+						mSamplers[type][offset] = checked_cast<D3D11SamplerStateObject*>(sampler.get())->getD3DSamplerState();
+					}
+				}
+				else
+				{
+					mParamBinds[type].push_back(this->getBindFunc(type, offset, p));
+				}
+			}
+		}
+		else
+		{
+			mIsShaderValidate[type] = false;
 		}
 	}
 }

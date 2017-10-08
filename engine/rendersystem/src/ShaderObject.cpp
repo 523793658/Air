@@ -1,5 +1,5 @@
 #include "Engine.h"
-#include <dxsdk/Include/d3dcommon.h>
+#include "dxsdk/Include/d3dcommon.h"
 #include <boost/lexical_cast.hpp>
 #include "rendersystem/include/RenderEngine.hpp"
 #include "rendersystem/include/RenderFactory.h"
@@ -14,7 +14,7 @@
 
 #ifdef CALL_D3DCOMPILER_DIRECTLY
 #include "SALWrapper.hpp"
-#include <d3dcompiler.h>
+#include "d3dcompiler.h"
 #else
 #define S_OK                                        0x00000000
 
@@ -65,6 +65,7 @@ namespace
 		static D3DCompilerLoader& getInstance()
 		{
 			static D3DCompilerLoader initer;
+			return initer;
 		}
 
 		HRESULT D3DCompile(std::string const & src_data, D3D_SHADER_MACRO const * defines, char const * entry_point, char const* target, uint32_t flags1, uint32_t flags2, std::vector<uint8_t> & code, std::string & error_msgs) const
@@ -430,12 +431,12 @@ namespace Air
 		return code;
 	}
 
-	void reflectionDXBC(std::vector<uint8_t> const & code, void** reflector)
+	void ShaderObject::reflectionDXBC(std::vector<uint8_t> const & code, void** reflector)
 	{
 		D3DCompilerLoader::getInstance().D3DReflect(code, reflector);
 	}
 
-	std::vector<uint8_t> stripDXBC(std::vector<uint8_t> const & code, uint32_t strip_flags)
+	std::vector<uint8_t> ShaderObject::stripDXBC(std::vector<uint8_t> const & code, uint32_t strip_flags)
 	{
 		std::vector<uint8_t> ret;
 		D3DCompilerLoader::getInstance().D3DStripShader(code, strip_flags, ret);

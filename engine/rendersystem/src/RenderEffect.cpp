@@ -3005,6 +3005,110 @@ namespace Air
 				mAnnotations = parent_tech->mAnnotations;
 			}
 		}
+		{
+			XMLNodePtr macro_node = node->getFirstNode("macro");
+			if (macro_node)
+			{
+				mMacros = MakeSharedPtr < std::remove_reference<decltype(*mMacros)>::type>();
+				if (parent_tech && parent_tech->mMacros)
+				{
+					*mMacros = *parent_tech->mMacros;
+					for (; macro_node; macro_node = macro_node->getNextSibling("macro"))
+					{
+						std::string name = macro_node->getAttribString("name");
+						std::string value = macro_node->getAttribString("value");
+						bool found = false;
+						for (size_t i = 0; i < mMacros->size(); ++i)
+						{
+							if ((*mMacros)[i].first == name)
+							{
+								(*mMacros)[i].second = value;
+								found = true;
+								break;
+							}
+						}
+						if (!found)
+						{
+							mMacros->emplace_back(name, value);
+						}
+					}
+				}
+				else if (parent_tech)
+				{
+					mMacros = parent_tech->mMacros;
+				}
+			}
+			if (!node->getFirstNode("pass") && parent_tech)
+			{
+				mIsValidate = parent_tech->mIsValidate;
+				mHasDiscard = parent_tech->mHasDiscard;
+				mHasTessellation = parent_tech->mHasTessellation;
+				mTransparent = parent_tech->mTransparent;
+				mWeight = parent_tech->mWeight;
+				if (mMacros == parent_tech->mMacros)
+				{
+					mPasses = parent_tech->mPasses;
+				}
+				else
+				{
+					for (uint32_t index = 0; index < parent_tech->mPasses.size(); ++index)
+					{
+						RenderPassPtr pass = MakeSharedPtr<RenderPass>();
+						mPasses.push_back(pass);
+						auto inherit_pass = parent_tech->mPasses[index].get();
+						pass->load(effect, tech_index, index, inherit_pass);
+						mIsValidate &= pass->isValidate();
+					}
+				}
+			}
+			else
+			{
+				mIsValidate = true;
+				mHasDiscard = false;
+				mHasTessellation = false;
+				mTransparent = false;
+				if (parent_tech)
+				{
+					mWeight = parent_tech->getWeight();
+				}
+				else
+				{
+					mWeight = 1;
+				}
+				uint32_t index = 0;
+				for (XMLNodePtr pass_node = node->getFirstNode("pass"); pass_node; pass_node = pass_node->getNextSibling("pass"), ++index)
+				{
+					RenderPassPtr pass = MakeSharedPtr<RenderPass>();
+					mPasses.push_back(pass);
+					RenderPass* inherit_pass = nullptr;
+					if (parent_tech && (index < parent_tech->mPasses.size()))
+					{
+						inherit_pass = parent_tech->mPasses[index].get();
+					}
+					pass->load(effect, pass_node, tech_index, index, inherit_pass);
+					mIsValidate &= pass->isValidate();
+					for (XMLNodePtr state_node = pass_node->getFirstNode("state"); state_node; state_node = state_node->getNextSibling("state"))
+					{
+						++mWeight;
+						std::string state_name = state_node->getAttribString("name");
+						if ("blend_enable" == state_name)
+						{
+							std::string value_str = state_node->getAttribString("value");
+							if (BoolFromStr(value_str))
+							{
+								mTransparent = true;
+							}
+						}
+					}
+					mHasDiscard |= pass->getShaderObject(effect)->hasDiscard();
+					mHasTessellation |= pass->getShaderObject(effect)->hasTessellation();
+				}
+				if (mTransparent)
+				{
+					mWeight += 10000;
+				}
+			}
+		}
 	}
 #endif
 
@@ -3686,7 +3790,7 @@ namespace Air
 		{
 			fxml_name = name;
 		}
-		std::string kfx_name = fxml_name.substr(0, fxml_name.rfind(".")) + ".kfx";
+		std::string kfx_name = fxml_name.substr(0, fxml_name.rfind(".")) + ".assets";
 #if AIR_IS_DEV_PLATFORM
 		ResIdentifierPtr source = ResLoader::getInstance().open(fxml_name);
 #endif
@@ -3804,7 +3908,7 @@ namespace Air
 				}
 				std::vector<XMLNodePtr> parameter_nodes;
 
-				for (XMLNodePtr node = root->getFirstNode(); node; node->getNextSibling())
+				for (XMLNodePtr node = root->getFirstNode(); node; node = node->getNextSibling())
 				{
 					if ("parameter" == node->getName())
 					{
@@ -3879,7 +3983,229 @@ namespace Air
 #if AIR_IS_DEV_PLATFORM
 	void RenderEffectTemplate::GenHLSLShaderText(RenderEffect const & effect)
 	{
+		std::string& str = mHLSLShader;
+		str += "#define SHADER_MODEL(major, minor) ((major) * 4 + (minor))\n\n";
+		for (uint32_t i = 0; i < this->getNumMacros(); ++i)
+		{
+			std::pair<std::string, std::string> const & name_value = this->getMacroByIndex(i);
+			str += "#define " + name_value.first + " " + name_value.second + "\n";
+		}
+		str += '\n';
+		for (uint32_t i = 0; i < effect.getNumCBuffers(); ++i)
+		{
+			RenderEffectConstantBuffer const & cbuff = *effect.getCBufferByIndex(i);
+			str += "cbuffer " + cbuff.getName() + "\n";
+			str += "{\n";
+			for (uint32_t j = 0; j < cbuff.getNumParameters(); ++j)
+			{
+				RenderEffectParameter const & param = *effect.getParameterByIndex(cbuff.getParametersIndex(j));
+				switch (param.getType())
+				{
+				case REDT_texture1D:
+				case REDT_texture2D:
+				case REDT_texture3D:
+				case REDT_textureCUBE:
+				case REDT_texture1DArray:
+				case REDT_texture2DArray:
+				case REDT_texture3DArray:
+				case REDT_textureCUBEArray:
+				case REDT_sampler:
+				case REDT_buffer:
+				case REDT_structured_buffer:
+				case REDT_byte_address_buffer:
+				case REDT_rw_buffer:
+				case REDT_rw_structured_buffer:
+				case REDT_rw_texture1D:
+				case REDT_rw_texture2D:
+				case REDT_rw_texture3D:
+				case REDT_rw_texture1DArray:
+				case REDT_rw_texture2DArray:
+				case REDT_rw_byte_address_buffer:
+				case REDT_append_structured_buffer:
+				case REDT_consume_structured_buffer:
+					break;
+				default:
+					str += this->getTypeName(param.getType()) + " " + param.getName();
+					if (param.getArraySize())
+					{
+						str += "[" + *param.getArraySize() + "]";
+					}
+					str += ";\n";
+					break;
+				}
+			}
+			str += "};\n";
+		}
+		for (uint32_t i = 0; i < effect.getNumParameters(); ++i)
+		{
+			RenderEffectParameter& param = *effect.getParameterByIndex(i);
+			std::string elem_type;
+			switch (param.getType())
+			{
+			case REDT_texture1D:
+			case REDT_texture2D:
+			case REDT_texture3D:
+			case REDT_textureCUBE:
+			case REDT_texture1DArray:
+			case REDT_texture2DArray:
+			case REDT_textureCUBEArray:
+			case REDT_buffer:
+			case REDT_structured_buffer:
+			case REDT_rw_buffer:
+			case REDT_rw_structured_buffer:
+			case REDT_rw_texture1D:
+			case REDT_rw_texture2D:
+			case REDT_rw_texture3D:
+			case REDT_rw_texture1DArray:
+			case REDT_rw_texture2DArray:
+			case REDT_append_structured_buffer:
+			case REDT_consume_structured_buffer:
+				param.getVar().getValue(elem_type);
+				break;
+			default:
+				break;
+			}
+			std::string const &param_name = param.getName();
+			switch (param.getType())
+			{
+			case REDT_texture1D:
+				str += "Texture1D<" + elem_type + "> " + param_name + ";\n";
+				break;
+			case REDT_texture2D:
+				str += "Texture2D<" + elem_type + "> " + param_name + ";\n";
+				break;
+			case REDT_texture3D:
+				str += "#if AIR_MAX_TEX_DEPTH <= 1\n";
+				str += "Texture2D<" + elem_type + ">" + param_name + ";\n";
+				str += "#else\n";
+				str += "Textrue3D<" + elem_type + ">" + param_name + ";\n";
+				str += "#endif\n";
+				break;
+			case REDT_textureCUBE:
+				str += "TextureCube<" + elem_type + "> " + param_name + ";\n";
+				break;
+			case REDT_texture1DArray:
+				str += "#if AIR_MAX_TEX_ARRAY_LEN >  1\n";
+				str += "Texture1DArray<" + elem_type + "> " + param_name + ";\n";
+				str += "endif\n";
+				break;
+			case REDT_texture2DArray:
+				str += "#if AIR_MAX_TEX_ARRAY_LEN > 1\n";
+				str += "Texture2DArray<" + elem_type + "> " + param_name + ";\n";
+				str += "#endif\n";
+				break;
+			case REDT_textureCUBEArray:
+				str += "#if (AIR_MAX_TEX_ARRAY_LEN > 1) && (AIR_SHADER_MODEL >= SHADER_MODE(4, 1))\n";
+				str += "TextureCubeArray<" + elem_type + "> " + param_name + ";\n";
+				str += "#endif\n";
+				break;
+			case REDT_buffer:
+				str += "Buffer<" + elem_type + "> " + param_name + ";\n";
+				break;
+			case REDT_sampler:
+				str += "sampler " + param_name + ";\n";
+				break;
+			case REDT_structured_buffer:
+				str += "StructuredBuffer<" + elem_type + "> " + param_name + ";\n";
+				break;
+			case REDT_byte_address_buffer:
+				str += "ByteAddressBuffer " + param_name + ";\n";
+				break;
+			case REDT_rw_buffer:
+				str += "#if AIR_SHADER_MODEL >= SHADER_MODEL(5, 0)\n";
+				str += "RWBuffer<" + elem_type + "> " + param_name + ";\n";
+				str += "#endif";
+				break;
+			case REDT_rw_structured_buffer:
+				str += "RWStructuredBuffer<" + elem_type + "> " + param_name + ";\n";
+				break;
+			case REDT_rw_texture1D:
+				str += "#if AIR_SHADER_MODEL >= SHADER_MODEL(5, 0)\n";
+				str += "RWTexture1D<" + elem_type + "> " + param_name + ";\n";
+				str += "#endif\n";
+				break;
+			case REDT_rw_texture2D:
+				str += "#if AIR_SHADER_MODEL >= SHADER_MODEL(5, 0)\n";
+				str += "RWTexture2D<" + elem_type + "> " + param_name + ";\n";
+				str += "#endif";
+				break;
+			case REDT_rw_texture3D:
+				str += "#if AIR_SHADER_MODEL >= SHADER_MODEL(5, 0)\n";
+				str += "RWTexture3D<" + elem_type + "> " + param_name + ";\n";
+				break;
+			case REDT_rw_texture1DArray:
+				str += "#if AIR_SHADER_MODEL >= SHADER_MODEL(5, 0)\n";
+				str += "RWTexture1DArray<" + elem_type + "> " + param_name + ";\n";
+				str += "endif";
+				break;
+			case REDT_rw_texture2DArray:
+				str += "#if AIR_SHADER_MODEL >= SHADER_MODEL(5, 0)\n";
+				str += "RWTexture2DAarray<" + elem_type + "> " + param_name + ";\n";
+				str += "#endif";
+				break;
+			case REDT_rw_byte_address_buffer:
+				str += "RWByteAddressBuffer " + param_name + ";\n";
+				break;
+			case REDT_append_structured_buffer:
+				str += "#if AIR_SHADER_MODEL >= SHADER_MODEL(5, 0)\n";
+				str += "AppendStructruedBuffer<" + elem_type + "> " + param_name + ";\n";
+				str += "#endif";
+				break;
+			case REDT_consume_structured_buffer:
+				str += "#if AIR_SHADER_MODEL >= SHADER_MODEL(5, 0)\n";
+				str += "ConsumeStructuredBuffer<" + elem_type + "> " + param_name + ";\n";
+				str += "#endif";
+				break;
+			default:
+				break;
+			}
+		}
 
+		for (uint32_t i = 0; i < this->getNumShaderFragments(); ++i)
+		{
+			RenderShaderFragment const & effect_shader_frag = this->getShaderFragmentByIndex(i);
+			ShaderObject::ShaderType const shader_type = effect_shader_frag.getType();
+			switch (shader_type)
+			{
+			case ShaderObject::ST_VertexShader:
+				str += "#if AIR_VERTEX_SHADER\n";
+				break;
+			case ShaderObject::ST_PixelShader:
+				str += "#if AIR_PIXEL_SHADER\n";
+				break;
+			case ShaderObject::ST_GeometryShader:
+				str += "#if AIR_COMPUTE_SHADER\n";
+				break;
+			case ShaderObject::ST_ComputeShader:
+				str += "#if AIR_COMPUTE_SHADER\n";
+				break;
+			case ShaderObject::ST_HullShader:
+				str += "#if AIR_HULL_SHADER\n";
+				break;
+			case ShaderObject::ST_DomainShader:
+				str += "#if AIR_DOMAIN_SHADER\n";
+				break;
+			case ShaderObject::ST_NumShaderTypes:
+				break;
+			default:
+				AIR_UNREACHABLE("Invalid shader type");
+			}
+			ShaderModel const & ver = effect_shader_frag.getVersion();
+			if ((ver.major_ver != 0) || (ver.minor_ver != 0))
+			{
+				str += "#if AIR_SHADER_MODEL >= SHADER_MODEL("
+					+ boost::lexical_cast<std::string>(static_cast<int>(ver.major_ver)) + ", " + boost::lexical_cast<std::string>(static_cast<int>(ver.minor_ver)) + ")\n";
+			}
+			str += effect_shader_frag.getString() + "\n";
+			if ((ver.major_ver != 0) || (ver.minor_ver != 0))
+			{
+				str += "#endif\n";
+			}
+			if (shader_type != ShaderObject::ST_NumShaderTypes)
+			{
+				str += "#endif\n";
+			}
+		}
 	}
 	std::string const & RenderEffectTemplate::getHLSLShaderText() const
 	{

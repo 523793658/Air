@@ -93,7 +93,8 @@ namespace Air
 			TT_29_Ctrl_Pt_PatchList,
 			TT_30_Ctrl_Pt_PatchList,
 			TT_31_Ctrl_Pt_PatchList,
-			TT_32_Ctrl_Pt_PatchList
+			TT_32_Ctrl_Pt_PatchList,
+			TT_UNKNOWN
 		};
 
 		enum StreamType
