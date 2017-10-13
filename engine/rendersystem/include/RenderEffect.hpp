@@ -503,6 +503,11 @@ protected:
 
 		void resize(uint32_t size);
 
+		ConstantBufferType const getType() const
+		{
+			return mType;
+		}
+
 		template<typename T>
 		T const * getVariableInBuff(uint32_t offset) const
 		{
@@ -552,6 +557,33 @@ protected:
 		int id{ 0 };
 	};
 
+	class AIR_CORE_API SharedConstantBuffer : boost::noncopyable
+	{
+	public:
+		SharedConstantBuffer();
+
+		RenderEffectConstantBufferPtr getCBuffer();
+
+		RenderEffectParameter* getParameterByIndex(uint32_t index) const;
+
+		uint32_t const getNumParams() const
+		{
+			return mParams.size();
+		}
+
+		bool isInit() const
+		{
+			return mIsInit;
+		}
+		void setInit()
+		{
+			mIsInit = true;
+		}
+	public:
+		RenderEffectConstantBufferPtr mCBuffer;
+		std::vector<std::unique_ptr<RenderEffectParameter>> mParams;
+		bool mIsInit{ false };
+	};
 
 
 	class AIR_CORE_API RenderEffectAnnotation : boost::noncopyable
@@ -732,6 +764,7 @@ protected:
 		RenderEffectTemplatePtr mEffectTemplate;
 		std::vector<std::unique_ptr<RenderEffectParameter>> mParams;
 		std::vector<std::shared_ptr<RenderEffectConstantBuffer>> mCbuffers;
+		std::vector<SharedConstantBuffer*> mSharedBuffers;
 		std::vector<ShaderObjectPtr> mShaderObjs;
 		bool isClone{ false };
 

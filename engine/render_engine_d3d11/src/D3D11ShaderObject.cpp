@@ -7,7 +7,7 @@
 #include "core/include/ResLoader.h"
 #include "rendersystem/include/RenderEffect.hpp"
 #include "rendersystem/include/RenderFactory.h"
-
+#include "rendersystem/include/RenderEnvironment.hpp"
 #include "render_engine_d3d11/include/D3D11RenderEngine.hpp"
 #include "render_engine_d3d11/include/D3D11Texture.hpp"
 #include "render_engine_d3d11/include/D3D11GraphicsBuffer.hpp"
@@ -492,6 +492,7 @@ namespace Air
 	void D3D11ShaderObject::linkShaders(RenderEffect const & effect)
 	{
 		std::vector<uint32_t> all_cbuff_indices;
+		RenderEnvironment &env = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance().getRenderEnvironment();
 		mIsvalidate = true;
 		for (size_t type = 0; type < ShaderObject::ST_NumShaderTypes; ++type)
 		{
@@ -502,37 +503,79 @@ namespace Air
 				for (size_t i = 0; i < mSoTemplate->mCBufferIndices[type]->size(); ++i)
 				{
 					auto cbuff = effect.getCBufferByIndex((*mSoTemplate->mCBufferIndices[type])[i]);
-					cbuff->resize(mSoTemplate->mShaderDesc[type]->mCBDesc[i].mSize);
-					BOOST_ASSERT(cbuff->getNumParameters() == mSoTemplate->mShaderDesc[type]->mCBDesc[i].mVarDesc.size());
-					for (uint32_t j = 0; j < cbuff->getNumParameters(); ++j)
+					if (cbuff->getType() == CBT_Object)
 					{
-						RenderEffectParameter* param = effect.getParameterByIndex(cbuff->getParametersIndex(j));
-						uint32_t stride;
-						if (mSoTemplate->mShaderDesc[type]->mCBDesc[i].mVarDesc[j].elements > 0)
+						cbuff->resize(mSoTemplate->mShaderDesc[type]->mCBDesc[i].mSize);
+						BOOST_ASSERT(cbuff->getNumParameters() == mSoTemplate->mShaderDesc[type]->mCBDesc[i].mVarDesc.size());
+						for (uint32_t j = 0; j < cbuff->getNumParameters(); ++j)
 						{
-							if (param->getType() != REDT_float4x4)
+							RenderEffectParameter* param = effect.getParameterByIndex(cbuff->getParametersIndex(j));
+							uint32_t stride;
+							if (mSoTemplate->mShaderDesc[type]->mCBDesc[i].mVarDesc[j].elements > 0)
 							{
-								stride = 16;
+								if (param->getType() != REDT_float4x4)
+								{
+									stride = 16;
+								}
+								else
+								{
+									stride = 64;
+								}
 							}
 							else
 							{
-								stride = 64;
+								if (param->getType() != REDT_float4x4)
+								{
+									stride = 4;
+								}
+								else
+								{
+									stride = 16;
+								}
 							}
-						}
-						else
-						{
-							if (param->getType() != REDT_float4x4)
-							{
-								stride = 4;
-							}
-							else
-							{
-								stride = 16;
-							}
-						}
-						param->bindToCBuffer(*cbuff, mSoTemplate->mShaderDesc[type]->mCBDesc[i].mVarDesc[j].start_offset, stride);
+							param->bindToCBuffer(*cbuff, mSoTemplate->mShaderDesc[type]->mCBDesc[i].mVarDesc[j].start_offset, stride);
 
+						}
 					}
+					else
+					{
+						SharedConstantBuffer* scb = env.getConstantBuffer(cbuff->getName());
+						if (!scb->isInit())
+						{
+							cbuff->resize(mSoTemplate->mShaderDesc[type]->mCBDesc[i].mSize);
+							BOOST_ASSERT(scb->getNumParams() == mSoTemplate->mShaderDesc[type]->mCBDesc[i].mVarDesc.size());
+							for (uint32_t j = 0; j < scb->getNumParams(); ++j)
+							{
+								RenderEffectParameter* param = scb->getParameterByIndex(j);
+								uint32_t stride;
+								if (mSoTemplate->mShaderDesc[type]->mCBDesc[i].mVarDesc[j].elements > 0)
+								{
+									if (param->getType() != REDT_float4x4)
+									{
+										stride = 16;
+									}
+									else
+									{
+										stride = 64;
+									}
+								}
+								else
+								{
+									if (param->getType() != REDT_float4x4)
+									{
+										stride = 4;
+									}
+									else
+									{
+										stride = 16;
+									}
+								}
+								param->bindToCBuffer(*cbuff, mSoTemplate->mShaderDesc[type]->mCBDesc[i].mVarDesc[j].start_offset, stride);
+							}
+							scb->setInit();
+						}
+					}
+					
 					mD3DCBuffers[type][i] = checked_cast<D3D11GraphicsBuffer*>(cbuff->getHWbuffer().get())->getD3DBuffer();
 				}
 			}
@@ -678,7 +721,10 @@ namespace Air
 
 		for (auto cb : mAllCBuffers)
 		{
-			cb->update();
+			if (cb->getType() == CBT_Object)
+			{
+				cb->update();
+			}
 		}
 
 		for (size_t st = 0; st < ST_NumShaderTypes; ++st)

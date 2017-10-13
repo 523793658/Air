@@ -1,6 +1,10 @@
 <?xml version='1.0'?>
 
 <effect>
+	<cbuffer name="color_buffer" type="CBT_Global">
+		<parameter type="float4" name="color"/>
+	</cbuffer>
+
 	<parameter type="float4x4" name="mvp"/>
 	<shader>
 		<![CDATA[
@@ -13,7 +17,7 @@ void simplestVS(float4 pos : POSITION,
 		
 float4 simplestPS() : SV_Target
 {
-	return float4(1.0, 1.0, 1.0, 1.0);
+	return color;
 }
 		
 		

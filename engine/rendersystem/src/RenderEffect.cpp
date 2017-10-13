@@ -3353,7 +3353,14 @@ namespace Air
 		ret->mCbuffers.resize(mCbuffers.size());
 		for (size_t i = 0; i < mCbuffers.size(); ++i)
 		{
-			ret->mCbuffers[i] = mCbuffers[i]->clone(*this, *ret);
+			if (mCbuffers[i]->getType() == CBT_Object)
+			{
+				ret->mCbuffers[i] = mCbuffers[i]->clone(*this, *ret);
+			}
+			else
+			{
+				ret->mCbuffers[i] = mCbuffers[i];
+			}
 		}
 		ret->mShaderObjs.resize(mShaderObjs.size());
 		for (size_t i = 0; i < mShaderObjs.size(); ++i)
@@ -3879,6 +3886,7 @@ namespace Air
 			{
 				effect.mParams.clear();
 				effect.mCbuffers.clear();
+				effect.mSharedBuffers.clear();
 				effect.mShaderObjs.clear();
 				mMacros.reset();
 				mShaderFrags.clear();
@@ -3956,18 +3964,52 @@ namespace Air
 					}
 				}
 				std::vector<XMLNodePtr> parameter_nodes;
-
+				bool global_cb_created = false;
 				for (XMLNodePtr node = root->getFirstNode(); node; node = node->getNextSibling())
 				{
 					if ("parameter" == node->getName())
 					{
+
 						parameter_nodes.push_back(node);
+						if (!global_cb_created)
+						{
+							effect.mCbuffers.push_back(MakeSharedPtr<RenderEffectConstantBuffer>());
+							RenderEffectConstantBuffer* cbuff = effect.mCbuffers.back().get();
+							cbuff->load("global_cb", CBT_Object);
+						}
 					}
 					else if ("cbuffer" == node->getName())
 					{
-						for (XMLNodePtr sub_node = node->getFirstNode("parameter"); sub_node; sub_node = sub_node->getNextSibling("parameter"))
+						std::string cbuff_name = node->getAttribString("name");
+						ConstantBufferType cbt = constant_buffer_type_define::getInstance().fromStr(node->getAttribString("type", "CBT_Object"));
+						
+
+						if (cbt == CBT_Object)
 						{
-							parameter_nodes.push_back(sub_node);
+							effect.mCbuffers.push_back(MakeSharedPtr<RenderEffectConstantBuffer>());
+							RenderEffectConstantBuffer* cbuff = effect.mCbuffers.back().get();
+							cbuff->load(cbuff_name, cbt);
+
+							for (XMLNodePtr sub_node = node->getFirstNode("parameter"); sub_node; sub_node = sub_node->getNextSibling("parameter"))
+							{
+								parameter_nodes.push_back(sub_node);
+							}
+						}
+						else
+						{
+							SharedConstantBuffer* shared_buffer = env.getConstantBuffer(cbuff_name);
+							if (!shared_buffer)
+							{
+								shared_buffer = env.addConstantBuffer(cbuff_name, cbt);
+								shared_buffer->mCBuffer->load(cbuff_name, cbt);
+								for (XMLNodePtr sub_node = node->getFirstNode("parameter"); sub_node; sub_node = sub_node->getNextSibling("parameter"))
+								{
+									shared_buffer->mParams.push_back(MakeUniquePtr<RenderEffectParameter>());
+									shared_buffer->mParams.back()->load(sub_node);
+								}
+							}
+							effect.mCbuffers.push_back(shared_buffer->getCBuffer());
+							effect.mSharedBuffers.push_back(shared_buffer);
 						}
 					}
 				}
@@ -3985,45 +4027,19 @@ namespace Air
 						RenderEffectConstantBuffer* cbuff = nullptr;
 						XMLNodePtr parent_node = node->getParent();
 						std::string cbuff_name = parent_node->getAttribString("name", "global_cb");
-						ConstantBufferType cbt = constant_buffer_type_define::getInstance().fromStr(parent_node->getAttribString("type", "CBT_Object"));
+				
 						size_t const cbuff_name_hash = RT_HASH(cbuff_name.c_str());
-						if (cbt == CBT_Object)
+						for (size_t i = 0; i < effect.mCbuffers.size(); i++)
 						{
-							bool found = false;
-							for (size_t i = 0; i < effect.mCbuffers.size(); i++)
+							if (effect.mCbuffers[i]->getNameHash() == cbuff_name_hash)
 							{
-								if (effect.mCbuffers[i]->getNameHash() == cbuff_name_hash)
-								{
-									cbuff = effect.mCbuffers[i].get();
-									found = true;
-									break;
-								}
+								cbuff = effect.mCbuffers[i].get();
+								break;
 							}
-							if (!found)
-							{
-								effect.mCbuffers.push_back(MakeSharedPtr<RenderEffectConstantBuffer>());
-								cbuff = effect.mCbuffers.back().get();
-								cbuff->load(cbuff_name, cbt);
-							}
-							BOOST_ASSERT(cbuff);
-							cbuff->addParameters(param_index);
 						}
-						else
-						{
-							/*bool found = false;
-							RenderEffectConstantBufferPtr cbuf = env.getConstantBuffer(cbuff_name);
-							if (!cbuf)
-							{
-								cbuf = MakeSharedPtr<RenderEffectConstantBuffer>();
-								cbuf->load(cbuff_name, cbt);
-								env.addConstantBuffer(cbuff_name, cbuf);
-								effect.mCbuffers.push_back(cbuf);
-							}*/
-
-						}
-
+						BOOST_ASSERT(cbuff);
+						cbuff->addParameters(param_index);
 					}
-
 					effect.mParams.push_back(MakeUniquePtr<RenderEffectParameter>());
 					effect.mParams.back()->load(node);
 				}
@@ -4040,8 +4056,8 @@ namespace Air
 					mTechniques.back()->load(effect, node, index);
 				}
 			}
-			std::ofstream ofs(kfx_name.c_str(), std::ios_base::binary | std::ios_base::out);
-			this->streamOut(ofs, effect);
+			/*std::ofstream ofs(kfx_name.c_str(), std::ios_base::binary | std::ios_base::out);
+			this->streamOut(ofs, effect);*/
 #endif
 		}
 
@@ -4058,48 +4074,70 @@ namespace Air
 			str += "#define " + name_value.first + " " + name_value.second + "\n";
 		}
 		str += '\n';
+
+		auto genCbufferTex = [&str, this](RenderEffectParameter const & param){
+			switch (param.getType())
+			{
+			case REDT_texture1D:
+			case REDT_texture2D:
+			case REDT_texture3D:
+			case REDT_textureCUBE:
+			case REDT_texture1DArray:
+			case REDT_texture2DArray:
+			case REDT_texture3DArray:
+			case REDT_textureCUBEArray:
+			case REDT_sampler:
+			case REDT_buffer:
+			case REDT_structured_buffer:
+			case REDT_byte_address_buffer:
+			case REDT_rw_buffer:
+			case REDT_rw_structured_buffer:
+			case REDT_rw_texture1D:
+			case REDT_rw_texture2D:
+			case REDT_rw_texture3D:
+			case REDT_rw_texture1DArray:
+			case REDT_rw_texture2DArray:
+			case REDT_rw_byte_address_buffer:
+			case REDT_append_structured_buffer:
+			case REDT_consume_structured_buffer:
+				break;
+			default:
+				str += this->getTypeName(param.getType()) + " " + param.getName();
+				if (param.getArraySize())
+				{
+					str += "[" + *param.getArraySize() + "]";
+				}
+				str += ";\n";
+				break;
+			}
+		};
+
+		for (uint32_t i = 0; i < effect.mSharedBuffers.size(); ++i)
+		{
+			SharedConstantBuffer* shared_buffer = effect.mSharedBuffers[i];
+			str += "cbuffer " + shared_buffer->getCBuffer()->getName() + "\n";
+			str += "{\n";
+			for (uint32_t j = 0; j < shared_buffer->mParams.size(); ++j)
+			{
+				RenderEffectParameter const & param = *shared_buffer->mParams[j];
+				genCbufferTex(param);
+			}
+			str += "};\n";
+		}
+
 		for (uint32_t i = 0; i < effect.getNumCBuffers(); ++i)
 		{
 			RenderEffectConstantBuffer const & cbuff = *effect.getCBufferByIndex(i);
+			if (cbuff.getType() != CBT_Object)
+			{
+				continue;
+			}
 			str += "cbuffer " + cbuff.getName() + "\n";
 			str += "{\n";
 			for (uint32_t j = 0; j < cbuff.getNumParameters(); ++j)
 			{
 				RenderEffectParameter const & param = *effect.getParameterByIndex(cbuff.getParametersIndex(j));
-				switch (param.getType())
-				{
-				case REDT_texture1D:
-				case REDT_texture2D:
-				case REDT_texture3D:
-				case REDT_textureCUBE:
-				case REDT_texture1DArray:
-				case REDT_texture2DArray:
-				case REDT_texture3DArray:
-				case REDT_textureCUBEArray:
-				case REDT_sampler:
-				case REDT_buffer:
-				case REDT_structured_buffer:
-				case REDT_byte_address_buffer:
-				case REDT_rw_buffer:
-				case REDT_rw_structured_buffer:
-				case REDT_rw_texture1D:
-				case REDT_rw_texture2D:
-				case REDT_rw_texture3D:
-				case REDT_rw_texture1DArray:
-				case REDT_rw_texture2DArray:
-				case REDT_rw_byte_address_buffer:
-				case REDT_append_structured_buffer:
-				case REDT_consume_structured_buffer:
-					break;
-				default:
-					str += this->getTypeName(param.getType()) + " " + param.getName();
-					if (param.getArraySize())
-					{
-						str += "[" + *param.getArraySize() + "]";
-					}
-					str += ";\n";
-					break;
-				}
+				genCbufferTex(param);
 			}
 			str += "};\n";
 		}
@@ -5635,4 +5673,18 @@ namespace Air
 		os.write(&mStr[0], len * sizeof(mStr[0]));
 	}
 #endif
+	SharedConstantBuffer::SharedConstantBuffer()
+	{
+		mCBuffer = MakeSharedPtr<RenderEffectConstantBuffer>();
+	}
+
+	RenderEffectConstantBufferPtr SharedConstantBuffer::getCBuffer()
+	{
+		return mCBuffer;
+	}
+
+	RenderEffectParameter* SharedConstantBuffer::getParameterByIndex(uint32_t index) const
+	{
+		return mParams[index].get();
+	}
 }

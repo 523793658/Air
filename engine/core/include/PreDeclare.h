@@ -84,6 +84,8 @@ namespace Air
 	class RenderEffectConstantBuffer;
 	typedef std::shared_ptr<RenderEffectConstantBuffer> RenderEffectConstantBufferPtr;
 
+	class SharedConstantBuffer;
+
 	class RenderEnvironment;
 
 	class SamplerStateObject;

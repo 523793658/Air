@@ -7,18 +7,29 @@ namespace Air
 	{
 
 	}
-
-	RenderEffectConstantBufferPtr const RenderEnvironment::getConstantBuffer(std::string name) const
+	SharedConstantBuffer* const RenderEnvironment::getConstantBuffer(std::string name) const
 	{
 		auto item = mSharedConstanBuffers.find(name);
-		return item == mSharedConstanBuffers.end() ? RenderEffectConstantBufferPtr() : item->second;
+		return item == mSharedConstanBuffers.end() ? nullptr : item->second.get();
 	}
 
-	void RenderEnvironment::addConstantBuffer(std::string name, RenderEffectConstantBufferPtr cbuffer)
+	SharedConstantBuffer* RenderEnvironment::addConstantBuffer(std::string name)
 	{
-		if (mSharedConstanBuffers.find(name) == mSharedConstanBuffers.end())
+		auto cb = mSharedConstanBuffers.find(name);
+		if (cb == mSharedConstanBuffers.end())
 		{
-			mSharedConstanBuffers.emplace(name, cbuffer);
+			mSharedConstanBuffers.emplace(name, MakeUniquePtr<SharedConstantBuffer>());
+			return mSharedConstanBuffers.find(name)->second.get();
+		}
+		return cb->second.get();
+	}
+
+	void RenderEnvironment::update()
+	{
+		auto b = mSharedConstanBuffers.find("color_buffer");
+		if (b != mSharedConstanBuffers.end())
+		{
+			
 		}
 	}
 
