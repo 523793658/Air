@@ -29,6 +29,7 @@ namespace Air
 	struct ContextCfg
 	{
 		std::string mRenderFactoryName;
+		std::string mInputFactoryName;
 		std::string mSceneManagerName;
 
 
@@ -48,7 +49,12 @@ namespace Air
 		static Engine& getInstance();
 		static void destroy();
 
+		void update();
+
 		RenderFactory& getRenderFactoryInstance();
+		InputFactory& getInputFactoryInstance();
+
+		
 
 		void loadCfg(std::string const & cfg_file);
 		void saveCfg(std::string const & cfg_file);
@@ -58,6 +64,7 @@ namespace Air
 
 		void loadRenderFactory(std::string const &rf_name);
 		void loadSceneManager(std::string const & sm_name);
+		void loadInputFactory(std::string const & if_name);
 		void loadResourcePlugins(std::vector<AssetsPluginCfg> const &rp_cfg);
 
 		void setAppInstance(App3DFramework& app);
@@ -78,10 +85,13 @@ namespace Air
 		App3DFramework* mApp;
 		std::unique_ptr<SceneManager> mSceneMgr;
 		std::unique_ptr<RenderFactory> mRenderFactory;
+		std::unique_ptr<InputFactory> mInputFactory;
 		std::map<std::string, std::unique_ptr<ResourcePlugin>> mResourcePlugins;
 
 		DllLoader mRenderLoader;
 		DllLoader mSceneManagerLoader;
+		DllLoader mInputLoader;
+
 		std::map<std::string, DllLoader> mResourceLoaders;
 
 		//Ïß³Ì³Ø

@@ -82,6 +82,9 @@ namespace Air
 	class RenderShaderFragment;
 
 	class RenderEffectConstantBuffer;
+	typedef std::shared_ptr<RenderEffectConstantBuffer> RenderEffectConstantBufferPtr;
+
+	class RenderEnvironment;
 
 	class SamplerStateObject;
 	typedef std::shared_ptr<SamplerStateObject> SamplerStateObjectPtr;
@@ -134,9 +137,16 @@ namespace Air
 	struct InputSensorActionParam;
 	typedef std::shared_ptr<InputSensorActionParam> InputSensorActionParamPtr;
 
+	class LightSource;
+	typedef std::shared_ptr<LightSource> LightSourcePtr;
+
+	class AmbientLightSource;
+	typedef std::shared_ptr<AmbientLightSource> AmbientLightSourcePtr;
 
 
 	struct VertexElement;
+
+	class InputFactory;
 }
 
 

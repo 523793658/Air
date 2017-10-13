@@ -8,10 +8,12 @@
 #else
 #define AIR_OCTREE_SM_API AIR_SYMBOL_IMPORT
 #endif
+#include "basic/include/AABBBox.hpp"
+#include "PreDeclare.h"
 
 extern "C"
 {
-	AIR_OCTREE_SM_API void makeSceneManager(std::unique_ptr<Air::SceneManager>& ptr);
+	AIR_OCTREE_SM_API void makeSceneManager(std::unique_ptr<Air::SceneManager>& ptr, Air::AABBox const & worldSize);
 }
 
 

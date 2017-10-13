@@ -56,6 +56,17 @@ namespace Air
 		AABBox const & getAABB() const;
 
 		RenderablePtr const & getRenderable() const;
+
+		void setSpaceNodeHandle(int handle)
+		{
+			mSpaceNodeHandle = handle;
+		}
+
+		int const getSpaceNodeHandle() const
+		{
+			return mSpaceNodeHandle;
+		}
+
 	protected:
 		uint32_t mAttrib;
 
@@ -72,7 +83,7 @@ namespace Air
 
 		AABBoxPtr mAABB;
 
-
+		int mSpaceNodeHandle;
 	};
 }
 

@@ -77,7 +77,6 @@ namespace Air
 
 	void App3DFramework::run()
 	{
-		RenderEngine& engine = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		bool gotMsg;
 		MSG msg;
 		::PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE);
@@ -99,7 +98,7 @@ namespace Air
 			else
 			{
 				//¸üÐÂäÖÈ¾
-				engine.refresh();
+				Engine::getInstance().update();
 			}
 
 

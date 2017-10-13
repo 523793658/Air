@@ -55,6 +55,7 @@ namespace Air{
 	template bool AABBox::isEmpty() const AIR_NOEXCEPT;
 	template float AABBox::getMaxRadiusSq() const AIR_NOEXCEPT;
 	template bool AABBox::contains(float3 const & v) const AIR_NOEXCEPT;
+	template bool AABBox::contains(AABBox const & aabb) const AIR_NOEXCEPT;
 
 	template void AABBox::join(float3 const & point) AIR_NOEXCEPT;
 
@@ -109,6 +110,12 @@ namespace Air{
 		return MathLib::in_bound(v.x(), mMin.x(), mMax.x()) && 
 			MathLib::in_bound(v.y(), mMin.y(), mMax.y())&&
 			MathLib::in_bound(v.z(), mMin.z(), mMax.z());
+	}
+
+	template<typename T>
+	bool AABBox_T<T>::contains(AABBox_T<T> const & aabb) const AIR_NOEXCEPT
+	{
+		return (mMin.x() < aabb.mMin.x()) && (mMin.y() < aabb.mMin.y()) && (mMin.z() < aabb.mMin.z()) && (mMax.x() > aabb.mMax.x()) && (mMax.y() > aabb.mMax.y()) && (mMax.z() > aabb.mMax.z());
 	}
 
 	template<typename T>

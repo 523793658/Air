@@ -1,9 +1,9 @@
 #include "Engine.h"
-#include "Input.hpp"
+#include "input_system/include/Input.hpp"
 
 namespace Air
 {
-	void InputActionMap::addAction(InputeActionDefine const & action_define)
+	void InputActionMap::addAction(InputActionDefine const & action_define)
 	{
 		mActionMap.emplace(action_define.semantic, action_define.action);
 	}
@@ -39,7 +39,7 @@ namespace Air
 			mTimer.restart();
 			for (auto const & device : mDevices)
 			{
-				device->updateInputes();
+				device->updateInputs();
 			}
 			for (uint32_t id = 0; id < mActionHandlers.size(); ++id)
 			{
@@ -100,6 +100,11 @@ namespace Air
 		return mDevices[index];
 	}
 
+	InputDevice::~InputDevice()
+	{
+
+	}
+
 	InputKeyboard::InputKeyboard()
 		:mIndex(false), mActionParam(MakeSharedPtr<InputKeyboardActionParam>())
 	{
@@ -143,7 +148,7 @@ namespace Air
 		{
 			if (actionMap.hasAction(i))
 			{
-				iam.addAction(InputeActionDefine(actionMap.getAction(i), i));
+				iam.addAction(InputActionDefine(actionMap.getAction(i), i));
 			}
 		}
 	}
@@ -252,7 +257,7 @@ namespace Air
 		{
 			if (actionMap.hasAction(i))
 			{
-				iam.addAction(InputeActionDefine(actionMap.getAction(i), i));
+				iam.addAction(InputActionDefine(actionMap.getAction(i), i));
 			}
 		}
 	}

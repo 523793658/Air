@@ -128,7 +128,12 @@ namespace Air
 
 	};
 
-
+	enum ConstantBufferType
+	{
+		CBT_Object,
+		CBT_Frame,
+		CBT_Global
+	};
 
 
 	template<typename T>
@@ -475,7 +480,7 @@ protected:
 	public:
 		RenderEffectConstantBuffer();
 #if AIR_IS_DEV_PLATFORM
-		void load(std::string const & name);
+		void load(std::string const & name, ConstantBufferType type);
 #endif
 		void streamIn(ResIdentifierPtr const & res);
 
@@ -483,7 +488,7 @@ protected:
 		void streamOut(std::ostream& os) const;
 #endif
 
-		std::unique_ptr<RenderEffectConstantBuffer> clone(RenderEffect& src_effect, RenderEffect& dst_effect);
+		std::shared_ptr<RenderEffectConstantBuffer> clone(RenderEffect& src_effect, RenderEffect& dst_effect);
 
 		std::string const & getName() const
 		{
@@ -542,7 +547,9 @@ protected:
 		std::shared_ptr<std::vector<uint32_t>> mParamIndices;
 		GraphicsBufferPtr mHWBuffer;
 		std::vector<uint8_t> mBuffer;
+		ConstantBufferType mType{ CBT_Object };
 		bool mIsDirty;
+		int id{ 0 };
 	};
 
 
@@ -724,8 +731,9 @@ protected:
 	private:
 		RenderEffectTemplatePtr mEffectTemplate;
 		std::vector<std::unique_ptr<RenderEffectParameter>> mParams;
-		std::vector<std::unique_ptr<RenderEffectConstantBuffer>> mCbuffers;
+		std::vector<std::shared_ptr<RenderEffectConstantBuffer>> mCbuffers;
 		std::vector<ShaderObjectPtr> mShaderObjs;
+		bool isClone{ false };
 
 
 	private:

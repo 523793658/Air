@@ -26,11 +26,18 @@ namespace Air
 // 		uint32_t getNumCameras() const;
 // 		CameraPtr& getCamera(uint32_t index);
 // 		CameraPtr const & getCamera(uint32_t index) const;
+		void markVisibleSceneObject(CameraPtr const & camera);
+
 		void addRenderable(Renderable* obj);
 
 		void addSceneObject(SceneObjectPtr const & obj);
 
 		void addSceneObjectLocked(SceneObjectPtr const & obj);
+
+		void addLight(LightSourcePtr const & light);
+		void addLightLocked(LightSourcePtr const & light);
+		void delLight(LightSourcePtr const & light);
+
 
 		void update();
 
@@ -53,7 +60,7 @@ namespace Air
 		virtual void onAddSceneObject(SceneObjectPtr const & obj) = 0;
 		virtual void onDelSceneObject(std::vector<SceneObjectPtr>::iterator iter) = 0;
 
-		BoundOverlap visibleTestFromParent(SceneObject* obj, float3 const & eye_pos, float4x4 const & view_proj);
+		BoundOverlap visibleTestFromParent(SceneObject* obj, float3 const & view_dir, float3 const & eye_pos, float4x4 const & view_proj);
 	private:
 		void flushScene();
 
@@ -79,6 +86,7 @@ namespace Air
 		std::unordered_map<size_t, std::shared_ptr<std::vector<BoundOverlap>>> mVisibleMarksMap;
 		std::vector<SceneObjectPtr> mSceneObjs;
 		std::vector<SceneObjectPtr> mOverlaySceneObjs;
+		std::vector<LightSourcePtr> mLights;
 		float mSmallObjThreshold;
 		float mUpdateElapse;
 		Frustum const * mFrustum;

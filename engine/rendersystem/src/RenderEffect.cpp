@@ -11,6 +11,7 @@
 #include "basic/include/XMLDom.hpp"
 #include "rendersystem/include/RenderStateObject.hpp"
 #include "rendersystem/include/RenderEffect.hpp"
+#include <map>
 
 
 namespace
@@ -117,6 +118,49 @@ namespace
 		static std::unique_ptr<type_define> mInstance;
 	};
 	std::unique_ptr<type_define> type_define::mInstance;
+
+	class constant_buffer_type_define
+	{
+	public:
+		static constant_buffer_type_define& getInstance()
+		{
+			if (!mInstance)
+			{
+				std::lock_guard<std::mutex> lock(singleton_mutex);
+				if (!mInstance)
+				{
+					mInstance = MakeUniquePtr<constant_buffer_type_define>();
+				}
+			}
+			return *mInstance;
+		}
+
+		ConstantBufferType fromStr(std::string_view name) const
+		{
+			size_t name_hash = boost::hash_range(name.begin(), name.end());
+			for (uint32_t i = 0; i < mCBTSHash.size(); ++i)
+			{
+				if (name_hash == mCBTSHash[i])
+				{
+					return static_cast<ConstantBufferType>(i);
+				}
+			}
+			AIR_UNREACHABLE("invalid constbuffer type.");
+		}
+
+		constant_buffer_type_define()
+		{
+			mCBTSHash.push_back(CT_HASH("CBT_Object"));
+			mCBTSHash.push_back(CT_HASH("CBT_Frame"));
+			mCBTSHash.push_back(CT_HASH("CBT_Global"));
+		}
+	private:
+		std::vector<size_t> mCBTSHash;
+		static std::unique_ptr<constant_buffer_type_define> mInstance;
+	private:
+
+	};
+	std::unique_ptr<constant_buffer_type_define> constant_buffer_type_define::mInstance;
 
 	class shade_mode_define
 	{
@@ -3224,15 +3268,18 @@ namespace Air
 
 	RenderEffectConstantBuffer::RenderEffectConstantBuffer() : mIsDirty(true)
 	{
-
+		static int x = 0;
+		x++;
+		id = x;
 	}
 #if AIR_IS_DEV_PLATFORM
-	void RenderEffectConstantBuffer::load(std::string const & name)
+	void RenderEffectConstantBuffer::load(std::string const & name, ConstantBufferType type)
 	{
 		mName = MakeSharedPtr<std::remove_reference<decltype(*mName)>::type>();
 		mName->first = name;
 		mName->second = boost::hash_range(mName->first.begin(), mName->first.end());
 		mParamIndices = MakeSharedPtr<std::remove_reference<decltype(*mParamIndices)>::type>();
+		mType = type;
 	}
 #endif
 	void RenderEffectConstantBuffer::streamIn(ResIdentifierPtr const & res)
@@ -3268,9 +3315,9 @@ namespace Air
 
 
 
-	std::unique_ptr<RenderEffectConstantBuffer> RenderEffectConstantBuffer::clone(RenderEffect& src_effect, RenderEffect& dst_effect)
+	std::shared_ptr<RenderEffectConstantBuffer> RenderEffectConstantBuffer::clone(RenderEffect& src_effect, RenderEffect& dst_effect)
 	{
-		auto ret = MakeUniquePtr<RenderEffectConstantBuffer>();
+		auto ret = MakeSharedPtr<RenderEffectConstantBuffer>();
 		ret->mName = mName;
 		ret->mParamIndices = mParamIndices;
 		ret->mBuffer = mBuffer;
@@ -3296,6 +3343,7 @@ namespace Air
 	RenderEffectPtr RenderEffect::clone()
 	{
 		auto ret = MakeSharedPtr<RenderEffect>();
+		ret->isClone = true;
 		ret->mEffectTemplate = mEffectTemplate;
 		ret->mParams.resize(mParams.size());
 		for (size_t i = 0; i < mParams.size(); ++i)
@@ -3310,7 +3358,7 @@ namespace Air
 		ret->mShaderObjs.resize(mShaderObjs.size());
 		for (size_t i = 0; i < mShaderObjs.size(); ++i)
 		{
-			ret->mShaderObjs[i] = mShaderObjs[i];
+			ret->mShaderObjs[i] = mShaderObjs[i]->clone(*ret);
 		}
 		return ret;
 	}
@@ -3352,7 +3400,7 @@ namespace Air
 	}
 	RenderEffectParameter* RenderEffect::getParameterByIndex(uint32_t n) const
 	{
-		BOOST_ASSERT(n < this->getNumCBuffers());
+		BOOST_ASSERT(n < this->getNumParameters());
 		return mParams[n].get();
 	}
 
@@ -3495,7 +3543,7 @@ namespace Air
 						effect.mCbuffers.resize(num_cbufs);
 						for (uint32_t i = 0; i < num_cbufs; ++i)
 						{
-							effect.mCbuffers[i] = MakeUniquePtr<RenderEffectConstantBuffer>();
+							effect.mCbuffers[i] = MakeSharedPtr<RenderEffectConstantBuffer>();
 							effect.mCbuffers[i]->streamIn(source);
 						}
 					}
@@ -3785,6 +3833,7 @@ namespace Air
 
 	void RenderEffectTemplate::load(std::string const & name, RenderEffect& effect)
 	{
+		RenderEnvironment & env = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance().getRenderEnvironment();
 		std::string fxml_name = ResLoader::getInstance().locate(name);
 		if (fxml_name.empty())
 		{
@@ -3936,25 +3985,43 @@ namespace Air
 						RenderEffectConstantBuffer* cbuff = nullptr;
 						XMLNodePtr parent_node = node->getParent();
 						std::string cbuff_name = parent_node->getAttribString("name", "global_cb");
+						ConstantBufferType cbt = constant_buffer_type_define::getInstance().fromStr(parent_node->getAttribString("type", "CBT_Object"));
 						size_t const cbuff_name_hash = RT_HASH(cbuff_name.c_str());
-						bool found = false;
-						for (size_t i = 0; i < effect.mCbuffers.size(); i++)
+						if (cbt == CBT_Object)
 						{
-							if (effect.mCbuffers[i]->getNameHash() == cbuff_name_hash)
+							bool found = false;
+							for (size_t i = 0; i < effect.mCbuffers.size(); i++)
 							{
-								cbuff = effect.mCbuffers[i].get();
-								found = true;
-								break;
+								if (effect.mCbuffers[i]->getNameHash() == cbuff_name_hash)
+								{
+									cbuff = effect.mCbuffers[i].get();
+									found = true;
+									break;
+								}
 							}
+							if (!found)
+							{
+								effect.mCbuffers.push_back(MakeSharedPtr<RenderEffectConstantBuffer>());
+								cbuff = effect.mCbuffers.back().get();
+								cbuff->load(cbuff_name, cbt);
+							}
+							BOOST_ASSERT(cbuff);
+							cbuff->addParameters(param_index);
 						}
-						if (!found)
+						else
 						{
-							effect.mCbuffers.push_back(MakeUniquePtr<RenderEffectConstantBuffer>());
-							cbuff = effect.mCbuffers.back().get();
-							cbuff->load(cbuff_name);
+							/*bool found = false;
+							RenderEffectConstantBufferPtr cbuf = env.getConstantBuffer(cbuff_name);
+							if (!cbuf)
+							{
+								cbuf = MakeSharedPtr<RenderEffectConstantBuffer>();
+								cbuf->load(cbuff_name, cbt);
+								env.addConstantBuffer(cbuff_name, cbuf);
+								effect.mCbuffers.push_back(cbuf);
+							}*/
+
 						}
-						BOOST_ASSERT(cbuff);
-						cbuff->addParameters(param_index);
+
 					}
 
 					effect.mParams.push_back(MakeUniquePtr<RenderEffectParameter>());
@@ -4491,7 +4558,7 @@ namespace Air
 
 	void RenderEffectConstantBuffer::update()
 	{
-		if (mIsDirty)
+		//if (mIsDirty)
 		{
 			mHWBuffer->updateSubResource(0, static_cast<uint32_t>(mBuffer.size()), &mBuffer[0]);
 			mIsDirty = false;

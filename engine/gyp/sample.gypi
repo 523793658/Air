@@ -28,5 +28,20 @@
 				'../sample/src/RenderOneBall.cpp',
 			],
 		},
+		{
+			'target_name': 'Simplelighting',
+			'product_name': 'Simplelighting',
+			'type': 'executable',
+			'includes':[
+				'sample_common.gypi',
+			],
+			'dependencies':[
+				'basic',
+				'engine',
+			],
+			'sources':[
+				'../sample/src/simplelighting.cpp',
+			],
+		},
 	],
 }

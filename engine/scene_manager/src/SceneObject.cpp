@@ -118,6 +118,7 @@ namespace Air
 			{
 				*mAABB = MathLib::transform_aabb(mRenderable->getPosAABB(), mWorldMatrix);
 			}
+			mRenderable->setMatrix(mWorldMatrix);
 		}
 	}
 

@@ -137,6 +137,8 @@ namespace Air
 		std::vector<RenderEffectConstantBuffer*> mAllCBuffers;
 
 	};
+
+	typedef std::shared_ptr<D3D11ShaderObject> D3D11ShaderObjectPtr;
 }
 
 #endif

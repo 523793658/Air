@@ -10,8 +10,11 @@
 #include "basic/include/Thread.h"
 #include "rendersystem/include/RenderFactory.h"
 #include "scene_manager/include/SceneManager.hpp"
+#include "input_system/include/InputFactory.hpp"
 #include "basic/include/Thread.h"
 #include "ResLoader.h"
+#include "app/include/App3D.hpp"
+#include "app/include/Window.hpp"
 #include "core/include/ResourcePlugin.h"
 
 #include <memory>
@@ -41,10 +44,10 @@ namespace Air
 {
 	std::unique_ptr<Engine> Engine::mEngineInstance;
 	typedef void(*makeRenderFactoryFunc)(std::unique_ptr<RenderFactory>& ptr);
-	typedef void(*makeSceneManagerFunc)(std::unique_ptr<SceneManager>& ptr);
+	typedef void(*makeSceneManagerFunc)(std::unique_ptr<SceneManager>& ptr, AABBox const & worldSize);
 	typedef void(*makeResourcePluginFunc)(std::unique_ptr<ResourcePlugin>& ptr);
 
-
+	typedef void(*makeInputFactoryFunc)(std::unique_ptr<InputFactory>& ptr);
 
 	Engine::Engine()
 		: mApp(nullptr)
@@ -65,6 +68,7 @@ namespace Air
 
 		mCfg.mRenderFactoryName = "D3D11";
 		mCfg.mSceneManagerName = "OCTree";
+		mCfg.mInputFactoryName = "Msg";
 
 		mCfg.mAssetsPlugins.push_back(AssetsPluginCfg("fbxPlugin", "fbx"));
 
@@ -110,6 +114,15 @@ namespace Air
 			mEngineInstance.reset();
 		}
 
+	}
+
+	void Engine::update()
+	{
+		if (mApp->getMainWnd()->getActive())
+		{
+			mRenderFactory->getRenderEngineInstance().refresh();
+			mInputFactory->getInputEngineInstance().update();
+		}
 	}
 
 	void Engine::loadCfg(std::string const & cfg_file)
@@ -196,6 +209,32 @@ namespace Air
 		return *mSceneMgr;
 	}
 
+	void Engine::loadInputFactory(std::string const & if_name)
+	{
+		mInputFactory.reset();
+#if !(defined(AIR_PLATFORM_ANDROID) || defined(AIR_PLATFORM_IOS))
+		mInputLoader.free();
+		std::string input_path = ResLoader::getInstance().locate("Input");
+		std::string fn = AIR_DLL_PREFIX"InputEngine" + if_name + DLL_SUFFIX;
+		std::string path = input_path + "/" + fn;
+		mInputLoader.load(ResLoader::getInstance().locate(path));
+		makeInputFactoryFunc mif = (makeInputFactoryFunc)mInputLoader.getProcAddress("makeInputFactory");
+		if (mif != nullptr)
+		{
+			mif(mInputFactory);
+		}
+		else
+		{
+			logError("Loading %s failed", path.c_str());
+			mInputLoader.free();
+		}
+#else
+		AIR_UNUSED(if_name);
+		MakeInputFactory(mInputFactory);
+#endif
+
+	}
+
 	void Engine::loadSceneManager(std::string const & sm_name)
 	{
 		mSceneMgr.reset();
@@ -207,7 +246,7 @@ namespace Air
 		makeSceneManagerFunc msf = (makeSceneManagerFunc)mSceneManagerLoader.getProcAddress("makeSceneManager");
 		if (msf != nullptr)
 		{
-			msf(mSceneMgr);
+			msf(mSceneMgr, AABBox(float3(-1000.0f, -1000.0f, -1000.0f), float3(1000, 1000, 1000)));
 		}
 		else
 		{
@@ -234,6 +273,19 @@ namespace Air
 			logError("Loading %s failed", path.c_str());
 			mRenderLoader.free();
 		}
+	}
+
+	InputFactory& Engine::getInputFactoryInstance()
+	{
+		if (!mInputFactory)
+		{
+			std::lock_guard<std::mutex> lock(singleton_mutex);
+			if (!mInputFactory)
+			{
+				this->loadInputFactory(mCfg.mInputFactoryName);
+			}
+		}
+		return *mInputFactory;
 	}
 
 

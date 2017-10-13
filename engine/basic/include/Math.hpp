@@ -51,6 +51,14 @@ namespace Air
 		{
 			return x < T(0) ? -x : x;
 		}
+
+		template<typename T>
+		inline T
+			sgn(T const & x) AIR_NOEXCEPT
+		{
+			return x < T(0) ? T(-1) : (x > T(0) ? T(1) : T(0));
+		}
+
 		// ½Ç¶È»¯»¡¶È
 		template <typename T>
 		inline T
@@ -286,9 +294,18 @@ namespace Air
 
 		template <typename T>
 		void decompose(Vector_T<T, 3> & scale, Quaternion_T<T> & rot, Vector_T<T, 3>& trans, Matrix4_T<T> const & rhs) AIR_NOEXCEPT;
+	
+		template <typename T>
+		Matrix4_T<T> transformation(Vector_T<T, 3> const * scaling_center, Quaternion_T<T> const * scaling_rotation, Vector_T<T, 3> const * scale, Vector_T<T, 3> const * rotation_center, Quaternion_T<T> const * rotation, Vector_T<T, 3> const * trans) AIR_NOEXCEPT;
+
+		template<typename T>
+		Matrix4_T<T> to_matrix(Quaternion_T<T> const & quat) AIR_NOEXCEPT;
 
 		template <typename T>
 		Quaternion_T<T> to_quaternion(Matrix4_T<T> const & mat) AIR_NOEXCEPT;
+
+		template<typename T>
+		Quaternion_T<T> rotation_axis(Vector_T<T, 3> const & v, T const & angle) AIR_NOEXCEPT;
 
 		template<typename T>
 		Color_T<T>	negative(Color_T<T> const & rhs) AIR_NOEXCEPT;
@@ -340,6 +357,9 @@ namespace Air
 
 		template<typename T>
 		Matrix4_T<T> transpose(Matrix4_T<T> const & lhs) AIR_NOEXCEPT;
+
+		template<typename T>
+		T ortho_area(Vector_T<T, 3> const & view_dir, AABBox_T<T> const & aabb) AIR_NOEXCEPT;
 
 		template <typename T>
 		T perspective_area(Vector_T<T, 3> const & view_pos, Matrix4_T<T> const & view_proj, AABBox_T<T> const & aabbox) AIR_NOEXCEPT;

@@ -74,6 +74,8 @@ namespace Air
 			virtual bool isEmpty() const AIR_NOEXCEPT override;
 			virtual float getMaxRadiusSq() const AIR_NOEXCEPT override;
 			virtual bool contains(Vector_T<T, 3> const & v) const AIR_NOEXCEPT override;
+
+			bool contains(AABBox_T<T> const & aabb) const AIR_NOEXCEPT;
 	private:
 		Vector_T<T,3> mMin, mMax;
 	};

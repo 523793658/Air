@@ -17,6 +17,7 @@ namespace Air
 		PC_Reflection,
 		PC_SpecialShading,
 		PC_SimpleForward,
+		PC_ForwardRendering,
 		PC_None
 	};
 
@@ -86,7 +87,8 @@ namespace Air
 		PT_TransparencyBackSpecialShading = MakePassType<PRT_None, PTB_TransparencyBack, PC_SpecialShading>::value,
 		PT_TransparencyFrontSpecialShading = MakePassType<PRT_None, PTB_TransparencyFront, PC_SpecialShading>::value,
 
-		PT_SimpleForward = MakePassType<PRT_None, PTB_None, PC_SimpleForward>::value
+		PT_SimpleForward = MakePassType<PRT_None, PTB_None, PC_SimpleForward>::value,
+		PT_ForwardLighting = MakePassType<PRT_None, PTB_None, PC_ForwardRendering>::value
 	};
 
 	inline PassRT GetPassRT(PassType pt)
@@ -166,6 +168,11 @@ namespace Air
 			}
 		}
 
+		void clearInstance()
+		{
+			mInstances.resize(0);
+		}
+
 		uint32_t getNumInstances() const
 		{
 			return static_cast<uint32_t>(mInstances.size());
@@ -176,7 +183,7 @@ namespace Air
 			return mInstances[index];
 		}
 
-		virtual void setLocalMatrix(float4x4 const & mat);
+		virtual void setMatrix(float4x4 const & mat);
 
 		template<typename ForwardIterator>
 		void assignSubrenderable(ForwardIterator first, ForwardIterator last)

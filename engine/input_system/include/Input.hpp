@@ -313,9 +313,9 @@ namespace Air
 		SS_AnySensing
 	};
 
-	struct AIR_CORE_API InputeActionDefine
+	struct AIR_CORE_API InputActionDefine
 	{
-		InputeActionDefine(uint32_t a, uint32_t s)
+		InputActionDefine(uint32_t a, uint32_t s)
 			: action(static_cast<uint16_t>(a)), semantic(static_cast<uint16_t>(s))
 		{
 
@@ -330,7 +330,7 @@ namespace Air
 	class AIR_CORE_API InputActionMap
 	{
 	public:
-		void addAction(InputeActionDefine const & action_define);
+		void addAction(InputActionDefine const & action_define);
 		template <typename ForwardIterator>
 		void addActions(ForwardIterator first, ForwardIterator last)
 		{
@@ -398,7 +398,7 @@ namespace Air
 		virtual ~InputDevice();
 		virtual std::wstring const & getName() const = 0;
 		virtual InputEngine::InputDeviceType getType() const = 0;
-		virtual void updateInputes() = 0;
+		virtual void updateInputs() = 0;
 		virtual InputActionsType updateActionMap(uint32_t id) = 0;
 
 		virtual void actionMap(uint32_t id, InputActionMap const & actiionMap) = 0;

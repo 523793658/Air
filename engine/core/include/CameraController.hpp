@@ -2,6 +2,7 @@
 #define _CameraController_H_
 #pragma once
 #include "boost/lexical_cast.hpp"
+#include "input_system/include/Input.hpp"
 #include "PreDeclare.h"
 namespace Air
 {
@@ -21,11 +22,32 @@ namespace Air
 		Camera* mCamera;
 	};
 
-	class AIR_CORE_API TrackbollCameraController : public CameraController
+	class AIR_CORE_API TrackballCameraController : public CameraController
 	{
 	public:
-		TrackbollCameraController(bool use_input_engine = true, uint32_t rotate_button = MB_LEFT)
+		TrackballCameraController(bool use_input_engine = true, uint32_t rotate_button = MB_Left, uint32_t zoom_button = MB_Right, uint32_t move_button = MB_Middle);
 
+		virtual void attachCamera(Camera& camera);
+
+		void move(float offset_x, float offset_y);
+		void rotate(float offset_x, float offset_y);
+		void zoom(float offset_x, float offset_y);
+
+	private:
+		bool mReverseTarget;
+		float3 mTarget;
+		float3 mRight;
+		uint32_t mMoveButton;
+		uint32_t mRotateButton;
+		uint32_t mZoomButton;
+
+		enum
+		{
+			Turn,
+			ZoomInOut
+		};
+	private:
+		void inputeHandler(InputEngine const & sender, InputAction const & action);
 	};
 
 

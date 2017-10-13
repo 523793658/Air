@@ -37,6 +37,11 @@ namespace Air
 			return *reinterpret_cast<float3 const *>(&mInvViewMatrix.row(2));
 		}
 
+		float getLookAtDist() const
+		{
+			return mLookDistance;
+		}
+
 		void setViewParams(float3 const & eye_pos, float3 const & look_at);
 		void setViewParams(float3 const & eye_pos, float3 const & look_at, float3 const & up_vec);
 		void setProjParams(float fov, float aspect, float near_plane, float far_plane);

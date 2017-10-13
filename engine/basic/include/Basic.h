@@ -1,6 +1,7 @@
 #ifndef _BASIC_H_
 #define _BASIC_H_
 #pragma once
+#include "boost/noncopyable.hpp"
 
 #include "basic/include/Config.h"
 #include "basic/include/Types.h"

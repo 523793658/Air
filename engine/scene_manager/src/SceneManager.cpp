@@ -31,6 +31,9 @@ namespace Air
 		RenderEngine& renderEngine = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		renderEngine.beginFrame();
 		this->flushScene();
+
+		FrameBuffer& fb = *renderEngine.getScreenFrameBuffer();
+		fb.swapBuffers();
 	}
 
 	void SceneManager::flush(uint32_t urt)
@@ -96,38 +99,39 @@ namespace Air
 				scene_obj->setVisibleMark(scene_obj->isVisible() ? BO_Yes : BO_No);
 			}
 		}
-		std::vector<std::pair<Renderable*, std::vector<SceneObject*>>> renderables;
+
+		for (auto const & obj : mSceneObjs)
 		{
-			std::map<Renderable*, size_t> renderables_map;
-			for (auto const & obj : scene_objs)
+			auto so = obj.get();
+			if ((so->getVisibleMark() != BO_No) && (0 == so->getNumChildren()))
 			{
-				auto so = obj.get();
-				if ((so->getVisibleMark() != BO_No) && (0 == so->getNumChildren()))
+				auto renderable = so->getRenderable();
+				if (renderable)
 				{
-					auto renderable = so->getRenderable().get();
-					if (renderable)
-					{
-						auto iter = renderables_map.lower_bound(renderable);
-						if ((iter != renderables_map.end()) && (iter->first == renderable))
-						{
-							renderables[iter->second].second.push_back(so);
-						}
-						else
-						{
-							renderables_map.emplace(renderable, renderables.size());
-							renderables.emplace_back(renderable, std::vector<SceneObject*>(1, so));
-						}
-						++mNumObjectsRendered;
-					}
+					renderable->clearInstance();
 				}
 			}
 		}
-		for (auto const & renderable : renderables)
+
+		for (auto const & obj : mSceneObjs)
 		{
-			Renderable& ra(*renderable.first);
-			ra.assignInstances(renderable.second.begin(), renderable.second.end());
-			ra.addToRenderQueue();
+			auto so = obj.get();
+			if ((so->getVisibleMark() != BO_No) && (0 == so->getNumChildren()))
+			{
+				auto renderable = so->getRenderable().get();
+				if (renderable)
+				{
+					if (0 == renderable->getNumInstances())
+					{
+						renderable->addToRenderQueue();
+					}
+					renderable->addInstance(so);
+					++mNumObjectsRendered;
+				}
+
+			}
 		}
+
 		std::sort(mRenderQueue.begin(), mRenderQueue.end(), [](std::pair<RenderTechnique const *, std::vector<Renderable*>> const & lhs,
 			std::pair<RenderTechnique const *, std::vector<Renderable*>> const & rhs)
 		{
@@ -140,7 +144,7 @@ namespace Air
 		{
 			for (auto const & item : items.second)
 			{
-				item->render();
+					item->render();
 			}
 			mNumRenderablesRendered += static_cast<uint32_t>(items.second.size());
 		}
@@ -150,7 +154,7 @@ namespace Air
 		urt = 0;
 	}
 
-	BoundOverlap SceneManager::visibleTestFromParent(SceneObject* obj, float3 const & eye_pos, float4x4 const & view_proj)
+	BoundOverlap SceneManager::visibleTestFromParent(SceneObject* obj, float3 const & view_dir, float3 const & eye_pos, float4x4 const & view_proj)
 	{
 		BoundOverlap visible;
 		if (obj->getParent())
@@ -169,7 +173,15 @@ namespace Air
 				}
 				if (attr & SceneObject::SOA_Cullable)
 				{
-					visible = MathLib::perspective_area(eye_pos, view_proj, obj->getAABB()) > mSmallObjThreshold ? parent_bo : BO_No;
+					if (mSmallObjThreshold > 0)
+					{
+						visible = ((MathLib::ortho_area(view_dir, obj->getAABB()) > mSmallObjThreshold) && (MathLib::perspective_area(eye_pos, view_proj, obj->getAABB()) > mSmallObjThreshold)) ? parent_bo : BO_No;
+					}
+					else
+					{
+						visible = parent_bo;
+					}
+				
 				}
 				else
 				{
@@ -196,7 +208,7 @@ namespace Air
 			uint32_t const attr = so->getAttrib();
 			if (so->isVisible())
 			{
-				visible = this->visibleTestFromParent(so, camera.getEyePos(), viewProjMat);
+				visible = this->visibleTestFromParent(so, camera.getForwardVec(), camera.getEyePos(), viewProjMat);
 				if (BO_Partial == visible)
 				{
 					if (attr & SceneObject::SOA_Moveable) 
@@ -336,6 +348,65 @@ namespace Air
 			}
 			mSceneObjs.push_back(obj);
 			this->onAddSceneObject(obj);
+		}
+	}
+
+
+	void SceneManager::addLight(LightSourcePtr const & light)
+	{
+		std::lock_guard<std::mutex> lock(mUpdateMutex);
+		this->addLightLocked(light);
+	}
+	void SceneManager::addLightLocked(LightSourcePtr const & light)
+	{
+		mLights.push_back(light);
+	}
+
+	void SceneManager::delLight(LightSourcePtr const & light)
+	{
+		auto it = std::find(mLights.begin(), mLights.end(), light);
+		if (it != mLights.end())
+		{
+			mLights.erase(it);
+		}
+	}
+
+	void SceneManager::markVisibleSceneObject(CameraPtr const & camera)
+	{
+		mFrustum = &camera->getViewFrustum();
+
+		std::vector<uint32_t> visible_list((mSceneObjs.size() + 31) / 32, 0);
+		for (size_t i = 0; i < mSceneObjs.size(); ++i)
+		{
+			if (mSceneObjs[i]->isVisible())
+			{
+				visible_list[i / 32] |= (1UL << (i & 31));
+			}
+		}
+		size_t seed = 0;
+		boost::hash_range(seed, visible_list.begin(), visible_list.end());
+		boost::hash_combine(seed, camera->getOmniDirectionalMode());
+		boost::hash_combine(seed, &camera);
+
+		auto vmiter = mVisibleMarksMap.find(seed);
+		if (vmiter == mVisibleMarksMap.end())
+		{
+			this->clipScene();
+
+			auto visible_marks = MakeUniquePtr<std::vector<BoundOverlap>>(mSceneObjs.size());
+			for (size_t i = 0; i < mSceneObjs.size(); ++i)
+			{
+				(*visible_marks)[i] = mSceneObjs[i]->getVisibleMark();
+			}
+
+			mVisibleMarksMap.emplace(seed, std::move(visible_marks));
+		}
+		else
+		{
+			for (size_t i = 0; i < mVisibleMarksMap.size(); ++i)
+			{
+				mSceneObjs[i]->setVisibleMark((*vmiter->second)[i]);
+			}
 		}
 	}
 }

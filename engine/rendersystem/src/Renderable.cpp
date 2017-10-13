@@ -96,6 +96,7 @@ namespace Air
 		AABBox const & pos_bb = this->getPosAABB();
 		AABBox const & tc_bb = this->getTexcoordAABB();
 		*mMVPParam = mvp;
+		
 	}
 
 	void Renderable::onRenderEnd()
@@ -112,7 +113,7 @@ namespace Air
 
 	}
 
-	void Renderable::setLocalMatrix(float4x4 const & mat)
+	void Renderable::setMatrix(float4x4 const & mat)
 	{
 		mModelMat = mat;
 	}

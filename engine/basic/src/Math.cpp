@@ -239,7 +239,7 @@ namespace Air
 		{
 			return Vector_T<T, 3>(lhs.y() * rhs.z() - lhs.z() * rhs.y(),
 				lhs.z() * rhs.x() - lhs.x() * rhs.z(),
-				lhs.x() * lhs.y() - lhs.y() * rhs.x());
+				lhs.x() * rhs.y() - lhs.y() * rhs.x());
 		}
 
 
@@ -342,6 +342,91 @@ namespace Air
 			rot = to_quaternion(rot_mat);
 		}
 
+
+		template float4x4 transformation(float3 const * scaling_center, Quaternion const * scaling_rotation, float3 const * scale, float3 const * rotation_center, Quaternion const * rotation, float3 const * trans) AIR_NOEXCEPT;
+
+
+		template <typename T>
+		Matrix4_T<T> transformation(Vector_T<T, 3> const * scaling_center, Quaternion_T<T> const * scaling_rotation, Vector_T<T, 3> const * scale, Vector_T<T, 3> const * rotation_center, Quaternion_T<T> const * rotation, Vector_T<T, 3> const * trans) AIR_NOEXCEPT
+		{
+			Vector_T<T, 3> psc, prc, pt;
+			if (scaling_center)
+			{
+				psc = *scaling_center;
+			}
+			else
+			{
+				psc = Vector_T<T, 3>(T(0), T(0), T(0));
+			}
+			if (rotation_center)
+			{
+				prc = *rotation_center;
+			}
+			else
+			{
+				prc = Vector_T<T, 3>(T(0), T(0), T(0));
+			}
+			if (trans)
+			{
+				pt = *trans;
+			}
+			else
+			{
+				pt = Vector_T<T, 3>(T(0), T(0), T(0));
+			}
+			Matrix4_T<T> m1, m2, m3, m4, m5, m6, m7;
+			m1 = translation(-psc);
+			if (scaling_rotation)
+			{
+				m4 = to_matrix(*scaling_rotation);
+				m2 = inverse(m4);
+			}
+			else
+			{
+				m2 = m4 = Matrix4_T<T>::identify();
+			}
+			if (scale)
+			{
+				m3 = scaling(*scale);
+			}
+			else
+			{
+				m3 = Matrix4_T<T>::identify();
+			}
+			if (rotation)
+			{
+				m6 = to_matrix(*rotation);
+			}
+			else
+			{
+				m6 = Matrix4_T<T>::identify();
+			}
+			m5 = translation(psc - prc);
+			m7 = translation(prc + pt);
+			return m1 * m2 * m3 * m4 * m5 * m6 * m7;
+		}
+
+		template float4x4 to_matrix(Quaternion const & quat) AIR_NOEXCEPT;
+
+		template<typename T>
+		Matrix4_T<T> to_matrix(Quaternion_T<T> const & quat) AIR_NOEXCEPT
+		{
+			T const x2(quat.x() + quat.x());
+			T const y2(quat.y() + quat.y());
+			T const z2(quat.z() + quat.z());
+			T const xx2(quat.x() * x2), xy2(quat.x() * y2), xz2(quat.x() * z2);
+			T const yy2(quat.y() * y2), yz2(quat.y() * z2), zz2(quat.z() * z2);
+			T const wx2(quat.w() * x2), wy2(quat.w() * y2), wz2(quat.w() * z2);
+
+			return Matrix4_T<T>(
+				1 - yy2 - zz2, xy2 + wz2, xz2 - wy2, 0,
+				xy2 - wz2, 1 - xx2 - zz2, yz2 + wx2, 0,
+				xz2 + wy2, yz2 - wx2, 1 - xx2 - yy2, 0,
+				0, 0, 0, 1
+				);
+
+		}
+
 		template Quaternion to_quaternion(float4x4 const & mat) AIR_NOEXCEPT;
 
 		template <typename T>
@@ -424,6 +509,23 @@ namespace Air
 			}
 
 			return normalize(quat);
+		}
+
+		template Quaternion rotation_axis(float3 const & v, float const & angle) AIR_NOEXCEPT;
+
+		template<typename T>
+		Quaternion_T<T> rotation_axis(Vector_T<T, 3> const & v, T const & angle) AIR_NOEXCEPT
+		{
+			T sa, ca;
+			sincos(angle * T(0.5), sa, ca);
+			if (equal<T>(length_sq(v), 0))
+			{
+				return Quaternion_T<T>(sa, sa, sa, ca);
+			}
+			else
+			{
+				return Quaternion_T<T>(sa * normalize(v), ca);
+			}
 		}
 
 		template int1 minimize(int1 const & lhs, int1 const & rhs) AIR_NOEXCEPT;
@@ -953,6 +1055,17 @@ namespace Air
 				sum += abs((dst[i].x() - dst[next].x()) * (dst[i].y() + dst[next].y()));
 			}
 			return sum / 2;
+		}
+
+		template float ortho_area(float3 const & view_dir, AABBox const & aabb) AIR_NOEXCEPT;
+
+		template<typename T>
+		T ortho_area(Vector_T<T, 3> const & view_dir, AABBox_T<T> const & aabb) AIR_NOEXCEPT
+		{
+			Vector_T<T, 3> size = aabb.getMax() - aabb.getMin();
+			return dot(Vector_T<T, 3>(abs(view_dir.x()), abs(view_dir.y
+			()), abs(view_dir.z())), Vector_T<T, 3>(size.y() * size
+				.z(), size.z() * size.x(), size.x() * size.y()));
 		}
 	}
 }

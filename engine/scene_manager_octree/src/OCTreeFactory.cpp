@@ -3,7 +3,7 @@
 #include "OCTree.hpp"
 #include "OCTreeFactory.hpp"
 
-AIR_OCTREE_SM_API void makeSceneManager(std::unique_ptr<Air::SceneManager>& ptr)
+AIR_OCTREE_SM_API void makeSceneManager(std::unique_ptr<Air::SceneManager>& ptr, Air::AABBox const & worldSize)
 {
-	ptr = Air::MakeUniquePtr<Air::OCTree>();
+	ptr = Air::MakeUniquePtr<Air::OCTree>(worldSize);
 }

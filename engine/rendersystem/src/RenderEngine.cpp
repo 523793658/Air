@@ -11,16 +11,23 @@
 #include "rendersystem/include/RenderEngine.hpp"
 namespace Air
 {
-	RenderEngine::RenderEngine()
-		:mDefaultRenderWidthScale(1), mDefaultRenderHeightScale(1),
-		mStereoSeparation(0),
-		mFBStage(0)
+	RenderEngine::RenderEngine() 
+		: mNumPrimitivesJustRendered(0), mNumVerticesJustRendered(0),
+		mNumDrawsJustCalled(0), mNumDispatchesJustCalled(0),
+		mDefaultFov(PI / 4), mDefaultRenderWidthScale(1),
+		mDefaultRenderHeightScale(1), mStereoMethod(STM_None),
+		mStereoSeparation(0), mFBStage(0), mForceLineMode(false)
 	{
 
 	}
 	RenderEngine::~RenderEngine()
 	{
 
+	}
+
+	RenderEnvironment& RenderEngine::getRenderEnvironment()
+	{
+		return mRenderEnvironment;
 	}
 
 	uint32_t RenderEngine::getNumPrimitivesJustRendered()
@@ -81,14 +88,7 @@ namespace Air
 
 	void RenderEngine::refresh()
 	{
-		FrameBuffer& fb = *this->getScreenFrameBuffer();
-		//激活才更新
-		if (Engine::getInstance().getAppInstance().getMainWnd()->getActive())
-		{
-			Engine::getInstance().getSceneManangerInstance().update();
-			fb.swapBuffers();
-			//fb.
-		}
+		Engine::getInstance().getSceneManangerInstance().update();
 	}
 
 	void RenderEngine::destroyRenderWindow()

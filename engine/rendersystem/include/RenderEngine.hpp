@@ -4,6 +4,7 @@
 #include "core/include/PreDeclare.h"
 #include "rendersystem/include/RenderDeviceCaps.hpp"
 #include "rendersystem/include/RenderSettings.hpp"
+#include "rendersystem/include/RenderEnvironment.hpp"
 
 namespace Air
 {
@@ -86,6 +87,8 @@ namespace Air
 
 		void setStateObject(RenderStateObjectPtr const & rs_obj);
 
+		RenderEnvironment & getRenderEnvironment();
+
 	private:
 		virtual void checkConfig(RenderSettings& settings);
 		virtual void doCreateRenderWindow(std::string const & name, RenderSettings const & settings) = 0;
@@ -124,7 +127,9 @@ namespace Air
 		RenderStateObjectPtr mCurrentRenderStateObject;
 		RenderStateObjectPtr mCurrentLineRenderStateObject;
 
-		bool mForceLineMode{ false };
+		RenderEnvironment mRenderEnvironment;
+
+		bool mForceLineMode;
 	};
 
 

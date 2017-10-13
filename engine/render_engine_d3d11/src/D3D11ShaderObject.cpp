@@ -550,7 +550,47 @@ namespace Air
 
 	ShaderObjectPtr D3D11ShaderObject::clone(RenderEffect const & effect)
 	{
-		AIR_UNREACHABLE("shaderObject clone");
+		D3D11ShaderObjectPtr ret = MakeSharedPtr<D3D11ShaderObject>(mSoTemplate);
+
+		ret->mHasDiscard = mHasDiscard;
+		ret->mHasTessellation = mHasTessellation;
+		ret->mIsvalidate = mIsvalidate;
+		ret->mIsShaderValidate = mIsShaderValidate;
+		ret->mCSBlockSizeX = mCSBlockSizeX;
+		ret->mCSBlockSizeY = mCSBlockSizeY;
+		ret->mCSBlockSizeZ = mCSBlockSizeZ;
+		ret->mUAVSRCS.resize(mUAVSRCS.size(), nullptr);
+		ret->mUAVS.resize(mUAVS.size());
+		std::vector<uint32_t> all_cbuff_indices;
+		for (size_t i = 0; i < ST_NumShaderTypes; ++i)
+		{
+			ret->mSamplers[i] = mSamplers[i];
+			ret->mSRVSrcs[i].resize(mSRVSrcs[i].size());
+			ret->mSRVS[i].resize(mSRVS[i].size());
+			if (mSoTemplate->mCBufferIndices[i] && !mSoTemplate->mCBufferIndices[i]->empty())
+			{
+				ret->mD3DCBuffers[i].resize(mD3DCBuffers[i].size());
+				all_cbuff_indices.insert(all_cbuff_indices.end(), mSoTemplate->mCBufferIndices[i]->begin(), mSoTemplate->mCBufferIndices[i]->end());
+				for (size_t j = 0; j < mSoTemplate->mCBufferIndices[i]->size(); ++j)
+				{
+					auto cbuff = effect.getCBufferByIndex((*mSoTemplate->mCBufferIndices[i])[j]);
+					ret->mD3DCBuffers[i][j] = checked_cast<D3D11GraphicsBuffer*>(cbuff->getHWbuffer().get())->getD3DBuffer();
+				}
+			}
+			ret->mParamBinds[i].reserve(mParamBinds[i].size());
+			for (auto const & pb : mParamBinds[i])
+			{
+				ret->mParamBinds[i].push_back(ret->getBindFunc(static_cast<ShaderType>(i), pb.offset, effect.getParameterByName(pb.param->getName())));
+			}
+		}
+		std::sort(all_cbuff_indices.begin(), all_cbuff_indices.end());
+		all_cbuff_indices.erase(std::unique(all_cbuff_indices.begin(), all_cbuff_indices.end()), all_cbuff_indices.end());
+		ret->mAllCBuffers.resize(all_cbuff_indices.size());
+		for (size_t i = 0; i < all_cbuff_indices.size(); ++i)
+		{
+			ret->mAllCBuffers[i] = effect.getCBufferByIndex(all_cbuff_indices[i]);
+		}
+		return ret;
 	}
 
 	D3D11ShaderObject::ParameterBind D3D11ShaderObject::getBindFunc(ShaderType type, uint32_t offset, RenderEffectParameter* param)
@@ -634,6 +674,8 @@ namespace Air
 				pb.func();
 			 }
 		}
+
+
 		for (auto cb : mAllCBuffers)
 		{
 			cb->update();

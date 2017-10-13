@@ -31,7 +31,7 @@
 				"../core/include/ResourcePlugin.h",
 				"../core/include/SALWrapper.hpp",
 				"../core/include/CameraController.hpp",
-				"../core/include/Input.hpp",
+
 				
 				"../core/src/Engine.cpp",
 				"../core/src/Context.cpp",
@@ -40,7 +40,7 @@
 				"../core/src/Camera.cpp",
 				"../core/src/ResourcePlugin.cpp",
 				"../core/src/CameraController.cpp",
-				"../core/src/Input.cpp",
+
 				
 				"../rendersystem/include/RenderFactory.h",
 				"../rendersystem/include/RenderEngine.hpp",
@@ -62,6 +62,9 @@
 				"../rendersystem/include/RenderStateObject.hpp",
 				"../rendersystem/include/TexCompression.hpp",
 				"../rendersystem/include/TexCompressionBC.hpp",
+				"../rendersystem/include/ForwardRenderingLayer.hpp",
+				"../rendersystem/include/Light.hpp",
+				"../rendersystem/include/RenderEnvironment.hpp",
 				
 				"../rendersystem/src/RenderSettings.cpp",
 				"../rendersystem/src/RenderFactory.cpp",
@@ -82,6 +85,9 @@
 				"../rendersystem/src/TexCompressionBC.cpp",
 				"../rendersystem/src/RenderStateObject.cpp",
 				"../rendersystem/src/TexCompression.cpp",
+				"../rendersystem/src/ForwardRenderingLayer.cpp",
+				"../rendersystem/src/Light.cpp",
+				"../rendersystem/src/RenderEnvironment.cpp",
 				
 				"../scene_manager/include/SceneManager.hpp",
 				"../scene_manager/include/SceneObject.hpp",
@@ -92,6 +98,11 @@
 				
 				"../packing_system/include/LZMACodec.h",
 				"../packing_system/src/LZMACodec.cpp",
+				
+				"../input_system/include/InputFactory.hpp",
+				"../input_system/include/Input.hpp",
+				"../input_system/src/InputFactory.cpp",
+				"../input_system/src/Input.cpp",
 				
 				"../app/include/Window.hpp",
 				"../app/include/App3D.hpp",
