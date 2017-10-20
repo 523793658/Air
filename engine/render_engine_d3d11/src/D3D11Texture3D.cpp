@@ -78,4 +78,31 @@ namespace Air
 		}
 	}
 
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC D3D11Texture3D::fillSRVDesc(uint32_t first_array_index, uint32_t num_items,
+		uint32_t first_level, uint32_t num_levels) const
+	{
+		D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+
+		switch (mFormat)
+		{
+		case EF_D16:
+			desc.Format = DXGI_FORMAT_R16_UNORM;
+			break;
+		case EF_D24S8:
+			desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+			break;
+		case EF_D32F:
+			desc.Format = DXGI_FORMAT_R32_FLOAT;
+			break;
+		default:
+			desc.Format = mDXGIFormat;
+			break;
+		}
+		desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
+		desc.Texture3D.MipLevels = num_levels;
+		desc.Texture3D.MostDetailedMip = first_level;
+		return desc;
+	}
+
 }

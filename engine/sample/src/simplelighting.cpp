@@ -50,8 +50,8 @@ namespace Sample
 			ambient_light->addToSceneManager();
 
 
-			uint32_t spheres_row = 10;
-			uint32_t spheres_column = 10;
+			uint32_t spheres_row = 0;
+			uint32_t spheres_column = 0;
 			mSpheres.resize(spheres_row * spheres_column);
 			for (uint32_t i = 0; i < spheres_row; ++i)
 			{

@@ -22,6 +22,7 @@ namespace Air
 		StereoMethod mStereoMethod;
 		float mStereoSeparation;
 		bool mHdr;
+		bool mPostProcessEnable;
 		std::vector<std::pair<std::string, std::string>> options;
 	};
 }

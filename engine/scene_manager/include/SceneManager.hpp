@@ -56,7 +56,7 @@ namespace Air
 
 	protected:
 		void flush(uint32_t urt);
-		void prepareRenderQueue(std::vector<SceneObjectPtr> const & objs);
+		void prepareRenderQueue(std::vector<SceneObjectPtr> const & objs, bool visibleTest = true);
 		virtual void onAddSceneObject(SceneObjectPtr const & obj) = 0;
 		virtual void onDelSceneObject(std::vector<SceneObjectPtr>::iterator iter) = 0;
 

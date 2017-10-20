@@ -50,6 +50,8 @@ namespace Air
 		RenderStateObjectPtr RenderFactory::makeRenderStateObject(RasterizerStateDesc const & rs_desc, DepthStencilStateDesc const & dss_desc, BlendStateDesc const & bs_desc);
 
 		virtual ShaderObjectPtr makeShaderObject() = 0;
+
+		virtual FrameBufferPtr makeFrameBuffer() = 0;
 	private:
 		virtual std::unique_ptr<RenderEngine> doMakeRenderEngine() = 0;
 		virtual RenderStateObjectPtr doMakeRenderStateObject(RasterizerStateDesc const & rs_desc, DepthStencilStateDesc const & dss_desc, BlendStateDesc const & bs_desc) = 0;

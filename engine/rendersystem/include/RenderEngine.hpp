@@ -100,7 +100,7 @@ namespace Air
 	protected:
 		FrameBufferPtr mCurrenFrameBuffer;
 		FrameBufferPtr mScreenFrameBuffer;
-		FrameBufferPtr mDefaultFrameBuffers[4];
+		FrameBufferPtr mDefaultFrameBuffer;
 		FrameBufferPtr mOverlayFrameBuffer;
 
 		float mStereoSeparation;
@@ -110,16 +110,12 @@ namespace Air
 		float mDefaultFov;
 		float mDefaultRenderWidthScale;
 		float mDefaultRenderHeightScale;
-		int mFBStage;
 
 		uint32_t mNumPrimitivesJustRendered;
 		uint32_t mNumVerticesJustRendered;
 		uint32_t mNumDrawsJustCalled;
 		uint32_t mNumDispatchesJustCalled;
 		uint32_t mMotionFrames;
-
-		RenderLayoutPtr mPPRenderLayout;
-
 		std::string mNativeShaderPlatformName;
 		std::uint32_t mNativeShaderFourCC;
 		std::uint32_t mNativeShaderVersion;
@@ -128,6 +124,8 @@ namespace Air
 		RenderStateObjectPtr mCurrentLineRenderStateObject;
 
 		RenderEnvironment mRenderEnvironment;
+
+		PostProcessChainPtr mPostProcessChain;
 
 		bool mForceLineMode;
 	};

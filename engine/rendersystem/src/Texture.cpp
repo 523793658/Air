@@ -893,7 +893,7 @@ namespace
 				{ EF_R16, EF_R16F },
 				{ EF_R16F, EF_R8 },
 			};
-			while (!caps.vertexFormatSupport(tex_data.format))
+			while (!caps.textureFormatSupport(tex_data.format))
 			{
 				bool found = false;
 				for (size_t i = 0; i < std::size(convert_fmts); ++i)

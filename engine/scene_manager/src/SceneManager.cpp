@@ -34,14 +34,15 @@ namespace Air
 
 		FrameBuffer& fb = *renderEngine.getScreenFrameBuffer();
 		fb.swapBuffers();
+		renderEngine.endFrame();
 	}
 
-	void SceneManager::prepareRenderQueue(std::vector<SceneObjectPtr> const & objs)
+	void SceneManager::prepareRenderQueue(std::vector<SceneObjectPtr> const & objs, bool visibleTest)
 	{
 		for (auto const & obj : objs)
 		{
 			auto so = obj.get();
-			if ((so->getVisibleMark() != BO_No) && (0 == so->getNumChildren()))
+			if ((!visibleTest ||( so->getVisibleMark() != BO_No)) && (0 == so->getNumChildren()))
 			{
 				auto renderable = so->getRenderable();
 				if (renderable)
@@ -55,7 +56,7 @@ namespace Air
 		for (auto const & obj : objs)
 		{
 			auto so = obj.get();
-			if ((so->getVisibleMark() != BO_No) && (0 == so->getNumChildren()))
+			if (((!visibleTest || so->getVisibleMark() != BO_No)) && (0 == so->getNumChildren()))
 			{
 				auto renderable = so->getRenderable().get();
 				if (renderable)
@@ -128,7 +129,7 @@ namespace Air
 				}
 			}
 
-			prepareRenderQueue(mNoCullableSceneObjects);
+			prepareRenderQueue(mNoCullableSceneObjects, false);
 		}
 		if (urt & App3DFramework::URV_Overlay)
 		{

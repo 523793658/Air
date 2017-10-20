@@ -17,6 +17,8 @@ namespace Air
 	public:
 		static StaticMeshPtr createStaticShpere(float radius);
 		static StaticMeshPtr createStaticCube();
+
+		static StaticMeshPtr createStaticQuat(float halfWidth = 0.5f);
 	};
 }
 

@@ -7,6 +7,7 @@
 #include "app/include/Window.hpp"
 #include "rendersystem/include/RenderStateObject.hpp"
 #include "scene_manager/include/SceneManager.hpp"
+#include "rendersystem/include/PostProcess.hpp"
 
 #include "rendersystem/include/RenderEngine.hpp"
 namespace Air
@@ -16,7 +17,7 @@ namespace Air
 		mNumDrawsJustCalled(0), mNumDispatchesJustCalled(0),
 		mDefaultFov(PI / 4), mDefaultRenderWidthScale(1),
 		mDefaultRenderHeightScale(1), mStereoMethod(STM_None),
-		mStereoSeparation(0), mFBStage(0), mForceLineMode(false)
+		mStereoSeparation(0), mForceLineMode(false)
 	{
 
 	}
@@ -50,8 +51,8 @@ namespace Air
 
 	void RenderEngine::resize(uint32_t width, uint32_t height)
 	{
-		uint32_t const oldScreenWidth = mDefaultFrameBuffers[3]->getWidth();
-		uint32_t const oldScreenHeight = mDefaultFrameBuffers[3]->getHeight();
+		uint32_t const oldScreenWidth = mScreenFrameBuffer->getWidth();
+		uint32_t const oldScreenHeight = mScreenFrameBuffer->getHeight();
 		uint32_t const newScreenWidth = width;
 		uint32_t const newScreenHeight = height;
 		uint32_t const newRenderWidth = static_cast<uint32_t>(newScreenWidth * mDefaultRenderWidthScale + 0.5f);
@@ -114,7 +115,7 @@ namespace Air
 
 	FrameBufferPtr const & RenderEngine::getDefaultFrameBuffer() const
 	{
-		return mDefaultFrameBuffers[mFBStage];
+		return mDefaultFrameBuffer;
 	}
 
 
@@ -141,6 +142,16 @@ namespace Air
 		}
 	}
 
+	void RenderEngine::postProcess(bool skip)
+	{
+		if (mPostProcessChain)
+		{
+			mPostProcessChain->update();
+		}
+
+
+	}
+
 	void RenderEngine::updateGPUTimestampsFrequency()
 	{
 
@@ -148,7 +159,7 @@ namespace Air
 	void RenderEngine::beginFrame()
 	{
 		mRenderEnvironment.update();
-		this->bindFrameBuffer(mDefaultFrameBuffers[0]);
+		this->bindFrameBuffer(mDefaultFrameBuffer);
 	}
 	void RenderEngine::beginPass()
 	{
@@ -186,7 +197,6 @@ namespace Air
 		this->doCreateRenderWindow(name, settings);
 		this->checkConfig(settings);
 		RenderDeviceCaps const & caps = this->getDeviceCaps();
-		mScreenFrameBuffer = mCurrenFrameBuffer;
 		uint32_t const screen_width = mScreenFrameBuffer->getWidth();
 		uint32_t const screen_height = mScreenFrameBuffer->getHeight();
 		float const screen_aspect = static_cast<float>(screen_width) / screen_height;
@@ -228,22 +238,13 @@ namespace Air
 		//mPPRenderLayout = renderFactory.MakeRenderLayout();
 		//mPPRenderLayout->setTopologyType(RenderLayout::TT_TriangleList);
 		
-// 		Float2 pos[] =
-// 		{
-// 			Float2(-1, 1),
-// 			Float2(1, 1),
-// 			Float2(-1, -1),
-// 			Float2(1, -1)
-// 		};
 		//后处理相关数据
 
 
-		for (int i = 0; i < 4; ++i)
-		{
-			mDefaultFrameBuffers[i] = mScreenFrameBuffer;
-		}
-
-		this->bindFrameBuffer(mDefaultFrameBuffers[0]);
+		mDefaultFrameBuffer = mScreenFrameBuffer;
+		this->bindFrameBuffer(mDefaultFrameBuffer);
+		mPostProcessChain = MakeSharedPtr<PostProcessChain>();
+		mPostProcessChain->load
 	}
 
 	void RenderEngine::setStateObject(RenderStateObjectPtr const & rs_obj)

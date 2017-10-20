@@ -117,4 +117,23 @@ namespace Air
 		mesh->setPosAABB(AABBox(float3(-0.5, -0.5, -0.5), float3(0.5, 0.5, 0.5)));
 		return mesh;
 	}
+
+	StaticMeshPtr SimpleMeshFactory::createStaticQuat(float halfWidth /* = 0.5f */)
+	{
+		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+		StaticMeshPtr mesh = MakeSharedPtr<StaticMesh>(nullptr, L"quat");
+		float2 pos[] =
+		{
+			float2(-halfWidth, +halfWidth),
+			float2(+halfWidth, +halfWidth),
+			float2(-halfWidth, -halfWidth),
+			float2(+halfWidth, -halfWidth)
+		};
+
+		GraphicsBufferPtr vb = rf.makeVertexBuffer(BU_Static, EAH_GPU_Read | EAH_Immutable, sizeof(float2) * 4, pos);
+		mesh->addVertexStream(vb, VertexElement(VEU_Position, 0, EF_GR32F));
+		mesh->setPosAABB(AABBox(float3(-halfWidth, -halfWidth, 0.0), float3(halfWidth, halfWidth, 0.0)));
+		mesh->setTopologyType(RenderLayout::TT_TriangleStrip);
+		return mesh;
+	}
 }

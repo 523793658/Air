@@ -17,7 +17,7 @@ namespace Air
 
 		RenderEffectPtr effect = syncLoadRenderEffect("assets/shader/skyBox.asd");
 
-		this->setTechnique(effect, effect->getTechniqueByName("SkyBoxTech"));
+		this->setTechnique(effect, effect->getTechniqueByName("skyBoxTech"));
 
 		float3 xyzs[] =
 		{

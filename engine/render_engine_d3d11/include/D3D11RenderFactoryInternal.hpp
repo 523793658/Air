@@ -35,6 +35,8 @@ namespace Air
 		RenderViewPtr Make2DDepthStencilRenderView(Texture& texture, int first_array_index, int array_size, int level);
 
 		virtual ShaderObjectPtr makeShaderObject();
+
+		virtual FrameBufferPtr makeFrameBuffer();
 	private:
 		virtual std::unique_ptr<RenderEngine> doMakeRenderEngine() override;
 

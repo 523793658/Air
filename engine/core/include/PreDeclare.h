@@ -88,6 +88,10 @@ namespace Air
 
 	class RenderEnvironment;
 
+	class PostProcessChain;
+	typedef std::shared_ptr<PostProcessChain> PostProcessChainPtr;
+
+
 	class SamplerStateObject;
 	typedef std::shared_ptr<SamplerStateObject> SamplerStateObjectPtr;
 

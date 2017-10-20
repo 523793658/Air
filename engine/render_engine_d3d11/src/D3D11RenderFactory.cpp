@@ -7,8 +7,10 @@
 #include "D3D11ShaderObject.hpp"
 #include "D3D11RenderStateObject.hpp"
 #include "D3D11RenderFactory.hpp"
-#include "D3D11RenderFactoryInternal.hpp"
+#include "D3D11FrameBuffer.hpp"
 #include "D3D11GraphicsBuffer.hpp"
+#include "D3D11RenderFactoryInternal.hpp"
+
 namespace Air
 {
 	D3D11RenderFactory::D3D11RenderFactory()
@@ -89,6 +91,11 @@ namespace Air
 	ShaderObjectPtr D3D11RenderFactory::makeShaderObject()
 	{
 		return MakeSharedPtr<D3D11ShaderObject>();
+	}
+
+	FrameBufferPtr D3D11RenderFactory::makeFrameBuffer()
+	{
+		return MakeSharedPtr<D3D11FrameBuffer>();
 	}
 
 	RenderStateObjectPtr D3D11RenderFactory::doMakeRenderStateObject(RasterizerStateDesc const & rs_desc, DepthStencilStateDesc const & dss_desc, BlendStateDesc const & bs_desc)

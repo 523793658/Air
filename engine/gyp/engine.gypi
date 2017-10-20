@@ -67,6 +67,8 @@
 				"../rendersystem/include/RenderEnvironment.hpp",
 				"../rendersystem/include/ForwardRenderEnvironment.hpp",
 				"../rendersystem/include/SkyBox.hpp",
+				"../rendersystem/include/PostProcess.hpp",
+				"../rendersystem/include/ToneMapping.hpp",
 				
 				"../rendersystem/src/RenderSettings.cpp",
 				"../rendersystem/src/RenderFactory.cpp",
@@ -92,6 +94,8 @@
 				"../rendersystem/src/RenderEnvironment.cpp",
 				"../rendersystem/src/ForwardRenderEnvironment.cpp",
 				"../rendersystem/src/SkyBox.cpp",
+				"../rendersystem/src/PostProcess.cpp",
+				"../rendersystem/src/ToneMapping.cpp",
 				
 				"../scene_manager/include/SceneManager.hpp",
 				"../scene_manager/include/SceneObject.hpp",

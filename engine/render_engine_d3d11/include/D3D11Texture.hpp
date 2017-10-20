@@ -113,7 +113,12 @@ namespace Air
 		uint32_t getHeight(uint32_t level) const;
 		uint32_t getDepth(uint32_t level) const;
 
+
+
 		virtual void createHWResource(ArrayRef<ElementInitData> init_data) override;
+	private:
+		virtual D3D11_SHADER_RESOURCE_VIEW_DESC fillSRVDesc(uint32_t first_array_index, uint32_t num_items,
+			uint32_t first_level, uint32_t num_levels) const override;
 	private:
 		uint32_t mWidth;
 		uint32_t mHeight;
@@ -128,7 +133,9 @@ namespace Air
 		uint32_t getWidth(uint32_t level) const;
 		uint32_t getHeight(uint32_t level) const;
 		virtual void createHWResource(ArrayRef<ElementInitData> init_data) override;
-
+	private:
+		virtual D3D11_SHADER_RESOURCE_VIEW_DESC fillSRVDesc(uint32_t first_array_index, uint32_t num_items,
+			uint32_t first_level, uint32_t num_levels) const override;
 	private:
 
 		uint32_t mWidth;

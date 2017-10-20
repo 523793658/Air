@@ -904,8 +904,7 @@ namespace Air
 			break;
 		}
 		this->resetRenderStates();
-		this->bindFrameBuffer(win);
-
+		mScreenFrameBuffer = win;
 // 		if (STM_LCDShutter == settings.mStereoMethod)
 // 		{
 // 			mStereoMethod = SM_None;

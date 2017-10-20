@@ -252,6 +252,11 @@ namespace Air
 	StaticMesh::~StaticMesh()
 	{
 	}
+
+	void StaticMesh::setTopologyType(RenderLayout::TopologyType type)
+	{
+		mRenderLayout->setTopologyType(type);
+	}
 	RenderLayout& StaticMesh::getRenderLayout() const
 	{
 		return *mRenderLayout;

@@ -107,6 +107,8 @@ namespace Air
 		{
 			return mRenderLayout->getStartIndexLocation();
 		}
+
+		void setTopologyType(RenderLayout::TopologyType type);
 	protected:
 		std::wstring mName;
 		RenderLayoutPtr mRenderLayout;

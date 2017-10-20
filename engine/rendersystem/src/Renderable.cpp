@@ -55,7 +55,7 @@ namespace Air
 		this->updateInstanceStream();
 		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		RenderLayout const & layout = this->getRenderLayout();
-		GraphicsBufferPtr const & inst_stream = layout.getIndexStream();
+		GraphicsBufferPtr const & inst_stream = layout.getInstanceStream();
 		RenderTechnique const & tech = *this->getRenderTechnique();
 		auto const & effect = *this->getRenderEffect();
 		if (inst_stream)
