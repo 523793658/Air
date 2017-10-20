@@ -303,7 +303,7 @@ namespace Air{
 	template<typename T>
 	Vector_T<T, 3> const & AABBox_T<T>::getMax() const AIR_NOEXCEPT
 	{
-		return mMin;
+		return mMax;
 	}
 
 	template<typename T>

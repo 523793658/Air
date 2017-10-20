@@ -36,6 +36,43 @@ namespace Air
 		fb.swapBuffers();
 	}
 
+	void SceneManager::prepareRenderQueue(std::vector<SceneObjectPtr> const & objs)
+	{
+		for (auto const & obj : objs)
+		{
+			auto so = obj.get();
+			if ((so->getVisibleMark() != BO_No) && (0 == so->getNumChildren()))
+			{
+				auto renderable = so->getRenderable();
+				if (renderable)
+				{
+					renderable->clearInstance();
+				}
+			}
+		}
+
+
+		for (auto const & obj : objs)
+		{
+			auto so = obj.get();
+			if ((so->getVisibleMark() != BO_No) && (0 == so->getNumChildren()))
+			{
+				auto renderable = so->getRenderable().get();
+				if (renderable)
+				{
+					if (0 == renderable->getNumInstances())
+					{
+						renderable->addToRenderQueue();
+					}
+					renderable->addInstance(so);
+					++mNumObjectsRendered;
+				}
+
+			}
+		}
+	}
+
+
 	void SceneManager::flush(uint32_t urt)
 	{
 		std::lock_guard<std::mutex> lock(mUpdateMutex);
@@ -90,6 +127,8 @@ namespace Air
 					scene_objs[i]->setVisibleMark((*vmiter->second)[i]);
 				}
 			}
+
+			prepareRenderQueue(mNoCullableSceneObjects);
 		}
 		if (urt & App3DFramework::URV_Overlay)
 		{
@@ -100,37 +139,7 @@ namespace Air
 			}
 		}
 
-		for (auto const & obj : mSceneObjs)
-		{
-			auto so = obj.get();
-			if ((so->getVisibleMark() != BO_No) && (0 == so->getNumChildren()))
-			{
-				auto renderable = so->getRenderable();
-				if (renderable)
-				{
-					renderable->clearInstance();
-				}
-			}
-		}
-
-		for (auto const & obj : mSceneObjs)
-		{
-			auto so = obj.get();
-			if ((so->getVisibleMark() != BO_No) && (0 == so->getNumChildren()))
-			{
-				auto renderable = so->getRenderable().get();
-				if (renderable)
-				{
-					if (0 == renderable->getNumInstances())
-					{
-						renderable->addToRenderQueue();
-					}
-					renderable->addInstance(so);
-					++mNumObjectsRendered;
-				}
-
-			}
-		}
+		prepareRenderQueue(mSceneObjs);
 
 		std::sort(mRenderQueue.begin(), mRenderQueue.end(), [](std::pair<RenderTechnique const *, std::vector<Renderable*>> const & lhs,
 			std::pair<RenderTechnique const *, std::vector<Renderable*>> const & rhs)
@@ -340,14 +349,18 @@ namespace Air
 		{
 			mOverlaySceneObjs.push_back(obj);
 		}
-		else
+		else if(attr & SceneObject::SOA_Cullable)
 		{
-			if ((attr & SceneObject::SOA_Cullable) && !(attr & SceneObject::SOA_Moveable))
+			if (!(attr & SceneObject::SOA_Moveable))
 			{
 				obj->updateWorldMatrix();
 			}
 			mSceneObjs.push_back(obj);
 			this->onAddSceneObject(obj);
+		}
+		else
+		{
+			mNoCullableSceneObjects.push_back(obj);
 		}
 	}
 

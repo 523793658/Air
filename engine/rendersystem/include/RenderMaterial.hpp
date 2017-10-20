@@ -9,8 +9,12 @@ namespace Air
 	};
 
 
-	struct AIR_CORE_API RenderMaterial
+	class AIR_CORE_API RenderMaterial
 	{
+	public:
+		RenderMaterial();
+		RenderMaterial(float3 const & diff, float3 const &spec, float glossiness, float metallic);
+	public:
 		enum TextureSlot
 		{
 			TS_Albedo,
@@ -29,9 +33,8 @@ namespace Air
 		};
 
 		std::string mName;
-		float4 mAlbedo;
-		float mMetalness;
-		float mGlossiness;
+		float4 mAlbedoRoughness;
+		float4 mSpecularMetalness;
 		float3 mEmissive;
 
 		bool mTransparent;

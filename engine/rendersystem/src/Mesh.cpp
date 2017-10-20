@@ -266,8 +266,13 @@ namespace Air
 
 	void StaticMesh::addVertexStream(GraphicsBufferPtr const & buffer, VertexElement const & ve)
 	{
-		mRenderLayout->bindVertexStream(buffer, std::make_tuple(ve));
+		mRenderLayout->bindVertexStream(buffer, ve);
 	}
+	void StaticMesh::addVertexStream(GraphicsBufferPtr const & buffer, ArrayRef<VertexElement> ve)
+	{
+		mRenderLayout->bindVertexStream(buffer, ve);
+	}
+
 	void StaticMesh::addIndexStream(void const * buf, uint32_t size, ElementFormat format, uint32_t access_hint)
 	{
 		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();

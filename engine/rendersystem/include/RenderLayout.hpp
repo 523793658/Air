@@ -1,9 +1,12 @@
 #ifndef _Air_Render_Layout_H_
 #define _Air_Render_Layout_H_
 #pragma once
+#include <tuple>
+
 #include "PreDeclare.h"
 #include "rendersystem/include/GraphicsBuffer.hpp"
 #include "ElementFormat.h"
+#include "basic/include/ArrayRef.hpp"
 namespace Air
 {
 	enum VertexElementUsage
@@ -210,13 +213,7 @@ namespace Air
 			return 1;
 		}
 
-		template<typename tuple_type>
-		void bindVertexStream(GraphicsBufferPtr const & buffer, tuple_type const & vertex_elems, StreamType type = ST_Geometry, uint32_t freq = 1)
-		{
-			this->bindVertexStream(buffer, Tuple2Vector<tuple_type, std::tuple_size<tuple_type>::value>::_do(vertex_elems), type, freq);
-		}
-
-		void bindVertexStream(GraphicsBufferPtr const & buffer, VertexElementsType const & vet, StreamType type = ST_Geometry, uint32_t freq = 1);
+		void bindVertexStream(GraphicsBufferPtr const & buffer, ArrayRef<VertexElement> vet, StreamType type = ST_Geometry, uint32_t freq = 1);
 
 
 		void bindIndexStream(GraphicsBufferPtr const & buffer, ElementFormat format);

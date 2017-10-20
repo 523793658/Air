@@ -212,12 +212,15 @@ namespace Air
 		}
 
 
-		bool isAllHWResourceReady() const;
+		bool isAllHWResourceReady() const
+		{
+			return true;
+		}
 
 		virtual void setObjectID(uint32_t id);
 
 
-
+		void setMaterial(RenderMaterialPtr material);
 
 		virtual bool getHWResourceReady() const;
 
@@ -259,7 +262,9 @@ namespace Air
 		//²ÎÊý
 		RenderEffectParameter* mMVPParam;
 		RenderEffectParameter* mMVParam;
-
+		RenderEffectParameter* mWorldParam;
+		RenderEffectParameter* mBaseColorRoughness;
+		RenderEffectParameter* mSpecularColorMetallic;
 	protected:
 		
 

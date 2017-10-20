@@ -56,7 +56,7 @@ namespace Air
 
 	protected:
 		void flush(uint32_t urt);
-
+		void prepareRenderQueue(std::vector<SceneObjectPtr> const & objs);
 		virtual void onAddSceneObject(SceneObjectPtr const & obj) = 0;
 		virtual void onDelSceneObject(std::vector<SceneObjectPtr>::iterator iter) = 0;
 
@@ -86,6 +86,7 @@ namespace Air
 		std::unordered_map<size_t, std::shared_ptr<std::vector<BoundOverlap>>> mVisibleMarksMap;
 		std::vector<SceneObjectPtr> mSceneObjs;
 		std::vector<SceneObjectPtr> mOverlaySceneObjs;
+		std::vector<SceneObjectPtr> mNoCullableSceneObjects;
 		std::vector<LightSourcePtr> mLights;
 		float mSmallObjThreshold;
 		float mUpdateElapse;

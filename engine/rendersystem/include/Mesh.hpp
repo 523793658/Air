@@ -63,11 +63,7 @@ namespace Air
 		void addVertexStream(void const * buf, uint32_t size, VertexElement const & ve, uint32_t access_hint);
 		void addVertexStream(GraphicsBufferPtr const & buffer, VertexElement const & ve);
 
-		template<typename tuple_type>
-		void addVertexStream(GraphicsBufferPtr const & buffer, tuple_type const & vertex_elems)
-		{
-			mRenderLayout->bindVertexStream(buffer, vertex_elems);
-		}
+		void addVertexStream(GraphicsBufferPtr const & buffer, ArrayRef<VertexElement> ve);
 
 		virtual std::wstring const & getName() const
 		{

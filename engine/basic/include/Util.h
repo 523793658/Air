@@ -76,7 +76,7 @@ namespace Air
 	{
 #ifdef AIR_LITTLE_ENDIAN
 		AIR_UNUSED(x);
-#
+#else
 		EndianSwitch<sizeof(T)>(&x);
 #endif
 		return x;

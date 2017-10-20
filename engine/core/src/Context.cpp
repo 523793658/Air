@@ -72,11 +72,7 @@ namespace Air
 
 		mCfg.mAssetsPlugins.push_back(AssetsPluginCfg("fbxPlugin", "fbx"));
 
-		
-
-
-
-
+		mCfg.mShaderPath = "assets/shader";
 		mGTPInstance = MakeUniquePtr<thread_pool>(1, 16);
 	}
 

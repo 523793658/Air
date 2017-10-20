@@ -63,6 +63,11 @@ namespace Air
 		bool getJitterMode() const;
 		void setJitterMode(bool jitter);
 
+		float getFarPlane() const
+		{
+			return mFarPlane;
+		}
+
 	private:
 		float mLookDistance;
 		float4x4 mViewMatrix;

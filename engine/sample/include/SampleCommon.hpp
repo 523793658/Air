@@ -20,13 +20,19 @@ namespace Sample
 	class SphereObject : public SceneObjectHelper
 	{
 	public:
-		SphereObject(float4 const & diff, float4 const &spec, float glossiness);
+		SphereObject(float3 const & diff, float3 const &spec, float glossiness, float metallic);
 
 		void setRenderingType(int type)
 		{
 
 		}
 
+	};
+
+	class CubeObject : public SceneObjectHelper
+	{
+	public:
+		CubeObject(float4 const & diff, float4 const & spec, float glossiness);
 	};
 }
 

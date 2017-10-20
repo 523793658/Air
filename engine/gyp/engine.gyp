@@ -3,6 +3,9 @@
 		{
 			"target_name": "alltargets",
 			"type": "none",
+			'variables': {
+				'shaderPath': '../../assets/shader',
+			},
 			"dependencies":[
 				"engine",
 				"basic",
@@ -12,7 +15,20 @@
 				"SampleRenderOneBall",
 				"InputEngineMsg",
 			],
-		}
+			'sources':
+			[
+				"<(shaderPath)/lighting.asd",
+				"<(shaderPath)/simpleforward.asd",
+				"<(shaderPath)/skyBox.asd",
+				
+				
+				"<(shaderPath)/shadingModels.hlsl",
+				"<(shaderPath)/brdf.hlsl",
+				"<(shaderPath)/common.hlsl",
+				"<(shaderPath)/skyBox.hlsl",
+				"<(shaderPath)/util.hlsl",
+			],
+		},
 	],
 	
 	'includes': [

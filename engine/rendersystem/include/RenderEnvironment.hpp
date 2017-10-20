@@ -15,12 +15,12 @@ namespace Air
 
 		SharedConstantBuffer* addConstantBuffer(std::string name, ConstantBufferType type);
 
+		void updateLights(std::vector<LightSourcePtr> const & lights);
+
 		void update();
 	private:
 
 		std::unordered_map<std::string, std::unique_ptr<SharedConstantBuffer>> mSharedConstanBuffers;
-
-		//std::vector<RenderEffectConstantBufferPtr> mConst
 	};
 
 

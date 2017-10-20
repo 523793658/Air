@@ -12,10 +12,14 @@ namespace Air
 
 	OCTree::OCTree(AABBox&& size)
 	{
+		mNodes.resize(1);
+		mNodes[0].mAABB = size;
 	} 
 
 	OCTree::OCTree(AABBox const & size)
 	{
+		mNodes.resize(1);
+		mNodes[0].mAABB = size;
 	}
 
 	void OCTree::markNodeVisible(size_t index)

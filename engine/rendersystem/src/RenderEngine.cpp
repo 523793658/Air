@@ -147,7 +147,7 @@ namespace Air
 	}
 	void RenderEngine::beginFrame()
 	{
-		mRenderEnvironment
+		mRenderEnvironment.update();
 		this->bindFrameBuffer(mDefaultFrameBuffers[0]);
 	}
 	void RenderEngine::beginPass()

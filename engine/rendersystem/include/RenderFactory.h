@@ -18,7 +18,13 @@ namespace Air
 
 		RenderEngine& getRenderEngineInstance();
 
-		virtual TexturePtr MakeDelayCreationTexture2D(uint32_t width, uint32_t height, uint32_t num_mip_maps, uint32_t array_size, ElementFormat format, uint32_t sample_count, uint32_t sample_quality, uint32_t access_hint) = 0;
+		virtual TexturePtr makeDelayCreationTexture1D(uint32_t width, uint32_t num_mip_maps, uint32_t array_size, ElementFormat format, uint32_t sample_count, uint32_t sample_quality, uint32_t access_hint) = 0;
+
+		virtual TexturePtr makeDelayCreationTexture2D(uint32_t width, uint32_t height, uint32_t num_mip_maps, uint32_t array_size, ElementFormat format, uint32_t sample_count, uint32_t sample_quality, uint32_t access_hint) = 0;
+
+		virtual TexturePtr makeDelayCreationTexture3D(uint32_t width, uint32_t height, uint32_t depth, uint32_t num_mip_maps, uint32_t array_size, ElementFormat format, uint32_t sample_count, uint32_t sample_quality, uint32_t access_hint) = 0;
+
+		virtual TexturePtr makeDelayCreationTextureCube(uint32_t size, uint32_t num_mip_maps, uint32_t array_size, ElementFormat format, uint32_t sample_count, uint32_t sample_quality, uint32_t access_hint) = 0;
 
 		virtual RenderLayoutPtr MakeRenderLayout() = 0;
 

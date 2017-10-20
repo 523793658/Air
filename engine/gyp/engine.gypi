@@ -65,6 +65,8 @@
 				"../rendersystem/include/ForwardRenderingLayer.hpp",
 				"../rendersystem/include/Light.hpp",
 				"../rendersystem/include/RenderEnvironment.hpp",
+				"../rendersystem/include/ForwardRenderEnvironment.hpp",
+				"../rendersystem/include/SkyBox.hpp",
 				
 				"../rendersystem/src/RenderSettings.cpp",
 				"../rendersystem/src/RenderFactory.cpp",
@@ -88,6 +90,8 @@
 				"../rendersystem/src/ForwardRenderingLayer.cpp",
 				"../rendersystem/src/Light.cpp",
 				"../rendersystem/src/RenderEnvironment.cpp",
+				"../rendersystem/src/ForwardRenderEnvironment.cpp",
+				"../rendersystem/src/SkyBox.cpp",
 				
 				"../scene_manager/include/SceneManager.hpp",
 				"../scene_manager/include/SceneObject.hpp",

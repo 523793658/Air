@@ -99,6 +99,7 @@ namespace Air
 		if (mFrustumDirty)
 		{
 			mFrustum.clipMatrix(getViewProjMatrixWOAdjust(), getInverseViewProjMatrixWOAdjust());
+			BoundOverlap bo = mFrustum.intersect(AABBox(float3(-5.0f, -0.5f, 4.0f), float3(-4.0f, 0.5f, 5.0f)));
 			mFrustumDirty = false;
 		}
 		return mFrustum;
@@ -179,6 +180,6 @@ namespace Air
 			mInvViewProjectMatrixWOAdjust = mInvProjectMatrixWoAdjust * mInvViewMatrix;
 			mViewProjMatrixWoAdjustDirty = false;
 		}
-		return mInvProjectMatrixWoAdjust;
+		return mInvViewProjectMatrixWOAdjust;
 	}
 }

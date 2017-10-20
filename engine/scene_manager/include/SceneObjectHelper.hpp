@@ -18,7 +18,20 @@ namespace Air
 
 	};
 
+	class AIR_CORE_API SceneObjectSkyBox : public SceneObjectHelper
+	{
+	public:
+		explicit SceneObjectSkyBox(uint32_t attrib = 0);
+		virtual ~SceneObjectSkyBox()
+		{
 
+		}
+		void setTechnique(RenderEffectPtr const & effect, RenderTechnique *);
+
+		void setCubeMap(TexturePtr const & cube);
+
+		void setCompressedCubeMap(TexturePtr const & y_cube, TexturePtr const & c_cube);
+	};
 }
 
 

@@ -15,7 +15,7 @@ namespace Air
 {
 	Renderable::Renderable()
 	{
-		RenderEffectPtr effect = syncLoadRenderEffect("assets/material/simpleforward.mtl");
+		RenderEffectPtr effect = syncLoadRenderEffect("assets/shader/simpleforward.asd");
 
 		bindEffect(effect);
 		mTechnique = effect->getTechniqueByIndex(0);
@@ -87,6 +87,11 @@ namespace Air
 		}
 	}
 
+	void Renderable::setMaterial(RenderMaterialPtr material)
+	{
+		mMaterial = material;
+	}
+
 	void Renderable::onRenderBegin()
 	{
 		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
@@ -96,7 +101,9 @@ namespace Air
 		AABBox const & pos_bb = this->getPosAABB();
 		AABBox const & tc_bb = this->getTexcoordAABB();
 		*mMVPParam = mvp;
-		
+		*mWorldParam = mModelMat;
+		*mSpecularColorMetallic = mMaterial->mSpecularMetalness;
+		*mBaseColorRoughness = mMaterial->mAlbedoRoughness;
 	}
 
 	void Renderable::onRenderEnd()
@@ -139,6 +146,10 @@ namespace Air
 		this->updateTechniques();
 
 		mMVPParam = effect->getParameterByName("mvp");
+		mWorldParam = effect->getParameterByName("worldMatrix");
+		mSpecularColorMetallic = effect->getParameterByName("u_SpecularColorMetallic");
+		mBaseColorRoughness = effect->getParameterByName("u_BaseColorRoughness");
+
 	}
 	RenderTechnique* Renderable::getPassTechnique(PassType type) const
 	{

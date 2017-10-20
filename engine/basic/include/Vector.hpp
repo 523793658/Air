@@ -137,6 +137,12 @@ namespace Air
 			return zero;
 		}
 
+		Vector_T & normalize() AIR_NOEXCEPT
+		{
+			*this = MathLib::normalize(*this);
+			return *this;
+		}
+
 		iterator begin() AIR_NOEXCEPT
 		{
 			return mVec.begin();

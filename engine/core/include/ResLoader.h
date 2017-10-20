@@ -79,10 +79,18 @@ namespace Air
 
 		std::shared_ptr<void> syncQuery(ResLoadingDescPtr const & res_desc);
 
+		std::shared_ptr<void> aSyncQuery(ResLoadingDescPtr const & res_desc);
+
 		template<typename T>
 		std::shared_ptr<T> syncQueryT(ResLoadingDescPtr const & res_desc)
 		{
 			return std::static_pointer_cast<T>(this->syncQuery(res_desc));
+		}
+
+		template<typename T>
+		std::shared_ptr<T> aSyncQueryT(ResLoadingDescPtr const & res_desc)
+		{
+			return std::static_pointer_cast<T>(this->aSyncQuery(res_desc));
 		}
 	private:
 		std::string getRealPath(std::string const & path);

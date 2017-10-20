@@ -54,6 +54,22 @@ namespace Air
 		AIR_UNREACHABLE("invalid invoke");
 	}
 
+	D3D11_RENDER_TARGET_VIEW_DESC D3D11Texture::fillRTVDesc(uint32_t first_array_index, uint32_t num_items, uint32_t first_level) const
+	{
+		AIR_UNUSED(first_level);
+		AIR_UNUSED(first_array_index);
+		AIR_UNUSED(num_items);
+		AIR_UNREACHABLE("Can't be called");
+	}
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC D3D11Texture::fillDSVDesc(uint32_t first_array_index, uint32_t array_size, uint32_t level) const
+	{
+		AIR_UNUSED(first_array_index);
+		AIR_UNUSED(array_size);
+		AIR_UNUSED(level);
+		AIR_UNREACHABLE("Can't be called");
+	}
+
 	D3D11_SHADER_RESOURCE_VIEW_DESC D3D11Texture::fillSRVDesc(uint32_t first_array_index, uint32_t num_items,
 		uint32_t first_level, uint32_t num_levels) const
 	{
@@ -274,22 +290,94 @@ namespace Air
 
 	ID3D11RenderTargetViewPtr const & D3D11Texture::retriveD3DRenderTargetView(uint32_t first_array_index, uint32_t array_size, uint32_t level)
 	{
-		BOOST_ASSERT(false);
-		static ID3D11RenderTargetViewPtr const ret;
-		return ret;
+		BOOST_ASSERT(this->getAccesshint() & EAH_GPU_Write);
+		BOOST_ASSERT(first_array_index < this->getArraySize());
+		BOOST_ASSERT(first_array_index + array_size <= this->getArraySize());
+		if (this->isHWResourceReady())
+		{
+			size_t hash_val = boost::hash_value(first_array_index);
+			boost::hash_combine(hash_val, array_size);
+			boost::hash_combine(hash_val, level);
+			boost::hash_combine(hash_val, 0);
+			boost::hash_combine(hash_val, 0);
+			auto iter = mD3DRenderTargetViews.find(hash_val);
+			if (iter != mD3DRenderTargetViews.end())
+			{
+				return iter->second;
+			}
+			else
+			{
+				auto desc = this->fillRTVDesc(first_array_index, array_size, level);
+				ID3D11RenderTargetView* rt_view;
+				mD3DDevice->CreateRenderTargetView(mD3DTexture.get(), &desc, &rt_view);
+				return mD3DRenderTargetViews.emplace(hash_val, MakeComPtr(rt_view)).first->second;
+			}
+		}
+		else
+		{
+			static ID3D11RenderTargetViewPtr const view;
+			return view;
+		}
 	}
 
 	ID3D11DepthStencilViewPtr const & D3D11Texture::retriveD3DDepthStencilView(uint32_t first_array_index, uint32_t array_size, uint32_t level)
 	{
-		BOOST_ASSERT(false);
-		static ID3D11DepthStencilViewPtr const ret;
-		return ret;
+		BOOST_ASSERT(this->mAccessHint & EAH_GPU_Write);
+		BOOST_ASSERT(first_array_index < this->mArraySize);
+		BOOST_ASSERT(first_array_index + array_size <= this->mArraySize);
+		if (this->isHWResourceReady())
+		{
+			size_t hash_val = boost::hash_value(first_array_index);
+			boost::hash_combine(hash_val, array_size);
+			boost::hash_combine(hash_val, level);
+			boost::hash_combine(hash_val, 0);
+			boost::hash_combine(hash_val, 0);
+			auto iter = mD3DDepthStencilViews.find(hash_val);
+			if (iter != mD3DDepthStencilViews.end())
+			{
+				return iter->second;
+			}
+			else
+			{
+				auto desc = this->fillDSVDesc(first_array_index, array_size, level);
+				ID3D11DepthStencilView* d3d_view;
+				TIFHR(mD3DDevice->CreateDepthStencilView(mD3DTexture.get(), &desc, &d3d_view));
+				return mD3DDepthStencilViews.emplace(hash_val, MakeComPtr(d3d_view)).first->second;
+			}
+		}
+		else
+		{
+			static ID3D11DepthStencilViewPtr const view;
+			return view;
+		}
 	}
 
 	ID3D11ShaderResourceViewPtr const & D3D11Texture::retriveD3DShaderResourceView(uint32_t first_array_index, uint32_t num_items, uint32_t first_level, uint32_t num_levels)
 	{
-		BOOST_ASSERT(false);
-		static ID3D11ShaderResourceViewPtr const ret;
-		return ret;
+		BOOST_ASSERT(this->mAccessHint & EAH_GPU_Read);
+		if (this->isHWResourceReady())
+		{
+			size_t hash_val = boost::hash_value(first_array_index);
+			boost::hash_combine(hash_val, num_items);
+			boost::hash_combine(hash_val, first_level);
+			boost::hash_combine(hash_val, num_levels);
+			auto iter = mD3DShaderResourceViews.find(hash_val);
+			if (iter != mD3DShaderResourceViews.end())
+			{
+				return iter->second;
+			}
+			else
+			{
+				auto desc = this->fillSRVDesc(first_array_index, num_items, first_level, num_levels);
+				ID3D11ShaderResourceView* d3d_sr_view;
+				mD3DDevice->CreateShaderResourceView(mD3DTexture.get(), &desc, &d3d_sr_view);
+				return mD3DShaderResourceViews.emplace(hash_val, MakeComPtr(d3d_sr_view)).first->second;
+			}
+		}
+		else
+		{
+			static ID3D11ShaderResourceViewPtr const view;
+			return view;
+		}
 	}
 }

@@ -31,7 +31,7 @@ namespace Air
 		std::string mRenderFactoryName;
 		std::string mInputFactoryName;
 		std::string mSceneManagerName;
-
+		std::string mShaderPath;
 
 		RenderSettings mGraphicsCfg;
 		std::vector<AssetsPluginCfg> mAssetsPlugins;

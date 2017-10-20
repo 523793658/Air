@@ -5,6 +5,7 @@
 #include "rendersystem/include/RenderFactory.h"
 #include "rendersystem/include/RenderEffect.hpp"
 #include "rendersystem/include/ShaderObject.hpp"
+#include "ResLoader.h"
 
 #if AIR_IS_DEV_PLATFORM
 
@@ -15,6 +16,7 @@
 #ifdef CALL_D3DCOMPILER_DIRECTLY
 #include "SALWrapper.hpp"
 #include "d3dcompiler.h"
+#include "d3dcommon.h"
 #else
 #define S_OK                                        0x00000000
 
@@ -53,8 +55,73 @@ struct D3D_SHADER_MACRO
 namespace
 {
 	using namespace Air;
+
+	std::mutex singleton_mutex;
+
 	class D3DCompilerLoader
 	{
+	public:
+		class IncludeInterface : public ID3DInclude
+		{
+		private:
+			IncludeInterface()
+			{
+				mShaderDir = Engine::getInstance().getConfig().mShaderPath;
+			}
+
+		public:
+
+			static IncludeInterface* getInstance()
+			{
+				if (!mInstance)
+				{
+					std::lock_guard<std::mutex> lock(singleton_mutex);
+					if (!mInstance)
+					{
+						mInstance = new IncludeInterface();
+					}
+				}
+				return mInstance;
+			}
+		private:
+			HRESULT __stdcall Open(D3D_INCLUDE_TYPE IncludeType,
+				LPCSTR pFileName,
+				LPCVOID pParentData,
+				LPCVOID *ppData,
+				UINT *pBytes) override
+			{
+				std::string finalPath;
+				switch (IncludeType)
+				{
+				case D3D_INCLUDE_LOCAL:
+					finalPath = mShaderDir + "\\" + pFileName;
+					break;
+				default:
+					break;
+				}
+
+				ResIdentifierPtr res = ResLoader::getInstance().open(finalPath);
+				if (res)
+				{
+					uint32_t fileSize = res->size();
+					uint8_t * data  = (uint8_t *)malloc(fileSize);
+					res->read(data, fileSize);
+					*pBytes = fileSize;
+					*ppData = data;
+					return S_OK;
+				}
+				return E_FAIL;
+			}
+			HRESULT __stdcall Close(LPCVOID pData) override
+			{
+				free((void*)pData);
+				return S_OK;
+			}
+		private:
+			std::string mShaderDir;
+			static IncludeInterface* mInstance;
+		};
+
 	public:
 		~D3DCompilerLoader()
 		{
@@ -71,9 +138,10 @@ namespace
 		HRESULT D3DCompile(std::string const & src_data, D3D_SHADER_MACRO const * defines, char const * entry_point, char const* target, uint32_t flags1, uint32_t flags2, std::vector<uint8_t> & code, std::string & error_msgs) const
 		{
 #ifdef CALL_D3DCOMPILER_DIRECTLY
+			
 			ID3DBlob* code_blob = nullptr;
 			ID3DBlob* error_msgs_blob = nullptr;
-			HRESULT hr = mDynamicD3DCompile(src_data.c_str(), static_cast<UINT>(src_data.size()), nullptr, defines, nullptr, entry_point, target, flags1, flags2, &code_blob, &error_msgs_blob);
+			HRESULT hr = mDynamicD3DCompile(src_data.c_str(), static_cast<UINT>(src_data.size()), nullptr, defines, IncludeInterface::getInstance(), entry_point, target, flags1, flags2, &code_blob, &error_msgs_blob);
 			if (code_blob)
 			{
 				uint8_t const * p = static_cast<uint8_t const *>(code_blob->GetBufferPointer());
@@ -246,6 +314,9 @@ namespace
 		D3DStripShaderFunc mDynamicD3DStripShader;
 #endif
 	};
+
+	D3DCompilerLoader::IncludeInterface* D3DCompilerLoader::IncludeInterface::mInstance;
+
 }
 #endif
 

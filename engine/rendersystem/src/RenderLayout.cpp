@@ -9,8 +9,9 @@ namespace Air
 
 	}
 
-	void RenderLayout::bindVertexStream(GraphicsBufferPtr const & buffer, VertexElementsType const & vet, StreamType type, uint32_t freq)
+	void RenderLayout::bindVertexStream(GraphicsBufferPtr const & buffer, ArrayRef<VertexElement> vet, StreamType type, uint32_t freq)
 	{
+		BOOST_ASSERT(buffer);
 		uint32_t size = 0;
 		for (size_t i = 0; i < vet.size(); ++i)
 		{
@@ -20,18 +21,19 @@ namespace Air
 		{
 			for (size_t i = 0; i < mVertexStreams.size(); ++i)
 			{
-				if (mVertexStreams[i].mFormat == vet)
+				if (ArrayRef<VertexElement>(mVertexStreams[i].mFormat) == vet)
 				{
 					mVertexStreams[i].mStream = buffer;
 					mVertexStreams[i].mVertexSize = size;
 					mVertexStreams[i].mType = type;
 					mVertexStreams[i].mFreq = freq;
+					mStreamsDirty = true;
 					return;
 				}
 			}
 			StreamUnit vs;
 			vs.mStream = buffer;
-			vs.mFormat = vet;
+			vs.mFormat = vet.ToVector();
 			vs.mVertexSize = size;
 			vs.mType = type;
 			vs.mFreq = freq;
@@ -40,13 +42,15 @@ namespace Air
 		else
 		{
 			mInstanceStream.mStream = buffer;
-			mInstanceStream.mFormat = vet;
+			mInstanceStream.mFormat = vet.ToVector();
 			mInstanceStream.mVertexSize = size;
 			mInstanceStream.mType = type;
 			mInstanceStream.mFreq = freq;
 		}
 		mStreamsDirty = true;
 	}
+
+	
 
 
 	void RenderLayout::bindIndexStream(GraphicsBufferPtr const & buffer, ElementFormat format)

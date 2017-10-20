@@ -52,6 +52,10 @@ namespace Air
 
 		virtual D3D11_SHADER_RESOURCE_VIEW_DESC fillSRVDesc(uint32_t first_array_index, uint32_t num_items,
 			uint32_t first_level, uint32_t num_levels) const;
+
+		virtual D3D11_RENDER_TARGET_VIEW_DESC fillRTVDesc(uint32_t first_array_index, uint32_t num_items, uint32_t first_level) const;
+
+		virtual D3D11_DEPTH_STENCIL_VIEW_DESC fillDSVDesc(uint32_t first_array_index, uint32_t array_size, uint32_t level) const;
 	protected:
 		ID3D11Device* mD3DDevice;
 		ID3D11DeviceContext* mD3DImmContext;
@@ -65,7 +69,13 @@ namespace Air
 
 	class D3D11Texture1D : public D3D11Texture
 	{
+	public:
+		D3D11Texture1D(uint32_t width, uint32_t num_mip_maps, uint32_t array_size, ElementFormat format, uint32_t sample_count, uint32_t sample_quality, uint32_t access_hint);
 
+		virtual void createHWResource(ArrayRef<ElementInitData> init_data) override;
+		uint32_t getWidth(uint32_t level) const;
+	private:
+		uint32_t mWidth;
 	};
 
 	class D3D11Texture2D : public D3D11Texture
@@ -74,13 +84,6 @@ namespace Air
 		D3D11Texture2D(uint32_t width, uint32_t height, uint32_t num_mip_maps, uint32_t array_size, ElementFormat format, uint32_t sample_count, uint32_t sample_quality, uint32_t access_hint);
 
 		explicit D3D11Texture2D(ID3D11Texture2DPtr const & d3d_tex);
-
-		virtual ID3D11RenderTargetViewPtr const & retriveD3DRenderTargetView(uint32_t first_array_index, uint32_t array_size, uint32_t level) override;
-
-		virtual ID3D11DepthStencilViewPtr const & retriveD3DDepthStencilView(uint32_t first_array_index, uint32_t array_size, uint32_t level) override;
-
-		virtual ID3D11ShaderResourceViewPtr const & retriveD3DShaderResourceView(uint32_t first_array_index, uint32_t num_items,
-			uint32_t first_level, uint32_t num_levels) override;
 
 		virtual void createHWResource(ArrayRef<ElementInitData> init_data) override;
 
@@ -91,6 +94,10 @@ namespace Air
 		virtual D3D11_SHADER_RESOURCE_VIEW_DESC D3D11Texture2D::fillSRVDesc(uint32_t first_array_index, uint32_t num_items,
 			uint32_t first_level, uint32_t num_levels) const override;
 
+		D3D11_RENDER_TARGET_VIEW_DESC fillRTVDesc(uint32_t first_array_index, uint32_t num_items, uint32_t first_level) const override;
+
+		D3D11_DEPTH_STENCIL_VIEW_DESC fillDSVDesc(uint32_t first_array_index, uint32_t array_size, uint32_t level) const override;
+
 		virtual D3D11_UNORDERED_ACCESS_VIEW_DESC fillUAVDesc(uint32_t first_array_index, uint32_t num_items, uint32_t level) const override;
 	private:
 		uint32_t mWidth;
@@ -99,12 +106,32 @@ namespace Air
 
 	class D3D11Texture3D : public D3D11Texture
 	{
+	public:
+		D3D11Texture3D(uint32_t width, uint32_t height, uint32_t depth, uint32_t numMipMaps, uint32_t array_size, ElementFormat format, uint32_t sample_count, uint32_t sample_quality, uint32_t access_hint);
 
+		uint32_t getWidth(uint32_t level) const;
+		uint32_t getHeight(uint32_t level) const;
+		uint32_t getDepth(uint32_t level) const;
+
+		virtual void createHWResource(ArrayRef<ElementInitData> init_data) override;
+	private:
+		uint32_t mWidth;
+		uint32_t mHeight;
+		uint32_t mDepth;
 	};
 
 	class D3D11TextureCube : public D3D11Texture
 	{
+	public:
+		D3D11TextureCube(uint32_t size, uint32_t numMipMaps, uint32_t array_size, ElementFormat format, uint32_t sample_count, uint32_t sample_quality, uint32_t access_hint);
 
+		uint32_t getWidth(uint32_t level) const;
+		uint32_t getHeight(uint32_t level) const;
+		virtual void createHWResource(ArrayRef<ElementInitData> init_data) override;
+
+	private:
+
+		uint32_t mWidth;
 	};
 }
 

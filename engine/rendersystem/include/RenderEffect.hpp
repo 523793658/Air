@@ -566,6 +566,8 @@ protected:
 
 		RenderEffectParameter* getParameterByIndex(uint32_t index) const;
 
+		RenderEffectParameter* getParameterByName(std::string_view name) const;
+
 		uint32_t const getNumParams() const
 		{
 			return mParams.size();

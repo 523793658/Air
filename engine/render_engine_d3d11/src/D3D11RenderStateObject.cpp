@@ -142,7 +142,7 @@ namespace Air
 		d3d_desc.MaxAnisotropy = desc.mMaxAnisotropy;
 		d3d_desc.MaxLOD = desc.mMaxLod;
 		d3d_desc.MinLOD = desc.mMinLod;
-		d3d_desc.MipLODBias = d3d_desc.MipLODBias;
+		d3d_desc.MipLODBias = desc.mMiPMapLoadBias;
 		ID3D11SamplerState* sampler_state;
 		TIFHR(d3d_device->CreateSamplerState(&d3d_desc, &sampler_state));
 		mSamplerState = MakeComPtr(sampler_state);

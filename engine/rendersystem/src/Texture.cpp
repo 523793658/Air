@@ -1177,8 +1177,17 @@ namespace
 			RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
 			switch (tex_data.type)
 			{
+			case Texture::TT_1D:
+				texture = rf.makeDelayCreationTexture1D(tex_data.width, tex_data.num_mipmap, tex_data.array_size, tex_data.format, 1, 0, mTexDesc.mAccessHint);
+				break;
 			case Texture::TT_2D:
-				texture = rf.MakeDelayCreationTexture2D(tex_data.width, tex_data.height, tex_data.num_mipmap, tex_data.array_size, tex_data.format, 1, 0, mTexDesc.mAccessHint);
+				texture = rf.makeDelayCreationTexture2D(tex_data.width, tex_data.height, tex_data.num_mipmap, tex_data.array_size, tex_data.format, 1, 0, mTexDesc.mAccessHint);
+				break;
+			case Texture::TT_3D:
+				texture = rf.makeDelayCreationTexture3D(tex_data.width, tex_data.height, tex_data.depth, tex_data.num_mipmap, tex_data.array_size, tex_data.format, 1, 0, mTexDesc.mAccessHint);
+				break;
+			case Texture::TT_Cube:
+				texture = rf.makeDelayCreationTextureCube(tex_data.width, tex_data.num_mipmap, tex_data.array_size, tex_data.format, 1, 0, mTexDesc.mAccessHint);
 				break;
 			default:
 				AIR_UNREACHABLE("Invalid texture type");
@@ -1246,8 +1255,7 @@ namespace Air
 	}
 	TexturePtr aSyncLoadTexture(std::string const & tex_name, uint32_t access_hint)
 	{
-		//return ResLoader::getInstance().syncQuery()
-		return TexturePtr();
+		return ResLoader::getInstance().aSyncQueryT<Texture>(MakeSharedPtr<TextureLoadingDesc>(tex_name, access_hint));
 	}
 
 	void resizeTexture(void* dst_data, uint32_t dst_row_pitch, uint32_t dst_slice_pitch, ElementFormat dst_format,

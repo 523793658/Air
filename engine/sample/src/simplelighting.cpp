@@ -39,6 +39,11 @@ namespace Sample
 		}
 		void onCreate()
 		{
+			TexturePtr y_cube_map = aSyncLoadTexture("assets/texture/uffizi_cross_filtered_y.dds", EAH_GPU_Read | EAH_Immutable);
+
+			TexturePtr c_cube_map = aSyncLoadTexture("assets/texture/uffizi_cross_filtered_c.dds", EAH_GPU_Read | EAH_Immutable);
+
+
 
 			AmbientLightSourcePtr ambient_light = MakeSharedPtr<AmbientLightSource>();
 
@@ -52,16 +57,21 @@ namespace Sample
 			{
 				for (uint32_t j = 0; j < spheres_column; ++j)
 				{
-					mSpheres[i * spheres_column + j] = MakeSharedPtr<SphereObject>(float4(1.0f, 1.0f, 1.0f, 1.0f), float4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f);
-					mSpheres[i * spheres_column + j]->setLocalMatrix(MathLib::scaling(1.3f, 1.3f, 1.3f) * MathLib::translation((-static_cast<float>(spheres_column / 2) + j + 0.5f),
+					mSpheres[i * spheres_column + j] = MakeSharedPtr<SphereObject>(float3(1.0f, 1.0f, 1.0f), float3(1.0f, 1.0f, 1.0f), static_cast<float>(i)/ (spheres_row-1), static_cast<float>(j)/ (spheres_column - 1));
+					mSpheres[i * spheres_column + j]->setLocalMatrix(MathLib::translation((-static_cast<float>(spheres_column / 2) + j + 0.5f),
 						0.0f,
 						(-static_cast<float>(spheres_row / 2) + i + 0.5f)));
 					mSpheres[i * spheres_column + j]->addToSceneManager();
 				}
 			}
+			mSkyBox = MakeSharedPtr<SceneObjectSkyBox>(0);
+			checked_pointer_cast<SceneObjectSkyBox>(mSkyBox)->setCompressedCubeMap(y_cube_map, c_cube_map);
 
-			this->LookAt(float3(10.0f, 0.0f, 0.0f), float3(0.0f, 0.0f, 0.0f));
-			this->Proj(0.05f, 100);
+			mSkyBox->addToSceneManager();
+
+
+			this->LookAt(float3(0.0f, 0.0f, -10.0f), float3(0.0f, 0.0f, 0.0f));
+			this->Proj(0.05f, 1000);
 			mCameraController.attachCamera(this->getActiveCamera());
 			mCameraController.setScalers(0.003f, 0.003f);
 
@@ -81,6 +91,7 @@ namespace Sample
 		}
 	private:
 		std::vector<Air::SceneObjectPtr> mSpheres;
+		SceneObjectPtr mSkyBox;
 		Air::TrackballCameraController mCameraController;
 	};
 }

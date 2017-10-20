@@ -721,10 +721,7 @@ namespace Air
 
 		for (auto cb : mAllCBuffers)
 		{
-			if (cb->getType() == CBT_Object)
-			{
-				cb->update();
-			}
+			cb->update();
 		}
 
 		for (size_t st = 0; st < ST_NumShaderTypes; ++st)
@@ -949,6 +946,14 @@ namespace Air
 					}
 					D3D11_SHADER_DESC desc;
 					reflection->GetDesc(&desc);
+					for (UINT o = 0; o < desc.OutputParameters; ++o)
+					{
+						D3D11_SIGNATURE_PARAMETER_DESC odc;
+						reflection->GetOutputParameterDesc(0, &odc);
+						std::string name = odc.SemanticName;
+
+
+					}
 					for (UINT c = 0; c < desc.ConstantBuffers; ++c)
 					{
 						ID3D11ShaderReflectionConstantBuffer* reflection_cb = reflection->GetConstantBufferByIndex(c);

@@ -4,6 +4,7 @@
 #include "basic/include/MathHelper.hpp"
 #include "basic/include/Matrix.hpp"
 #include "basic/include/Quaternion.hpp"
+#include <vector>
 #include "basic/include/Math.hpp"
 
 namespace Air
@@ -292,7 +293,7 @@ namespace Air
 		template <typename T>
 		T dot_coord(Plane_T<T> const & lhs, Vector_T<T, 3> const & rhs) AIR_NOEXCEPT
 		{
-			return lhs.a() * rhs.x() + lhs.b() * rhs.y() + lhs.b() * rhs.z() + lhs.d();
+			return lhs.a() * rhs.x() + lhs.b() * rhs.y() + lhs.c() * rhs.z() + lhs.d();
 		}
 
 
@@ -599,6 +600,34 @@ namespace Air
 			return AABBox_T<T>(min, max);
 		}
 
+		template AABBox compute_aabbox(float3* first, float3* last) AIR_NOEXCEPT;
+		template AABBox compute_aabbox(float4* first, float4* last) AIR_NOEXCEPT;
+		template AABBox compute_aabbox(float3 const * first, float3 const * last) AIR_NOEXCEPT;
+		template AABBox compute_aabbox(float4 const * first, float4 const * last) AIR_NOEXCEPT;
+		template AABBox compute_aabbox(std::vector<float3>::iterator first, std::vector<float3>::iterator last) AIR_NOEXCEPT;
+		template AABBox compute_aabbox(std::vector<float4>::iterator first, std::vector<float4>::iterator last) AIR_NOEXCEPT;
+		template AABBox compute_aabbox(std::vector<float3>::const_iterator first, std::vector<float3>::const_iterator last) AIR_NOEXCEPT;
+		template AABBox compute_aabbox(std::vector<float4>::const_iterator first, std::vector<float4>::const_iterator last) AIR_NOEXCEPT;
+
+
+
+		template<typename Iterator>
+		AABBox_T<typename std::iterator_traits<Iterator>::value_type::value_type>
+			compute_aabbox(Iterator first, Iterator last) AIR_NOEXCEPT
+		{
+			typedef typename std::iterator_traits<Iterator>::value_type::value_type value_type;
+			Vector_T<value_type, 3> minVec = *first;
+			Vector_T<value_type, 3> maxVec = *first;
+			Iterator iter = first;
+			++iter;
+			for (; iter != last; ++iter)
+			{
+				Vector_T<value_type, 3> const & v = *iter;
+				minVec = minimize(minVec, v);
+				maxVec = maximize(maxVec, v);
+			}
+			return AABBox_T<value_type>(minVec, maxVec);
+		}
 
 
 

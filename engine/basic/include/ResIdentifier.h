@@ -36,6 +36,15 @@ namespace Air
 
 		void clear();
 
+		uint32_t size()
+		{
+			int index = static_cast<int>(tellg());
+			seekg(0, std::ios_base::end);
+			uint32_t len = static_cast<uint32_t>(tellg());
+			seekg(index, std::ios_base::beg);
+			return len;
+		}
+
 		operator bool() const
 		{
 			return !mIstream->fail();

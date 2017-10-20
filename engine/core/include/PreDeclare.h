@@ -93,7 +93,7 @@ namespace Air
 
 	struct TextureSubresource;
 
-	struct RenderMaterial;
+	class RenderMaterial;
 	typedef std::shared_ptr<RenderMaterial> RenderMaterialPtr;
 
 	struct SamplerStateDesc;

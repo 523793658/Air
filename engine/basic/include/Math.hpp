@@ -280,6 +280,10 @@ namespace Air
 		template <typename T>
 		AABBox_T<T> transform_aabb(AABBox_T<T> const & aabb, Vector_T<T, 3> const & scale, Quaternion_T<T> const & rot, Vector_T<T, 3> const & trans) AIR_NOEXCEPT;
 
+		template<typename Iterator>
+		AABBox_T<typename std::iterator_traits<Iterator>::value_type::value_type>
+			compute_aabbox(Iterator first, Iterator last) AIR_NOEXCEPT;
+
 		template <typename T>
 		Vector_T<T, 3> transform_quat(Vector_T<T, 3> const & v, Quaternion_T<T> const & quat) AIR_NOEXCEPT;
 

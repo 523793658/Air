@@ -209,7 +209,7 @@ namespace
 			if (!mInstance)
 			{
 				std::lock_guard<std::mutex> lock(singleton_mutex);
-				if (mInstance)
+				if (!mInstance)
 				{
 					mInstance = MakeUniquePtr<compare_function_define>();
 				}
@@ -750,7 +750,7 @@ namespace
 				{
 					tmp = attr->getValueInt();
 				}
-				var = MakeUniquePtr<RenderVariableUInt>();
+				var = MakeUniquePtr<RenderVariableInt>();
 				*var = tmp;
 			}
 			else
@@ -5686,5 +5686,18 @@ namespace Air
 	RenderEffectParameter* SharedConstantBuffer::getParameterByIndex(uint32_t index) const
 	{
 		return mParams[index].get();
+	}
+
+	RenderEffectParameter* SharedConstantBuffer::getParameterByName(std::string_view name) const
+	{
+		size_t name_hash = boost::hash_range(name.begin(), name.end());
+		for (auto const & it : mParams)
+		{
+			if (it->getNameHash() == name_hash)
+			{
+				return it.get();
+			}
+		}
+		return nullptr;
 	}
 }
