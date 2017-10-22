@@ -848,6 +848,11 @@ namespace Air
 		mRenderCache.mRTVPtr.clear();
 	}
 
+	TexturePtr const & D3D11RenderEngine::getScreenDepthStencilTexture() const 
+	{
+		return checked_cast<D3D11RenderWindow*>(mScreenFrameBuffer.get())->getD3DDepthStencilBuffer();
+	}
+
 	void D3D11RenderEngine::doCreateRenderWindow(std::string const & name, RenderSettings const & settings)
 	{
 		mMotionFrames = settings.mMotionFrames;

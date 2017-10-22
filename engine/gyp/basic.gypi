@@ -44,6 +44,7 @@
 				"../basic/include/XMLDom.hpp",
 				"../basic/include/ErrorHanding.hpp",
 				"../basic/include/ArrayRef.hpp",
+				"../basic/include/Reflection.hpp",
 				
 				"../basic/src/Thread.cpp",
 				"../basic/src/CPP11.cpp",
@@ -69,6 +70,7 @@
 				"../basic/src/Quaternion.cpp",
 				"../basic/src/ErrorHanding.cpp",
 				"../basic/src/ArrayRef.cpp",
+				"../basic/src/Reflection.cpp",
 			],
 			"conditions":[
 				[

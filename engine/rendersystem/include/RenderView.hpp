@@ -42,10 +42,13 @@ namespace Air
 		virtual void onBind(FrameBuffer& fb, uint32_t att);
 		virtual void onUnbind(FrameBuffer& fb, uint32_t att);
 
+		Texture* getSrcTexture();
+
 	protected:
 		uint32_t mWidth;
 		uint32_t mHeight;
 		ElementFormat mFormat;
+		Texture* mSrcTexture;
 	};
 
 	class AIR_CORE_API UnorderAccessView

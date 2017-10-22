@@ -11,6 +11,12 @@ namespace Air
 	{
 
 	}
+
+	Texture* RenderView::getSrcTexture()
+	{
+		return mSrcTexture;
+	}
+
 	void UnorderAccessView::onBind(FrameBuffer& fb, uint32_t att)
 	{
 
@@ -20,4 +26,5 @@ namespace Air
 	{
 
 	}
+
 }

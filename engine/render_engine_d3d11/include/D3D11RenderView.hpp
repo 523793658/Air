@@ -26,7 +26,6 @@ namespace Air
 		ID3D11Device* mD3DDevice;
 		ID3D11DeviceContext* mD3DImmContext;
 		ID3D11DeviceContext1* mD3DImmContext1;
-		void* mSrcTexture;
 	};
 
 	class D3D11RenderTargetRenderView : public D3D11RenderView

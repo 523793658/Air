@@ -52,6 +52,7 @@ namespace Air
 
 		void bindFrameBuffer(FrameBufferPtr const &fb);
 		FrameBufferPtr const & getDefaultFrameBuffer() const;
+		void setDefaultFrameBuffer(FrameBufferPtr ptr);
 
 		virtual void adjustProjectionMatrix(float4x4&);
 
@@ -88,6 +89,8 @@ namespace Air
 		void setStateObject(RenderStateObjectPtr const & rs_obj);
 
 		RenderEnvironment & getRenderEnvironment();
+
+		virtual TexturePtr const & getScreenDepthStencilTexture() const = 0;
 
 	private:
 		virtual void checkConfig(RenderSettings& settings);

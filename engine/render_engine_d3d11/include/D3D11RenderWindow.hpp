@@ -19,6 +19,15 @@ namespace Air
 
 		void setFullScreen(bool fs);
 
+		TexturePtr const & getD3DDepthStencilBuffer() const
+		{
+			return mDepthStencil;
+		}
+		TexturePtr const & getD3DBackBuffer() const
+		{
+			return mBackBuffer;
+		}
+
 		D3D11Adapter const & getAdapter() const
 		{
 			return *mAdapter;

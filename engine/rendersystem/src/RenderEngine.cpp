@@ -118,6 +118,11 @@ namespace Air
 		return mDefaultFrameBuffer;
 	}
 
+	void RenderEngine::setDefaultFrameBuffer(FrameBufferPtr frameBuffer)
+	{
+		mDefaultFrameBuffer = frameBuffer;
+	}
+
 
 	void RenderEngine::bindFrameBuffer(FrameBufferPtr const &fb)
 	{
@@ -244,7 +249,7 @@ namespace Air
 		mDefaultFrameBuffer = mScreenFrameBuffer;
 		this->bindFrameBuffer(mDefaultFrameBuffer);
 		mPostProcessChain = MakeSharedPtr<PostProcessChain>();
-		mPostProcessChain->load
+		mPostProcessChain->loadCfg(settings.mPostProcessCfgPath);
 	}
 
 	void RenderEngine::setStateObject(RenderStateObjectPtr const & rs_obj)

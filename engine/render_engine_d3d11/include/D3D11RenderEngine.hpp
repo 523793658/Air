@@ -159,6 +159,8 @@ namespace Air
 		{
 			return mDSProfile;
 		}
+
+		TexturePtr const & getScreenDepthStencilTexture() const override;
 	private:
 		bool isVertexFormatSupport(ElementFormat elem_fmt);
 		bool isTextureFormatSupport(ElementFormat elem_fmt);

@@ -23,6 +23,7 @@ namespace Air
 		float mStereoSeparation;
 		bool mHdr;
 		bool mPostProcessEnable;
+		std::string mPostProcessCfgPath;
 		std::vector<std::pair<std::string, std::string>> options;
 	};
 }
