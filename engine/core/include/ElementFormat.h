@@ -454,6 +454,9 @@ namespace Air
 	{
 		return (ECT_SNorm == channelType<0>(format));
 	}
+
+	ElementFormat parseFormat(std::string formatStr);
+
 }
 
 

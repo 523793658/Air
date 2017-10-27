@@ -4,10 +4,11 @@
 #include "rendersystem/include/PostProcess.hpp"
 namespace Air
 {
+
 	class AIR_CORE_API ToneMapping : public PostProcesser
 	{
 	public:
-		ToneMapping();
+		ToneMapping(PostProcessChain* chain);
 		~ToneMapping();
 
 
@@ -18,9 +19,6 @@ namespace Air
 		RenderTechnique* mTechnique;
 		RenderEffectParameter* mSrcColorTextureParam;
 	};
-
-
-
 }
 
 

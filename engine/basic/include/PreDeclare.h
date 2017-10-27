@@ -75,6 +75,12 @@ namespace Air
 
 	class bad_join;
 	class thread_pool;
+
+	class Json;
+	typedef std::shared_ptr<Json> JsonPtr;
+
+	class JsonValue;
+	typedef std::shared_ptr<JsonValue> JsonValuePtr;
 }
 
 

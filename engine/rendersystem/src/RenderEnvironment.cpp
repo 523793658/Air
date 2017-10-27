@@ -37,6 +37,8 @@ namespace Air
 
 			*b->second->getParameterByName("u_CameraDir") = Engine::getInstance().getAppInstance().getActiveCamera().getForwardVec();
 
+			*b->second->getParameterByName("u_AmbientCubemapColor") = float3(0.3, 0.3, 0.3);
+			*b->second->getParameterByName("u_DiffuseSpecularMip") = mEnvironmentTexMips;
 		}
 	}
 

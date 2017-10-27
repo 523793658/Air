@@ -45,6 +45,7 @@
 				"../basic/include/ErrorHanding.hpp",
 				"../basic/include/ArrayRef.hpp",
 				"../basic/include/Reflection.hpp",
+				"../basic/include/Json.hpp",
 				
 				"../basic/src/Thread.cpp",
 				"../basic/src/CPP11.cpp",
@@ -71,6 +72,7 @@
 				"../basic/src/ErrorHanding.cpp",
 				"../basic/src/ArrayRef.cpp",
 				"../basic/src/Reflection.cpp",
+				"../basic/src/Json.cpp",
 			],
 			"conditions":[
 				[

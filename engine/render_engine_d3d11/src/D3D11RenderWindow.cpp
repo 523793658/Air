@@ -405,20 +405,20 @@ namespace Air
 		ID3D11Texture2D* back_buffer;
 		TIFHR(mSwapChain1->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&back_buffer)));
 		mBackBuffer = MakeSharedPtr<D3D11Texture2D>(MakeComPtr(back_buffer));
-		mRenderTargetView = rf.Make2DRenderView(*mBackBuffer, 0, 1, 0);
+		mRenderTargetView = rf.Make2DRenderView(mBackBuffer, 0, 1, 0);
 		bool stereo = (STM_LCDShutter == Engine::getInstance().getConfig().mGraphicsCfg.mStereoMethod) && mDXGIStereoSupport;
 		if (stereo)
 		{
-			mRenderTargetViewRightEye = rf.Make2DRenderView(*mBackBuffer, 1, 1, 0);
+			mRenderTargetViewRightEye = rf.Make2DRenderView(mBackBuffer, 1, 1, 0);
 		}
 		if (mDepthStencilFormat != EF_Unknown)
 		{
 			mDepthStencil = rf.MakeTexture2D(mWidth, mHeight, 1, stereo ? 2 : 1, mDepthStencilFormat, mBackBuffer->getSampleCount(), mBackBuffer->getSampleQuality(), EAH_GPU_Read | EAH_GPU_Write);
 
-			mDepthStencilView = rf.Make2DDepthStencilRenderView(*mDepthStencil, 0, 1, 0);
+			mDepthStencilView = rf.Make2DDepthStencilRenderView(mDepthStencil, 0, 1, 0);
 			if (stereo)
 			{
-				mDepthStencilViewRightEye = rf.Make2DDepthStencilRenderView(*mDepthStencil, 1, 1, 0);
+				mDepthStencilViewRightEye = rf.Make2DDepthStencilRenderView(mDepthStencil, 1, 1, 0);
 			}
 		}
 		//TODO amd

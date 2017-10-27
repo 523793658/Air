@@ -20,6 +20,7 @@
 				"<(shaderPath)/lighting.asd",
 				"<(shaderPath)/simpleforward.asd",
 				"<(shaderPath)/skyBox.asd",
+				"<(shaderPath)/toneMap.asd",
 				
 				
 				"<(shaderPath)/shadingModels.hlsl",
@@ -27,6 +28,7 @@
 				"<(shaderPath)/common.hlsl",
 				"<(shaderPath)/skyBox.hlsl",
 				"<(shaderPath)/util.hlsl",
+				"<(shaderPath)/toneMap.hlsl",
 			],
 		},
 	],

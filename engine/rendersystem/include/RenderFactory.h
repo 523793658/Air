@@ -36,12 +36,12 @@ namespace Air
 		GraphicsBufferPtr makeIndexBuffer(BufferUsage usage, uint32_t access_hint, uint32_t size_in_byte, void const * init_data, ElementFormat fmt = EF_Unknown);
 		GraphicsBufferPtr makeConstantBuffer(BufferUsage usage, uint32_t access_hint, uint32_t size_in_byte, void const * init_data, ElementFormat fmt = EF_Unknown);
 
-		virtual RenderViewPtr Make1DRenderView(Texture& texture, int first_array_index, int array_size, int level) = 0;
-		virtual RenderViewPtr Make2DRenderView(Texture& texture, int first_array_index, int array_size, int level) = 0;
-		virtual RenderViewPtr Make2DRenderView(Texture& texture, int array_index, Texture::CubeFaces face, int level) = 0;
-		virtual RenderViewPtr Make2DRenderView(Texture& texture, int array_index, uint32_t slice, int level) = 0;
+		virtual RenderViewPtr Make1DRenderView(TexturePtr const & texture, int first_array_index, int array_size, int level) = 0;
+		virtual RenderViewPtr Make2DRenderView(TexturePtr const & texture, int first_array_index, int array_size, int level) = 0;
+		virtual RenderViewPtr Make2DRenderView(TexturePtr const & texture, int array_index, Texture::CubeFaces face, int level) = 0;
+		virtual RenderViewPtr Make2DRenderView(TexturePtr const & texture, int array_index, uint32_t slice, int level) = 0;
 
-		virtual RenderViewPtr Make2DDepthStencilRenderView(Texture& texture, int first_array_index, int array_size, int level) = 0;
+		virtual RenderViewPtr Make2DDepthStencilRenderView(TexturePtr const & texture, int first_array_index, int array_size, int level) = 0;
 
 		TexturePtr MakeTexture2D(uint32_t width, uint32_t height, uint32_t num_mip_maps, uint32_t array_size, ElementFormat format, uint32_t sample_count, uint32_t sample_quality, uint32_t access_hint, ArrayRef<ElementInitData> init_data = {});
 

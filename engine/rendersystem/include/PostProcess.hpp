@@ -9,12 +9,15 @@ namespace Air
 
 	enum PostProcessType
 	{
-		PPT_ToneMapping
+		PPT_ToneMapping,
+
+		PPT_CUSTOM			//自定义后处理类型
 	};
 
 	struct PostProcessConfig 
 	{
-		PostProcessType mType;
+		uint32_t mType;
+		std::string mName;
 	};
 
 	class AIR_CORE_API PostProcesser
@@ -37,6 +40,13 @@ namespace Air
 	};
 
 
+	class AIR_CORE_API PostProcesserCreator
+	{
+	public:
+		virtual std::shared_ptr<PostProcessConfig> loadCfg(XMLNodePtr const & node) = 0;
+		virtual PostProcesser* createInstance(std::shared_ptr<PostProcessConfig> const & cfg, PostProcessChain* chain) = 0;
+	};
+
 	class AIR_CORE_API PostProcessChain
 	{
 	public:
@@ -50,11 +60,16 @@ namespace Air
 
 		RenderablePtr const & getRenderable() const;
 
-	private:
-		PostProcesser* createPostProcesser(PostProcessConfig config);
+	public:
+		static void registerProcesser(std::string name, PostProcesserCreator* creater);
 
 	private:
-		std::vector<PostProcessConfig> mConfigs;
+		static std::unordered_map<std::string, PostProcesserCreator*> mProcesserCreators;
+	private:
+		PostProcesser* createPostProcesser(PostProcessConfigPtr config);
+
+	private:
+		std::vector<PostProcessConfigPtr> mConfigs;
 
 		ElementFormat mColorFormat;
 
@@ -64,15 +79,23 @@ namespace Air
 
 		FrameBufferPtr mSceneFrameBuffer;
 		std::stack<FrameBufferPtr> mTempFrameBuffers;
-		std::unordered_map<std::string, FrameBufferPtr> mFrameBufferMap;
-	};
 
-	class AIR_CORE_API PostProcesserRegister
-	{
-	private:
-		std::unordered_map<uint32_t, 
+		std::vector<PostProcesser*> mPostProcessers;
 	};
 }
+
+#define RegisterProcesser(name, creator) \
+namespace {	\
+class ObjectFactory##creator { \
+public: \
+	ObjectFactory##creator(){\
+		Air::PostProcessChain::registerProcesser(name, new creator());	\
+	}						\
+private: \
+	static ObjectFactory##creator instance;		\
+}; \
+	ObjectFactory##creator ObjectFactory##creator::instance;		\
+}\
 
 
 

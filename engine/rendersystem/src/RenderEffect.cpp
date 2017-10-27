@@ -137,6 +137,7 @@ namespace
 
 		ConstantBufferType fromStr(std::string_view name) const
 		{
+
 			size_t name_hash = boost::hash_range(name.begin(), name.end());
 			for (uint32_t i = 0; i < mCBTSHash.size(); ++i)
 			{
@@ -5096,9 +5097,9 @@ namespace Air
 			{
 				dss_desc.mDepthEnable = BoolFromStr(state_node->getAttrib("value")->getValueString());
 			}
-			else if (CT_HASH("depth_write_mask") == state_name_hash)
+			else if (CT_HASH("depth_write_enable") == state_name_hash)
 			{
-				dss_desc.mDepthWriteMask = BoolFromStr(state_node->getAttrib("value")->getValueString());
+				dss_desc.mDepthWriteEnable = BoolFromStr(state_node->getAttrib("value")->getValueString());
 			}
 			else if (CT_HASH("depth_func") == state_name_hash)
 			{

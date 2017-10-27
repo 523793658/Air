@@ -56,7 +56,7 @@ namespace Air
 		d3d_dss_desc.BackFace.StencilPassOp = D3D11Mapping::mapping(dss_desc.mBackStencilPass);
 		d3d_dss_desc.DepthEnable = dss_desc.mDepthEnable;
 		d3d_dss_desc.DepthFunc = D3D11Mapping::mapping(dss_desc.mDepthFunc);
-		d3d_dss_desc.DepthWriteMask = D3D11Mapping::mapping(dss_desc.mDepthWriteMask);
+		d3d_dss_desc.DepthWriteMask = D3D11Mapping::mapping(dss_desc.mDepthWriteEnable);
 		d3d_dss_desc.FrontFace.StencilDepthFailOp = D3D11Mapping::mapping(dss_desc.mFrontStencilDepthFail);
 		d3d_dss_desc.FrontFace.StencilFailOp = D3D11Mapping::mapping(dss_desc.mFrontStencilFail);
 		d3d_dss_desc.FrontFace.StencilFunc = D3D11Mapping::mapping(dss_desc.mFrontStencilFunc);

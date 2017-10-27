@@ -21,7 +21,7 @@
     <technique name="skyBoxTech">
         <pass name="p0">
             <state name="cull_mode" value="none"/>
-            <state name="depth_write_mask" value="0"/>
+            <state name="depth_write_enable" value="0"/>
             <state name="depth_func" value="equal"/>
             <state name="vertex_shader" value="skyBoxVS()"/>
             <state name="pixel_shader" value="skyBoxPS()"/>

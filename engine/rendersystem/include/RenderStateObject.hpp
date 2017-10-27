@@ -173,7 +173,7 @@ namespace Air
 	struct AIR_CORE_API DepthStencilStateDesc
 	{
 		bool			mDepthEnable{ true };
-		bool			mDepthWriteMask{ true };
+		bool			mDepthWriteEnable{ true };
 		CompareFunction	mDepthFunc{ CF_Less };
 		bool			mFrontStencilEnable{ false };
 		CompareFunction mFrontStencilFunc{ CF_AlwaysPass };

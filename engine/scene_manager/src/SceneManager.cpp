@@ -32,6 +32,8 @@ namespace Air
 		renderEngine.beginFrame();
 		this->flushScene();
 
+		renderEngine.postProcess(false);
+
 		FrameBuffer& fb = *renderEngine.getScreenFrameBuffer();
 		fb.swapBuffers();
 		renderEngine.endFrame();

@@ -24,6 +24,8 @@
 namespace Air
 {
 
+
+
 	template<typename T, typename... Args>
 	inline std::unique_ptr<T> MakeUniquePtrHelper(std::false_type, Args&&... args)
 	{
@@ -122,6 +124,39 @@ namespace Air
 		}
 
 #define PRIME_NUM 0x9e3779b9
+#define PRIME_C1 0xcc9e2d51
+#define PRIME_C2 0x1b873593
+#define PRIME_C3 0xe6546b64
+#if defined AIR_CPU_X64
+#define SIZEBIT 64
+#else
+#define SIZEBIT 32
+#endif
+	size_t constexpr LeftMoveC(size_t v, size_t n)
+	{
+		return (v >>(SIZEBIT - n)) | (v << n);
+	}
+	size_t constexpr CTHashKV(size_t k1)
+	{
+		return LeftMoveC(k1 * PRIME_C1, 15) * PRIME_C2;
+	}
+#ifdef AIR_CPU_X64
+	size_t constexpr CTHashImpl(char const* str, size_t seed)
+	{
+		
+		return 0 == *str ? seed : CTHashImpl(str + 1,
+			(seed ^ (((static_cast<size_t>(*str) * 0xc6a4a7935bd1e995ull) ^ ((static_cast<size_t>(*str) * 0xc6a4a7935bd1e995ull) >> 47)) * 0xc6a4a7935bd1e995ull)) * 0xc6a4a7935bd1e995ull + 0xe6546b64
+			
+			);
+	}
+
+#else
+	size_t constexpr CTHashImpl(char const* str, size_t seed)
+	{
+		return 0 == *str ? seed : CTHashImpl(str + 1,
+			LeftMoveC(seed ^ CTHashKV(static_cast<size_t>(*str)), 13) * 5 + PRIME_C3);
+	}
+#endif
 
 #ifdef AIR_CPP11_CORE_CONSTEXPR_SUPPORT
 #ifdef AIR_COMPILER_MSVC
@@ -150,9 +185,10 @@ namespace Air
 	{
 		static const size_t value = N;
 	};
-#define CT_HASH(x) RT_HASH(x)
+#define CT_HASH(x) (EnsureConst<CTHashImpl(x, 0)>::value)
+
 #else
-#define CT_HASH(x) RT_HASH(x)
+#define CT_HASH(x) (CTHashImpl(x, 0))
 #endif // AIR_COMPILER_MSVC
 #else
 #if defined(KLAYGE_COMPILER_MSVC)

@@ -97,6 +97,9 @@ namespace Air
 
 	struct TextureSubresource;
 
+	struct PostProcessConfig;
+	typedef std::shared_ptr<PostProcessConfig> PostProcessConfigPtr;
+
 	class RenderMaterial;
 	typedef std::shared_ptr<RenderMaterial> RenderMaterialPtr;
 

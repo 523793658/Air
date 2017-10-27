@@ -13,7 +13,7 @@ float3 standardShading(float3 diffuseColor, float3 specularColor, float3 lobeRou
 	float Vis = Vis_SmithJointApprox(lobeRoughness[1], NoV, NoL);
 	float3 F = F_Schlick(specularColor, VoH);
 	float3 diffuse = diffuse_lambert(diffuseColor);
-	return diffuse * lobeEnergy[2] + (D * Vis) * F;
+	return (D * Vis) *F;
 }
 
 

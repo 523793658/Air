@@ -22,4 +22,9 @@ float4 decode_hdr_yc(float y, float4 c)
 	return float4(Y * float3(C.g, (1.0f - C.g - C.r), C.r) / float3(0.2126f, 0.7152f, 0.0722f), 1);
 }
 
+float3 calcPrefilteredEnvVec(float3 normal, float3 view)
+{
+	return -reflect(view, normal);
+}
+
 #endif

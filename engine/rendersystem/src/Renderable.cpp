@@ -102,8 +102,11 @@ namespace Air
 		AABBox const & tc_bb = this->getTexcoordAABB();
 		*mMVPParam = mvp;
 		*mWorldParam = mModelMat;
-		*mSpecularColorMetallic = mMaterial->mSpecularMetalness;
-		*mBaseColorRoughness = mMaterial->mAlbedoRoughness;
+		if (mMaterial)
+		{
+			*mSpecularColorMetallic = mMaterial->mSpecularMetalness;
+			*mBaseColorRoughness = mMaterial->mAlbedoRoughness;
+		}
 	}
 
 	void Renderable::onRenderEnd()

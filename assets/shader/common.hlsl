@@ -53,8 +53,29 @@ float4 pow6(float4 x)
 }
 
 
+struct FLightAccumulator
+{
+	float3 mTotalLight;
+	float mScatterableLightLuma;
+	float3 mScatterableLight;
+	float mEsTimatedCost;
+};
 
 
+void lightAccumulatorAdd(inout FLightAccumulator input, float3 totalLight, float3 scatterableLight, float3 commonMultiplier, const bool bNeedsSeparateSubsurfaceLightAccumulation)
+{
+	input.mTotalLight += totalLight * commonMultiplier;
+	/*if (bNeedsSeparateSubsurfaceLightAccumulation)
+	{
+
+	}*/
+}
+
+float4 lightAccumulatorGetResult(FLightAccumulator input)
+{
+	float4 ret = float4(input.mTotalLight, 0);
+	return ret;
+}
 
 
 

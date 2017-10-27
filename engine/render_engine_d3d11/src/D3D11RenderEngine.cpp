@@ -794,7 +794,7 @@ namespace Air
 			}
 			if (cleared)
 			{
-				ShaderSetShaderResource[st](mD3DIMMContext.get(), 0, static_cast<UINT>(mRenderCache.mShaderSRVPtr.size()), &mRenderCache.mShaderSRVPtr[st][0]);
+				ShaderSetShaderResource[st](mD3DIMMContext.get(), 0, static_cast<UINT>(mRenderCache.mShaderSRVPtr[st].size()), &mRenderCache.mShaderSRVPtr[st][0]);
 			}
 		}
 	}
@@ -829,7 +829,7 @@ namespace Air
 		{
 			for (auto const & p : iter->second)
 			{
-				if ((sample_count == p.first) && (sample_quality == p.second))
+				if ((sample_count == p.first) && (sample_quality <= p.second))
 				{
 					return true;
 				}

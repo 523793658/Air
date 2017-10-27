@@ -1,0 +1,6 @@
+<?xml version='1.0'?>
+<postProcessChain name='test1' colorFormat='EF_ABGR32F'>
+	<postProcesser name='toneMap'>
+		
+	</postProcesser>
+</postProcessChain>

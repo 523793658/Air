@@ -66,7 +66,7 @@ namespace Air
 			if (mColorViews[i])
 			{
 				D3D11RenderTargetRenderView* p = checked_cast<D3D11RenderTargetRenderView*>(mColorViews[i].get());
-				rt_src.push_back(p->getRenderTargetSrc());
+				rt_src.push_back(p->getSrcTexture().get());
 				rt_first_subres.push_back(p->getRTFirstSubRes());
 				rt_num_subres.push_back(p->getRTNumSubRes());
 				rt_view[i] = p->getD3DRenderTargetView();
@@ -79,7 +79,9 @@ namespace Air
 		if (mDepthStencilView)
 		{
 			D3D11DepthStencilRenderView* p = checked_cast<D3D11DepthStencilRenderView*>(mDepthStencilView.get());
-			rt_src.push_back(p->getRenderTargetSrc());
+			void* p1 = p->getSrcTexture().get();
+			BOOST_ASSERT(p1 != nullptr);
+			rt_src.push_back(p1);
 			rt_first_subres.push_back(p->getRTFirstSubRes());
 			rt_num_subres.push_back(p->getRTNumSubRes());
 		}

@@ -12,8 +12,12 @@ namespace Air
 
 	}
 
-	Texture* RenderView::getSrcTexture()
+	TexturePtr const & RenderView::getSrcTexture() const
 	{
+		if (mSrcTexture.get() == nullptr)
+		{
+			BOOST_ASSERT(false);
+		}
 		return mSrcTexture;
 	}
 

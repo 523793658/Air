@@ -18,7 +18,7 @@ namespace Air
 	{
 	public:
 		D3D11RenderView();
-		D3D11RenderView(Texture* texture);
+		D3D11RenderView(TexturePtr const & texture);
 		virtual ~D3D11RenderView();
 		virtual void onAttached(FrameBuffer& fb, uint32_t att);
 		virtual void onDetached(FrameBuffer& fb, uint32_t att);
@@ -31,7 +31,7 @@ namespace Air
 	class D3D11RenderTargetRenderView : public D3D11RenderView
 	{
 	public:
-		D3D11RenderTargetRenderView(Texture& texture_1d_2d_cube, int first_index, int array_size, int level);
+		D3D11RenderTargetRenderView(TexturePtr const & texture_1d_2d_cube, int first_index, int array_size, int level);
 		void clearColor(Color const &clr);
 		void clearDepth(float depth);
 		void clearStencil(int32_t stencil);
@@ -49,11 +49,6 @@ namespace Air
 		ID3D11RenderTargetView* getD3DRenderTargetView() const
 		{
 			return mRenderTargetView.get();
-		}
-
-		void* getRenderTargetSrc() const
-		{
-			return mRenderTargetSrc;
 		}
 
 		uint32_t getRTFirstSubRes() const
@@ -74,7 +69,6 @@ namespace Air
 		void FackDiscard();
 	private:
 		ID3D11RenderTargetViewPtr mRenderTargetView;
-		void* mRenderTargetSrc;
 		uint32_t mRenderTargetFirstSubRes;
 		uint32_t mRenderTargetNumSubRes;
 		std::function<void()> mDiscardFunc;
@@ -83,7 +77,7 @@ namespace Air
 	class D3D11DepthStencilRenderView : public D3D11RenderView
 	{
 	public:
-		D3D11DepthStencilRenderView(Texture& texture, int first_array_index, int array_size, int level);
+		D3D11DepthStencilRenderView(TexturePtr const & texture, int first_array_index, int array_size, int level);
 		void clearColor(Color const &clr);
 		void clearDepth(float depth);
 		void clearStencil(int32_t stencil);
@@ -95,11 +89,6 @@ namespace Air
 		void onDetached(FrameBuffer& fb, uint32_t att)
 		{
 
-		}
-
-		void* getRenderTargetSrc() const
-		{
-			return mRenderTargetSrc;
 		}
 
 		uint32_t getRTFirstSubRes() const
@@ -127,7 +116,6 @@ namespace Air
 		ID3D11DepthStencilViewPtr mDepthStencilView;
 		uint32_t mRenderTargetFirstSubRes;
 		uint32_t mRenderTargetNumSubRes;
-		void* mRenderTargetSrc;
 		std::function<void()> mDiscardFunc;
 	};
 }

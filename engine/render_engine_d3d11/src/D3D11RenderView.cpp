@@ -14,7 +14,7 @@ namespace Air
 		mD3DImmContext1 = renderEngine.getD3DDeviceContext1();
 	}
 
-	D3D11RenderView::D3D11RenderView(Texture* texture)
+	D3D11RenderView::D3D11RenderView(TexturePtr const & texture)
 	{
 		D3D11RenderEngine& renderEngine(*checked_cast<D3D11RenderEngine*>(&Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance()));
 		mD3DDevice = renderEngine.getD3DDevice();
@@ -37,13 +37,14 @@ namespace Air
 
 	}
 
-	D3D11RenderTargetRenderView::D3D11RenderTargetRenderView(Texture& texture, int first_index, int array_size, int level)
-		:mRenderTargetSrc(&texture), mRenderTargetFirstSubRes(first_index * texture.getNumMipMaps() + level), mRenderTargetNumSubRes(1)
+	D3D11RenderTargetRenderView::D3D11RenderTargetRenderView(TexturePtr const & texture, int first_index, int array_size, int level)
+		:mRenderTargetFirstSubRes(first_index * texture->getNumMipMaps() + level), mRenderTargetNumSubRes(1), D3D11RenderView(texture)
 	{
-		mRenderTargetView = checked_cast<D3D11Texture*>(&texture)->retriveD3DRenderTargetView(first_index, array_size, level);
-		mWidth = texture.getWidth(level);
-		mHeight = texture.getHeight(level);
-		mFormat = texture.getFormat();
+		mSrcTexture = texture;
+		mRenderTargetView = checked_cast<D3D11Texture*>(texture.get())->retriveD3DRenderTargetView(first_index, array_size, level);
+		mWidth = texture->getWidth(level);
+		mHeight = texture->getHeight(level);
+		mFormat = texture->getFormat();
 		this->bindDiscardFunc();
 	}
 	void D3D11RenderTargetRenderView::discard()
@@ -112,13 +113,13 @@ namespace Air
 		mD3DImmContext->ClearDepthStencilView(mDepthStencilView.get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 	}
 
-	D3D11DepthStencilRenderView::D3D11DepthStencilRenderView(Texture& texture, int first_array_index, int array_size, int level)
-		:D3D11RenderView(&texture), mRenderTargetFirstSubRes(first_array_index * texture.getNumMipMaps() + level), mRenderTargetNumSubRes(1)
+	D3D11DepthStencilRenderView::D3D11DepthStencilRenderView(TexturePtr const & texture, int first_array_index, int array_size, int level)
+		:D3D11RenderView(texture), mRenderTargetFirstSubRes(first_array_index * texture->getNumMipMaps() + level), mRenderTargetNumSubRes(1)
 	{
-		mDepthStencilView = checked_cast<D3D11Texture*>(&texture)->retriveD3DDepthStencilView(first_array_index, array_size, level);
-		mWidth = texture.getWidth(level);
-		mHeight = texture.getHeight(level);
-		mFormat = texture.getFormat();
+		mDepthStencilView = checked_cast<D3D11Texture*>(texture.get())->retriveD3DDepthStencilView(first_array_index, array_size, level);
+		mWidth = texture->getWidth(level);
+		mHeight = texture->getHeight(level);
+		mFormat = texture->getFormat();
 		this->bindDiscardFunc();
 	}
 

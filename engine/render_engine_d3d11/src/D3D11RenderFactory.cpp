@@ -53,24 +53,24 @@ namespace Air
 		return name;
 	}
 
-	RenderViewPtr D3D11RenderFactory::Make1DRenderView(Texture& texture, int first_array_index, int array_size, int level)
+	RenderViewPtr D3D11RenderFactory::Make1DRenderView(TexturePtr const & texture, int first_array_index, int array_size, int level)
 	{
 		return nullptr;
 	}
-	RenderViewPtr D3D11RenderFactory::Make2DRenderView(Texture& texture, int first_array_index, int array_size, int level)
+	RenderViewPtr D3D11RenderFactory::Make2DRenderView(TexturePtr const & texture, int first_array_index, int array_size, int level)
 	{
 		return MakeSharedPtr<D3D11RenderTargetRenderView>(texture, first_array_index, array_size, level);
 	}
-	RenderViewPtr D3D11RenderFactory::Make2DRenderView(Texture& texture, int array_index, Texture::CubeFaces face, int level)
+	RenderViewPtr D3D11RenderFactory::Make2DRenderView(TexturePtr const & texture, int array_index, Texture::CubeFaces face, int level)
 	{
 		//return MakeSharedPtr<D3D11RenderTargetRenderView>()
 		return nullptr;
 	}
-	RenderViewPtr D3D11RenderFactory::Make2DRenderView(Texture& texture, int array_index, uint32_t slice, int level)
+	RenderViewPtr D3D11RenderFactory::Make2DRenderView(TexturePtr const & texture, int array_index, uint32_t slice, int level)
 	{
 		return nullptr;
 	}
-	RenderViewPtr D3D11RenderFactory::Make2DDepthStencilRenderView(Texture& texture, int first_array_index, int array_size, int level)
+	RenderViewPtr D3D11RenderFactory::Make2DDepthStencilRenderView(TexturePtr const & texture, int first_array_index, int array_size, int level)
 	{
 		return MakeSharedPtr<D3D11DepthStencilRenderView>(texture, first_array_index, array_size, level);
 	}

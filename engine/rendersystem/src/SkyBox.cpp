@@ -53,7 +53,7 @@ namespace Air
 
 	void RenderableSkyBox::setCubeMap(TexturePtr const & cube)
 	{
-		*mSkyCubeTex = cube;
+		*mSkyCcubeTex = cube;
 		*mSkyCompressed = static_cast<int32_t>(0);
 	}
 	void RenderableSkyBox::setCompressedCubeMap(TexturePtr const & y_cube, TexturePtr const & c_cube)

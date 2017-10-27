@@ -17,10 +17,18 @@ namespace Air
 
 		void updateLights(std::vector<LightSourcePtr> const & lights);
 
+		void setEnvironmentTexMips(int2 mips)
+		{
+			mEnvironmentTexMips = mips;
+		}
+
 		void update();
 	private:
 
 		std::unordered_map<std::string, std::unique_ptr<SharedConstantBuffer>> mSharedConstanBuffers;
+
+		int2 mEnvironmentTexMips{ int2(1, 1) };
+
 	};
 
 

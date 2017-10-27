@@ -65,6 +65,7 @@ namespace Air
 		mCfg.mGraphicsCfg.mSampleQuality = 0;
 		mCfg.mGraphicsCfg.mSyncInterval = 0;
 		mCfg.mGraphicsCfg.mMotionFrames = 0;
+		mCfg.mGraphicsCfg.mPostProcessCfgPath = "assets/cfg/postprocess.xml";
 
 		mCfg.mRenderFactoryName = "D3D11";
 		mCfg.mSceneManagerName = "OCTree";
