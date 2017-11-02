@@ -17,10 +17,10 @@
 			],
 			'sources':
 			[
-				"<(shaderPath)/lighting.asd",
 				"<(shaderPath)/simpleforward.asd",
 				"<(shaderPath)/skyBox.asd",
 				"<(shaderPath)/toneMap.asd",
+				"<(shaderPath)/Luminance.asd",
 				
 				
 				"<(shaderPath)/shadingModels.hlsl",
@@ -29,6 +29,7 @@
 				"<(shaderPath)/skyBox.hlsl",
 				"<(shaderPath)/util.hlsl",
 				"<(shaderPath)/toneMap.hlsl",
+				"<(shaderPath)/Luminance.hlsl",
 			],
 		},
 	],

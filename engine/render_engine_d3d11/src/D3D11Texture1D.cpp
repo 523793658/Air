@@ -59,4 +59,101 @@ namespace Air
 			this->retriveD3DShaderResourceView(0, mArraySize, 0, mNumMipMaps);
 		}
 	}
+
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC D3D11Texture1D::fillSRVDesc(uint32_t first_array_index, uint32_t num_items,
+		uint32_t first_level, uint32_t num_levels) const
+	{
+		D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+		switch (mFormat)
+		{
+		case EF_D16:
+			desc.Format = DXGI_FORMAT_R16_UNORM;
+			break;
+		case EF_D24S8:
+			desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+			break;
+		case EF_D32F:
+			desc.Format = DXGI_FORMAT_D32_FLOAT;
+			break;
+			
+		default:
+			desc.Format = mDXGIFormat;
+			break;
+		}
+		if (mArraySize > 1)
+		{
+			desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1DARRAY;
+			desc.Texture1DArray.ArraySize = num_items;
+			desc.Texture1DArray.FirstArraySlice = first_array_index;
+			desc.Texture1DArray.MipLevels = num_levels;
+			desc.Texture1DArray.MostDetailedMip = first_level;
+		}
+		else
+		{
+			desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
+			desc.Texture1D.MipLevels = num_levels;
+			desc.Texture1D.MostDetailedMip = first_level;
+		}
+		return desc;
+	}
+
+	D3D11_RENDER_TARGET_VIEW_DESC D3D11Texture1D::fillRTVDesc(uint32_t first_array_index, uint32_t num_items, uint32_t first_level) const
+	{
+		D3D11_RENDER_TARGET_VIEW_DESC desc;
+		desc.Format = mDXGIFormat;
+		if (mArraySize > 1)
+		{
+			desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE1DARRAY;
+			desc.Texture1DArray.ArraySize = num_items;
+			desc.Texture1DArray.FirstArraySlice = first_array_index;
+			desc.Texture1DArray.MipSlice = first_level;
+		}
+		else
+		{
+			desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE1D;
+			desc.Texture1D.MipSlice = first_level;
+		}
+		return desc;
+	}
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC D3D11Texture1D::fillDSVDesc(uint32_t first_array_index, uint32_t array_size, uint32_t level) const
+	{
+		D3D11_DEPTH_STENCIL_VIEW_DESC desc;
+		desc.Format = mDXGIFormat;
+		desc.Flags = 0;
+		if (mArraySize > 1)
+		{
+			desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE1DARRAY;
+			desc.Texture1DArray.ArraySize = array_size;
+			desc.Texture1DArray.FirstArraySlice = first_array_index;
+			desc.Texture1DArray.MipSlice = level;
+
+		}
+		else
+		{
+			desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE1D;
+			desc.Texture1D.MipSlice = level;
+		}
+		return desc;
+	}
+
+	D3D11_UNORDERED_ACCESS_VIEW_DESC  D3D11Texture1D::fillUAVDesc(uint32_t first_array_index, uint32_t num_items, uint32_t level) const
+	{
+		D3D11_UNORDERED_ACCESS_VIEW_DESC desc;
+		desc.Format = mDXGIFormat;
+		if (mArraySize > 1)
+		{
+			desc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE1DARRAY;
+			desc.Texture1DArray.ArraySize = num_items;
+			desc.Texture1DArray.FirstArraySlice = first_array_index;
+			desc.Texture1DArray.MipSlice = level;
+		}
+		else
+		{
+			desc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE1D;
+			desc.Texture1D.MipSlice = level;
+		}
+		return desc;
+	}
 }

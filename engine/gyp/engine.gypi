@@ -70,6 +70,7 @@
 				"../rendersystem/include/PostProcess.hpp",
 				"../rendersystem/include/ToneMapping.hpp",
 				"../rendersystem/include/HDRPostProcess.hpp",
+				"../rendersystem/include/MaterialCompiler.hpp",
 				
 				"../rendersystem/src/RenderSettings.cpp",
 				"../rendersystem/src/RenderFactory.cpp",
@@ -98,6 +99,7 @@
 				"../rendersystem/src/PostProcess.cpp",
 				"../rendersystem/src/ToneMapping.cpp",
 				"../rendersystem/src/HDRPostProcess.cpp",
+				"../rendersystem/src/MaterialCompiler.cpp",
 				
 				"../scene_manager/include/SceneManager.hpp",
 				"../scene_manager/include/SceneObject.hpp",

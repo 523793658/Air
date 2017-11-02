@@ -1,4 +1,5 @@
 #include "Engine.h"
+#include "basic/include/XMLDom.hpp"
 #include "rendersystem/include/mesh.hpp"
 #include "rendersystem/include/RenderEffect.hpp"
 #include "rendersystem/include/RenderFactory.h"
@@ -10,10 +11,7 @@ namespace Air
 	namespace
 	{
 
-		struct ToneMappingConfig : public PostProcessConfig
-		{
 
-		};
 
 
 		class ToneCreator : public PostProcesserCreator
@@ -21,34 +19,25 @@ namespace Air
 		public:
 			std::shared_ptr<PostProcessConfig> loadCfg(XMLNodePtr const & node) override
 			{
-				std::shared_ptr<PostProcessConfig> config = MakeSharedPtr<ToneMappingConfig>();
+				std::shared_ptr<ToneMapping::ToneMappingConfig> config = MakeSharedPtr<ToneMapping::ToneMappingConfig>();
 				config->mType = PPT_ToneMapping;
-
-
-
-
+				config->mEffectPath = node->getAttribString("shader");
 				return config;
 			}
 
-			PostProcesser* createInstance(std::shared_ptr<PostProcessConfig> const &, PostProcessChain* chain) override
+			PostProcesser* createInstance(std::shared_ptr<PostProcessConfig> const & config) override
 			{
-				ToneMapping* processer = new ToneMapping(chain);
-				
+				ToneMapping* processer = new ToneMapping();
+				processer->setConfig(config);
 				return processer;
 			}
 		};
+		RegisterProcesser("toneMapping", ToneCreator);
 	}
 
-	RegisterProcesser("toneMap", ToneCreator);
-
-
-	ToneMapping::ToneMapping(PostProcessChain* chain)
+	ToneMapping::ToneMapping()
 	{
-		mChain = chain;
-		
-		mEffect = syncLoadRenderEffect("assets/shader/toneMap.asd");
-		mTechnique = mEffect->getTechniqueByName("toneMap");
-		mSrcColorTextureParam = mEffect->getParameterByName("u_SceneTex");
+
 	}
 
 	ToneMapping::~ToneMapping()
@@ -58,7 +47,16 @@ namespace Air
 
 	void ToneMapping::update()
 	{
-		*mSrcColorTextureParam = mSrcTextures[0];
+		if (mDirty)
+		{
+			std::shared_ptr<ToneMappingConfig> cfg = checked_pointer_cast<ToneMappingConfig>(mConfig);
+			mEffect = syncLoadRenderEffect(cfg->mEffectPath);
+			mTechnique = mEffect->getTechniqueByName("toneMap");
+			*mEffect->getParameterByName("u_SceneTex") = mSrcTextures[0];
+			*mEffect->getParameterByName("u_LuminanceTex") = mSrcTextures[1];
+			*mEffect->getParameterByName("u_Params") = float2(0, 1);
+			*mEffect->getParameterByName("u_BlueShift") = 0;
+		}
 	}
 
 	void ToneMapping::render()
@@ -67,7 +65,7 @@ namespace Air
 		re.bindFrameBuffer(mOutputFrameBuffer);
 		mOutputFrameBuffer->discard(FrameBuffer::CBM_Color);
 
-		StaticMesh & renderable = *checked_cast<StaticMesh*>(mChain->getRenderable().get());
+		StaticMesh & renderable = *checked_cast<StaticMesh*>(mConfig->mChain->getRenderable().get());
 		renderable.setTechnique(mEffect, mTechnique);
 		
 		renderable.render();

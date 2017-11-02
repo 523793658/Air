@@ -4,11 +4,15 @@
 #include "rendersystem/include/PostProcess.hpp"
 namespace Air
 {
-
 	class AIR_CORE_API ToneMapping : public PostProcesser
 	{
 	public:
-		ToneMapping(PostProcessChain* chain);
+		struct ToneMappingConfig : public PostProcessConfig
+		{
+			std::string mEffectPath;
+		};
+	public:
+		ToneMapping();
 		~ToneMapping();
 
 

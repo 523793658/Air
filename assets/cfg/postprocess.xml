@@ -1,6 +1,10 @@
 <?xml version='1.0'?>
 <postProcessChain name='test1' colorFormat='EF_ABGR32F'>
-	<postProcesser name='toneMap'>
+	<postProcesser name='hdr'>
+		<luminanceConfig name="luminanceCS" shader="assets/shader/Luminance.asd">
+		</luminanceConfig>
 		
+		<toneMapping name="toneMapping" shader="assets/shader/toneMap.asd">
+		</toneMapping>
 	</postProcesser>
 </postProcessChain>

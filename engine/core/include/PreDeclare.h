@@ -100,6 +100,9 @@ namespace Air
 	struct PostProcessConfig;
 	typedef std::shared_ptr<PostProcessConfig> PostProcessConfigPtr;
 
+	class PostProcesser;
+	typedef std::shared_ptr<PostProcesser> PostProcesserPtr;
+
 	class RenderMaterial;
 	typedef std::shared_ptr<RenderMaterial> RenderMaterialPtr;
 

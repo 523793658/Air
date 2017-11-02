@@ -639,6 +639,178 @@ namespace
 	};
 	std::unique_ptr<logic_operation_define> logic_operation_define::mInstance;
 
+	class domain_type_define
+	{
+	public:
+		static domain_type_define& getInstance()
+		{
+			if (!mInstance)
+			{
+				std::lock_guard<std::mutex> lock(singleton_mutex);
+				if (!mInstance)
+				{
+					mInstance = MakeUniquePtr<domain_type_define>();
+				}
+			}
+			return *mInstance;
+		}
+
+		DomainType fromStr(std::string_view name) const
+		{
+			size_t const name_hash = boost::hash_range(name.begin(), name.end());
+			switch (name_hash)
+			{
+			case CT_HASH("surface"):
+				return DT_Surface;
+
+			case CT_HASH("deferredDecal"):
+				return DT_DeferredDecal;
+
+			case CT_HASH("lightFunction"):
+				return DT_LightFunction;
+
+			case CT_HASH("postProcess"):
+				return DT_PostProcess;
+
+			case CT_HASH("userInterface"):
+				return DT_UserInterface;
+			default:
+				break;
+			}
+			AIR_UNREACHABLE("Invalid DomainType name");
+		}
+
+		domain_type_define()
+		{
+		}
+	private:
+		static std::unique_ptr<domain_type_define> mInstance;
+	};
+	std::unique_ptr<domain_type_define> domain_type_define::mInstance;
+
+	class blend_mode_type_define
+	{
+	public:
+		static blend_mode_type_define& getInstance()
+		{
+			if (!mInstance)
+			{
+				std::lock_guard<std::mutex> lock(singleton_mutex);
+				if (!mInstance)
+				{
+					mInstance = MakeUniquePtr<blend_mode_type_define>();
+				}
+			}
+			return *mInstance;
+		}
+
+		BlendModeType fromStr(std::string_view name) const
+		{
+			size_t const name_hash = boost::hash_range(name.begin(), name.end());
+			switch (name_hash)
+			{
+			case CT_HASH("opaque"):
+				return BMT_Opaque;
+
+			case CT_HASH("masked"):
+				return BMT_Masked;
+
+			case CT_HASH("translucent"):
+				return BMT_Translucent;
+
+			case CT_HASH("additive"):
+				return BMT_Additive;
+
+			case CT_HASH("modulate"):
+				return BMT_Modulate;
+
+			case CT_HASH("alphaComposite"):
+				return BMT_AlphaComposite;
+
+			default:
+				break;
+			}
+			AIR_UNREACHABLE("Invalid BlendModeType name");
+		}
+
+		blend_mode_type_define()
+		{
+		}
+	private:
+		static std::unique_ptr<blend_mode_type_define> mInstance;
+	};
+	std::unique_ptr<blend_mode_type_define> blend_mode_type_define::mInstance;
+
+
+
+
+	class shading_model_type_define
+	{
+	public:
+		static shading_model_type_define& getInstance()
+		{
+			if (!mInstance)
+			{
+				std::lock_guard<std::mutex> lock(singleton_mutex);
+				if (!mInstance)
+				{
+					mInstance = MakeUniquePtr<shading_model_type_define>();
+				}
+			}
+			return *mInstance;
+		}
+
+		ShadingModelType fromStr(std::string_view name) const
+		{
+			size_t const name_hash = boost::hash_range(name.begin(), name.end());
+			switch (name_hash)
+			{
+			case CT_HASH("unlit"):
+				return SMT_Unlit;
+
+			case CT_HASH("defaultLit"):
+				return SMT_DefaultLit;
+
+			case CT_HASH("subsurface"):
+				return SMT_Subsurface;
+
+			case CT_HASH("preintegratedSkin"):
+				return SMT_PreintegratedSkin;
+
+			case CT_HASH("clearCoat"):
+				return SMT_ClearCoat;
+
+			case CT_HASH("subsurfaceProfile"):
+				return SMT_SubsurfaceProfile;
+
+			case CT_HASH("twoSidedFoliage"):
+				return SMT_TwoSidedFoliage;
+
+			case CT_HASH("hair"):
+				return SMT_Hair;
+				
+			case CT_HASH("cloth"):
+				return SMT_Cloth;
+
+			case CT_HASH("eye"):
+				return SMT_Eye;
+			default:
+				break;
+			}
+			AIR_UNREACHABLE("Invalid ShadingModelType name");
+		}
+
+		shading_model_type_define()
+		{
+		}
+	private:
+		static std::unique_ptr<shading_model_type_define> mInstance;
+	};
+	std::unique_ptr<shading_model_type_define> shading_model_type_define::mInstance;
+	
+	
+
+
 
 #if AIR_IS_DEV_PLATFORM
 	bool BoolFromStr(std::string_view name)
@@ -651,6 +823,29 @@ namespace
 		{
 			return false;
 		}
+	}
+	template <typename T, int N>
+	Vector_T<T, N> Vector3FromStr(std::string_view str)
+	{
+		size_t right = str.find_first_of(')');
+		size_t left = str.find_first_of('(');
+		std::string_view ss = str.substr(left + 1);
+		Vector_T<T, N> vec;
+		if ((right != -1 )&& (left != -1))
+		{
+			for (int i = 0; i < N - 1; i++)
+			{
+				size_t index = ss.find_first_of(',');
+				std::string vstr = std::string(ss.substr(0, index));
+				ss = ss.substr(index + 1);
+				boost::trim(vstr);
+				vec[i] = boost::lexical_cast<T>(vstr);
+			}
+			std::string vstr = std::string(ss.substr(0, ss.find_first_of(')')));
+			boost::trim(vstr);
+			vec[N - 1] = boost::lexical_cast<T>(vstr);
+		}
+		return vec;
 	}
 
 	int get_index(XMLNodePtr const & node)
@@ -3489,6 +3684,7 @@ namespace Air
 
 	std::string const & RenderEffect::getHLSHShader() const
 	{
+		//logWarn("hlsl:\n%s",mEffectTemplate->getHLSLShaderText().c_str());
 		return mEffectTemplate->getHLSLShaderText();
 	}
 
@@ -3977,6 +4173,7 @@ namespace Air
 							effect.mCbuffers.push_back(MakeSharedPtr<RenderEffectConstantBuffer>());
 							RenderEffectConstantBuffer* cbuff = effect.mCbuffers.back().get();
 							cbuff->load("global_cb", CBT_Object);
+							global_cb_created = true;
 						}
 					}
 					else if ("cbuffer" == node->getName())
@@ -4233,21 +4430,22 @@ namespace Air
 			case REDT_rw_texture2D:
 				str += "#if AIR_SHADER_MODEL >= SHADER_MODEL(5, 0)\n";
 				str += "RWTexture2D<" + elem_type + "> " + param_name + ";\n";
-				str += "#endif";
+				str += "#endif\n";
 				break;
 			case REDT_rw_texture3D:
 				str += "#if AIR_SHADER_MODEL >= SHADER_MODEL(5, 0)\n";
 				str += "RWTexture3D<" + elem_type + "> " + param_name + ";\n";
+				str += "endif\n";
 				break;
 			case REDT_rw_texture1DArray:
 				str += "#if AIR_SHADER_MODEL >= SHADER_MODEL(5, 0)\n";
 				str += "RWTexture1DArray<" + elem_type + "> " + param_name + ";\n";
-				str += "endif";
+				str += "endif\n";
 				break;
 			case REDT_rw_texture2DArray:
 				str += "#if AIR_SHADER_MODEL >= SHADER_MODEL(5, 0)\n";
 				str += "RWTexture2DAarray<" + elem_type + "> " + param_name + ";\n";
-				str += "#endif";
+				str += "#endif\n";
 				break;
 			case REDT_rw_byte_address_buffer:
 				str += "RWByteAddressBuffer " + param_name + ";\n";
@@ -4255,12 +4453,12 @@ namespace Air
 			case REDT_append_structured_buffer:
 				str += "#if AIR_SHADER_MODEL >= SHADER_MODEL(5, 0)\n";
 				str += "AppendStructruedBuffer<" + elem_type + "> " + param_name + ";\n";
-				str += "#endif";
+				str += "#endif\n";
 				break;
 			case REDT_consume_structured_buffer:
 				str += "#if AIR_SHADER_MODEL >= SHADER_MODEL(5, 0)\n";
 				str += "ConsumeStructuredBuffer<" + elem_type + "> " + param_name + ";\n";
-				str += "#endif";
+				str += "#endif\n";
 				break;
 			default:
 				break;
@@ -4311,10 +4509,12 @@ namespace Air
 			{
 				str += "#endif\n";
 			}
+
 		}
 	}
 	std::string const & RenderEffectTemplate::getHLSLShaderText() const
 	{
+		//logWarn("hlsl:\n%s", str.c_str());
 		return mHLSLShader;
 	}
 #endif
@@ -4864,6 +5064,35 @@ namespace Air
 		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
 		mName = node->getAttrib("name")->getValueString();
 		mNameHash = boost::hash_range(mName.begin(), mName.end());
+
+		DomainType dt = DT_Surface;
+		BlendModeType bmt = BMT_Opaque;
+		ShadingModelType smt = SMT_DefaultLit;
+		bool hasVertexShader = true;
+
+		XMLAttributePtr passAttr = node->getAttrib("domain");
+		if (passAttr)
+		{
+			dt = domain_type_define::getInstance().fromStr(passAttr->getValueString());
+		}
+		passAttr = node->getAttrib("blendMode");
+		if (passAttr)
+		{
+			bmt = blend_mode_type_define::getInstance().fromStr(passAttr->getValueString());
+		}
+		passAttr = node->getAttrib("shadingModel");
+		if (passAttr)
+		{
+			smt = shading_model_type_define::getInstance().fromStr(passAttr->getValueString());
+		}
+
+		passAttr = node->getAttrib("hasVertexShader");
+		if (passAttr)
+		{
+			hasVertexShader = BoolFromStr(passAttr->getValueString());
+		}
+
+
 		{
 			XMLNodePtr anno_node = node->getFirstNode("annotation");
 			if (anno_node)
@@ -4886,14 +5115,17 @@ namespace Air
 			}
 		}
 		{
+			mMacros = MakeSharedPtr<std::remove_reference<decltype(*mMacros)>::type>();
+			if (inherit_pass && inherit_pass->mMacros)
+			{
+				*mMacros = *inherit_pass->mMacros;
+			}
+
+
+
 			XMLNodePtr macro_node = node->getFirstNode("macro");
 			if (macro_node)
 			{
-				mMacros = MakeSharedPtr<std::remove_reference<decltype(*mMacros)>::type>();
-				if (inherit_pass && inherit_pass->mMacros)
-				{
-					*mMacros = *inherit_pass->mMacros;
-				}
 				for (; macro_node; macro_node = macro_node->getNextSibling("macro"))
 				{
 					std::string name = macro_node->getAttribString("name");
@@ -4914,29 +5146,10 @@ namespace Air
 					}
 				}
 			}
-			else if (inherit_pass)
-			{
-				mMacros = inherit_pass->mMacros;
-			}
 		}
-		uint64_t macros_hash;
-		{
-			RenderTechnique* tech = effect.getTechniqueByIndex(tech_index);
-			size_t hash_val = 0;
-			for (uint32_t i = 0; i < tech->getNumMacros(); ++i)
-			{
-				std::pair<std::string, std::string> const & name_value = tech->getMacroByIndex(i);
-				boost::hash_range(hash_val, name_value.first.begin(), name_value.first.end());
-				boost::hash_range(hash_val, name_value.second.begin(), name_value.second.end());
-			}
-			for (uint32_t i = 0; i < this->getNumMacros(); ++i)
-			{
-				std::pair<std::string, std::string> const & name_value = this->getMacroByIndex(i);
-				boost::hash_range(hash_val, name_value.first.begin(), name_value.first.end());
-				boost::hash_range(hash_val, name_value.second.begin(), name_value.second.end());
-			}
-			macros_hash = static_cast<uint64_t>(hash_val);
-		}
+
+
+
 		RasterizerStateDesc rs_desc;
 		DepthStencilStateDesc dss_desc;
 		BlendStateDesc bs_desc;
@@ -4949,6 +5162,9 @@ namespace Air
 			bs_desc = inherit_pass->mRenderStateObject->getBlendStateDesc();
 			mShaderDescIds = inherit_pass->mShaderDescIds;
 		}
+
+		uint64_t macros_hash = setDefaultShadingModelState(dt, bmt, smt, effect, tech_index, hasVertexShader);
+
 		for (XMLNodePtr state_node = node->getFirstNode("state"); state_node; state_node = state_node->getNextSibling("state"))
 		{
 			std::string state_name = state_node->getAttribString("name");
@@ -5303,6 +5519,20 @@ namespace Air
 					}
 				}
 
+				if (ShaderObject::ST_ComputeShader == type)
+				{
+					XMLAttributePtr disAtt = state_node->getAttrib("dispatch");
+					if (disAtt)
+					{
+						mUseDispach = false;
+						mDispatchParams = Vector3FromStr<int, 3>(disAtt->getValueString());
+					}
+					else
+					{
+						mUseDispach = true;
+					}
+				}
+
 				mShaderDescIds[type] = effect.addShaderDesc(sd);
 			}
 			else
@@ -5311,6 +5541,12 @@ namespace Air
 			}
 
 		}
+
+
+
+		
+
+
 		mRenderStateObject = rf.makeRenderStateObject(rs_desc, dss_desc, bs_desc);
 		auto const & shader_obj = this->getShaderObject(effect);
 
@@ -5341,6 +5577,72 @@ namespace Air
 
 	}
 #endif
+
+	uint64_t RenderPass::setDefaultShadingModelState(DomainType dt, BlendModeType bmt, ShadingModelType smt, RenderEffect& effect, uint32_t tech_index, bool hasVertexShader)
+	{
+		bool defaultVS = false;
+		bool defaultPS = false;
+
+		ShaderDesc vsdesc;
+		ShaderDesc fsdesc;
+
+
+		switch ((dt << (SMT_Num + BMT_Num)) | (bmt << SMT_Num) | smt)
+		{
+		case ((DT_Surface << (SMT_Num + BMT_Num)) | (BMT_Opaque << SMT_Num) | SMT_DefaultLit):
+
+			mMacros->emplace_back("STANDARDSURFACE", "1");
+			vsdesc.mFunctionName = "defaultModelVertexShader";
+			vsdesc.mProfile = "auto";
+			defaultVS = true;
+			break;
+		default:
+			if (DT_PostProcess == dt)
+			{
+				mMacros->emplace_back("POST_PROCESS", "1");
+				vsdesc.mFunctionName = "postProcessVertexShader";
+				vsdesc.mProfile = "auto";
+				defaultVS = true;
+			}
+			else
+			{
+				AIR_UNREACHABLE("invalid mateirals");
+				break;
+			}
+		}
+		uint64_t macros_hash;
+		{
+			RenderTechnique* tech = effect.getTechniqueByIndex(tech_index);
+			size_t hash_val = 0;
+			for (uint32_t i = 0; i < tech->getNumMacros(); ++i)
+			{
+				std::pair<std::string, std::string> const & name_value = tech->getMacroByIndex(i);
+				boost::hash_range(hash_val, name_value.first.begin(), name_value.first.end());
+				boost::hash_range(hash_val, name_value.second.begin(), name_value.second.end());
+			}
+			for (uint32_t i = 0; i < this->getNumMacros(); ++i)
+			{
+				std::pair<std::string, std::string> const & name_value = this->getMacroByIndex(i);
+				boost::hash_range(hash_val, name_value.first.begin(), name_value.first.end());
+				boost::hash_range(hash_val, name_value.second.begin(), name_value.second.end());
+			}
+			macros_hash = static_cast<uint64_t>(hash_val);
+		}
+		if (hasVertexShader)
+		{
+			if (defaultVS)
+			{
+				vsdesc.mMacrosHash = macros_hash;
+				mShaderDescIds[ShaderObject::ST_VertexShader] = effect.addShaderDesc(vsdesc);
+			}
+			if (defaultPS)
+			{
+				fsdesc.mMacrosHash = macros_hash;
+				mShaderDescIds[ShaderObject::ST_PixelShader] = effect.addShaderDesc(fsdesc);
+			}
+		}
+		return macros_hash;
+	}
 
 	void RenderPass::bind(RenderEffect const & effect) const
 	{

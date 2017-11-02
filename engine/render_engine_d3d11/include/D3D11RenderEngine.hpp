@@ -170,6 +170,9 @@ namespace Air
 		D3D11AdapterPtr const & getActiveAdapter() const;
 		void resetRenderStates();
 		virtual void doRender(RenderEffect const &effect, RenderTechnique const & tech, RenderLayout const & rl) override;
+
+		virtual void doDispatch(RenderEffect const & effect, RenderTechnique const & tech,
+			uint32_t tgx, uint32_t tgy, uint32_t tgz)override;
 		void doSuspend();
 		void doResume();
 

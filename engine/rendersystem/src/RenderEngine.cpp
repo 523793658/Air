@@ -176,6 +176,11 @@ namespace Air
 		this->doRender(effect, tech, rl);
 	}
 
+	void RenderEngine::dispatch(RenderEffect const & effect, RenderTechnique const & technique, uint32_t tgx, uint32_t tgy, uint32_t tgz)
+	{
+		this->doDispatch(effect, technique, tgx, tgy, tgz);
+	}
+
 	void RenderEngine::endPass()
 	{
 

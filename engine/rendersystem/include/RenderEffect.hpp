@@ -134,6 +134,42 @@ namespace Air
 		CBT_Frame,
 		CBT_Global
 	};
+	enum DomainType
+	{
+		DT_Surface = 1 << 0,
+		DT_DeferredDecal = 1 << 1,
+		DT_LightFunction = 1 << 2,
+		DT_PostProcess = 1 << 3,
+		DT_UserInterface = 1 << 4,
+	};
+#define DT_Num = 5
+
+	enum BlendModeType
+	{
+		BMT_Opaque = 1 << 0,
+		BMT_Masked = 1 << 1,
+		BMT_Translucent = 1 << 2,
+		BMT_Additive = 1 << 3,
+		BMT_Modulate = 1 << 4,
+		BMT_AlphaComposite = 1 << 5,
+	};
+#define BMT_Num 6
+
+	enum ShadingModelType
+	{
+		SMT_Unlit = 1 << 0,
+		SMT_DefaultLit = 1 << 1,
+		SMT_Subsurface = 1 << 2,
+		SMT_PreintegratedSkin = 1 << 3,
+		SMT_ClearCoat = 1 << 4,
+		SMT_SubsurfaceProfile = 1 << 5,
+		SMT_TwoSidedFoliage = 1 << 6,
+		SMT_Hair = 1 << 7,
+		SMT_Cloth = 1 << 8,
+		SMT_Eye = 1 << 9,
+	};
+
+#define SMT_Num 10
 
 
 	template<typename T>
@@ -891,6 +927,18 @@ protected:
 			BOOST_ASSERT(n < getNumMacros());
 			return (*mMacros)[n];
 		}
+
+		bool isUseDispatchParams() const
+		{
+			return mUseDispach;
+		}
+
+		int3 getDispatchParams() const
+		{
+			return mDispatchParams;
+		}
+	private:
+		uint64_t setDefaultShadingModelState(DomainType dt, BlendModeType bmt, ShadingModelType smt, RenderEffect& effect, uint32_t tech_index, bool hasVertexShader = true);
 	private:
 		std::string mName;
 		size_t mNameHash;
@@ -899,6 +947,10 @@ protected:
 		std::array<uint32_t, ShaderObject::ST_NumShaderTypes> mShaderDescIds;
 		RenderStateObjectPtr mRenderStateObject;
 		uint32_t mShaderObjectIndex;
+		int3 mDispatchParams;
+		bool mUseDispach{ true };
+
+		uint32_t mFlags{ DT_Surface | BMT_Opaque | SMT_DefaultLit };
 		bool mIsValidate;
 	};
 

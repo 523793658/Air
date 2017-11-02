@@ -25,6 +25,8 @@ namespace Air
 
 		void render(RenderEffect const &effect, RenderTechnique const & tech, RenderLayout const & rl);
 
+		void dispatch(RenderEffect const & effect, RenderTechnique const & technique, uint32_t tgx, uint32_t tgy, uint32_t tgz);
+
 		virtual void endPass();
 		virtual void endFrame();
 		virtual void updateGPUTimestampsFrequency();
@@ -99,6 +101,9 @@ namespace Air
 		virtual void doSuspend() = 0;
 		virtual void doResume() = 0;
 		virtual void doRender(RenderEffect const &effect, RenderTechnique const & tech, RenderLayout const & rl) = 0;
+
+		virtual void doDispatch(RenderEffect const & effect, RenderTechnique const & tech,
+			uint32_t tgx, uint32_t tgy, uint32_t tgz) = 0;
 
 	protected:
 		FrameBufferPtr mCurrenFrameBuffer;

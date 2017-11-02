@@ -99,8 +99,7 @@ namespace Air
 		if (this->isHWResourceReady())
 		{
 			char const *p = reinterpret_cast<char const *>(&desc);
-			size_t hash_val = 0;
-			boost::hash_range(hash_val, p, p + sizeof(desc));
+			size_t hash_val = boost::hash_range(p, p + sizeof(desc));
 			auto iter = mD3DRenderTargetViews.find(hash_val);
 			if (iter != mD3DRenderTargetViews.end())
 			{

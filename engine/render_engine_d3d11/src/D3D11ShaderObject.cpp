@@ -739,7 +739,7 @@ namespace Air
 				re.setConstantBuffers(static_cast<ShaderObject::ShaderType>(st), mD3DCBuffers[st]);
 			}
 		}
-		if (mSoTemplate->mComputeShader && !!mUAVS.empty())
+		if (mSoTemplate->mComputeShader && !mUAVS.empty())
 		{
 			for (uint32_t i = 0; i < mUAVS.size(); ++i)
 			{

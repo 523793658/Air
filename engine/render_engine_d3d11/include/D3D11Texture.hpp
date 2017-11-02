@@ -15,9 +15,9 @@ namespace Air
 
 
 		//子类去实现，由于1d，2d，3d纹理的长、宽、深度定义不同
-		uint32_t getWidth(uint32_t level) const;
-		uint32_t getHeight(uint32_t level) const;
-		uint32_t getDepth(uint32_t level) const;
+		uint32_t getWidth(uint32_t level = 0) const;
+		uint32_t getHeight(uint32_t level = 0) const;
+		uint32_t getDepth(uint32_t level = 0) const;
 
 
 		virtual ID3D11RenderTargetViewPtr const & retriveD3DRenderTargetView(uint32_t first_array_index, uint32_t array_size, uint32_t level);
@@ -74,6 +74,16 @@ namespace Air
 
 		virtual void createHWResource(ArrayRef<ElementInitData> init_data) override;
 		uint32_t getWidth(uint32_t level) const;
+
+	private:
+		virtual D3D11_SHADER_RESOURCE_VIEW_DESC fillSRVDesc(uint32_t first_array_index, uint32_t num_items,
+			uint32_t first_level, uint32_t num_levels) const override;
+
+		D3D11_RENDER_TARGET_VIEW_DESC fillRTVDesc(uint32_t first_array_index, uint32_t num_items, uint32_t first_level) const override;
+
+		D3D11_DEPTH_STENCIL_VIEW_DESC fillDSVDesc(uint32_t first_array_index, uint32_t array_size, uint32_t level) const override;
+
+		virtual D3D11_UNORDERED_ACCESS_VIEW_DESC fillUAVDesc(uint32_t first_array_index, uint32_t num_items, uint32_t level) const override;
 	private:
 		uint32_t mWidth;
 	};
@@ -91,7 +101,7 @@ namespace Air
 		uint32_t getHeight(uint32_t level) const;
 
 	private:
-		virtual D3D11_SHADER_RESOURCE_VIEW_DESC D3D11Texture2D::fillSRVDesc(uint32_t first_array_index, uint32_t num_items,
+		virtual D3D11_SHADER_RESOURCE_VIEW_DESC fillSRVDesc(uint32_t first_array_index, uint32_t num_items,
 			uint32_t first_level, uint32_t num_levels) const override;
 
 		D3D11_RENDER_TARGET_VIEW_DESC fillRTVDesc(uint32_t first_array_index, uint32_t num_items, uint32_t first_level) const override;

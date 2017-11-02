@@ -82,6 +82,7 @@ namespace Air
 			return static_cast<T>(static_cast<int>(x > 0 ? x : (x - 1)));
 		}
 
+
 		// 取x的小数部分
 		template <typename T>
 		inline T

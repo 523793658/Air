@@ -43,6 +43,8 @@ namespace Air
 
 		virtual RenderViewPtr Make2DDepthStencilRenderView(TexturePtr const & texture, int first_array_index, int array_size, int level) = 0;
 
+		TexturePtr MakeTexture1D(uint32_t width, uint32_t num_mip_maps, uint32_t array_size, ElementFormat format, uint32_t sample_count, uint32_t sample_quality, uint32_t access_hit, ArrayRef<ElementInitData> init_data = {});
+
 		TexturePtr MakeTexture2D(uint32_t width, uint32_t height, uint32_t num_mip_maps, uint32_t array_size, ElementFormat format, uint32_t sample_count, uint32_t sample_quality, uint32_t access_hint, ArrayRef<ElementInitData> init_data = {});
 
 		SamplerStateObjectPtr MakeSamplerStateObject(SamplerStateDesc const & desc);

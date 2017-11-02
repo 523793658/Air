@@ -41,7 +41,7 @@ namespace Air
 	{
 		va_list args;
 		va_start(args, fmt);
-		std::array<char, 1024> buffer;
+		std::array<char, 1024 * 10> buffer;
 		vsprintf(&buffer[0], fmt, args);
 		std::clog << "(WARN) Air: " << &buffer[0] << std::endl;
 #ifdef AIR_DEBUG

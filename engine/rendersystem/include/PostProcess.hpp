@@ -10,6 +10,7 @@ namespace Air
 	enum PostProcessType
 	{
 		PPT_ToneMapping,
+		PPT_HDR,
 
 		PPT_CUSTOM			//自定义后处理类型
 	};
@@ -18,6 +19,10 @@ namespace Air
 	{
 		uint32_t mType;
 		std::string mName;
+		PostProcessChain * mChain;
+		virtual ~PostProcessConfig() = 0
+		{
+		}
 	};
 
 	class AIR_CORE_API PostProcesser
@@ -27,16 +32,27 @@ namespace Air
 		PostProcesser(PostProcessChain* chain);
 		~PostProcesser();
 
-		virtual void update();
-		virtual void render();
+		virtual void update() = 0;
+		virtual void render() = 0;
 
 		virtual void setOutputFrameBuffer(FrameBufferPtr const & output);
 		virtual void setInputTexture(uint16_t index, TexturePtr srcTex);
 
+		virtual void setOuputTexture(uint16_t index, TexturePtr const & tex);
+
+		virtual void setConfig(PostProcessConfigPtr config);
+
+		virtual void onRenderBegin();
+
+		virtual void onRenderEnd();
+
 	protected:
+
+		PostProcessConfigPtr mConfig;
 		std::vector<TexturePtr> mSrcTextures;
 		FrameBufferPtr mOutputFrameBuffer;
-		PostProcessChain * mChain;
+		std::vector<TexturePtr> mOutputTexture;
+		bool mDirty{ true };
 	};
 
 
@@ -44,7 +60,7 @@ namespace Air
 	{
 	public:
 		virtual std::shared_ptr<PostProcessConfig> loadCfg(XMLNodePtr const & node) = 0;
-		virtual PostProcesser* createInstance(std::shared_ptr<PostProcessConfig> const & cfg, PostProcessChain* chain) = 0;
+		virtual PostProcesser* createInstance(std::shared_ptr<PostProcessConfig> const & cfg) = 0;
 	};
 
 	class AIR_CORE_API PostProcessChain
@@ -60,9 +76,10 @@ namespace Air
 
 		RenderablePtr const & getRenderable() const;
 
+
 	public:
 		static void registerProcesser(std::string name, PostProcesserCreator* creater);
-
+		static PostProcesserCreator* getProcesserCreator(std::string name);
 	private:
 		static std::unordered_map<std::string, PostProcesserCreator*> mProcesserCreators;
 	private:

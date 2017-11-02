@@ -44,9 +44,9 @@ namespace Air
 
 
 		//子类去实现，由于1d，2d，3d纹理的长、宽、深度定义不同
-		virtual uint32_t getWidth(uint32_t level) const = 0;
-		virtual uint32_t getHeight(uint32_t level) const = 0;
-		virtual uint32_t getDepth(uint32_t level) const = 0;
+		virtual uint32_t getWidth(uint32_t level = 0) const = 0;
+		virtual uint32_t getHeight(uint32_t level = 0) const = 0;
+		virtual uint32_t getDepth(uint32_t level = 0) const = 0;
 
 	public:
 		virtual void deleteHWResource() = 0;

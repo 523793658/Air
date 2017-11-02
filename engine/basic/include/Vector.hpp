@@ -172,6 +172,7 @@ namespace Air
 			return mVec[index];
 		}
 
+
 		reference x() AIR_NOEXCEPT
 		{
 			static_assert(elem_num >= 1, "Must be 1D vector");

@@ -1126,6 +1126,28 @@ namespace Air
 		mNumDrawsJustCalled += num_passes;
 	}
 
+	void D3D11RenderEngine::doDispatch(RenderEffect const & effect, RenderTechnique const & tech,
+		uint32_t tgx, uint32_t tgy, uint32_t tgz)
+	{
+		uint32_t const num_passes = tech.getNumPasses();
+		for (uint32_t i = 0; i < num_passes; ++i)
+		{
+			auto & pass = tech.getPass(i);
+			pass.bind(effect);
+			if (pass.isUseDispatchParams())
+			{
+				mD3DIMMContext->Dispatch(tgx, tgy, tgz);
+			}
+			else
+			{
+				int3 param = pass.getDispatchParams();
+				mD3DIMMContext->Dispatch(param.x(), param.y(), param.z());
+			}
+			pass.unbind(effect);
+		}
+		mNumDispatchesJustCalled += num_passes;
+	}
+
 	void D3D11RenderEngine::setRasterizerState(ID3D11RasterizerState* ras)
 	{
 		if (mRenderCache.mRasterizerState != ras)

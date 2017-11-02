@@ -6,7 +6,7 @@ namespace Air
 {
 	ElementFormat parseFormat(std::string formatStr)
 	{
-		int32_t hash_value = boost::hash_range(formatStr.begin(), formatStr.end());
+		size_t hash_value = boost::hash_range(formatStr.begin(), formatStr.end());
 		switch (hash_value)
 		{
 		case CT_HASH("EF_A8"):

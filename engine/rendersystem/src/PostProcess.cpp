@@ -18,14 +18,8 @@ namespace Air
 	std::unordered_map<std::string, PostProcesserCreator*> PostProcessChain::mProcesserCreators;
 
 	PostProcesser::PostProcesser()
-		: mChain(nullptr)
 	{
 
-	}
-
-	PostProcesser::PostProcesser(PostProcessChain* chain)
-		:mChain(chain)
-	{
 	}
 
 	PostProcesser::~PostProcesser()
@@ -33,19 +27,25 @@ namespace Air
 
 	}
 
-	void PostProcesser::update()
-	{
-		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
-		re.bindFrameBuffer(mOutputFrameBuffer);
-	}
-
-	void PostProcesser::render()
-	{
-	}
-
 	void PostProcesser::setOutputFrameBuffer(FrameBufferPtr const & output)
 	{
 		mOutputFrameBuffer = output;
+	}
+
+	void PostProcesser::setOuputTexture(uint16_t index, TexturePtr const & tex)
+	{
+		if (mOutputTexture.size() <= index)
+		{
+			mOutputTexture.resize(index + 1);
+		}
+		mOutputTexture[index] = tex;
+		mDirty = true;
+	}
+
+	void PostProcesser::setConfig(PostProcessConfigPtr config)
+	{
+		mConfig = config;
+		mDirty = true;
 	}
 
 	void PostProcesser::setInputTexture(uint16_t index, TexturePtr srcTex)
@@ -55,6 +55,16 @@ namespace Air
 			mSrcTextures.resize(index + 1);
 		}
 		mSrcTextures[index] = srcTex;
+		mDirty = true;
+	}
+
+	void PostProcesser::onRenderBegin()
+	{
+
+	}
+	void PostProcesser::onRenderEnd()
+	{
+
 	}
 
 	PostProcessChain::PostProcessChain()
@@ -75,6 +85,7 @@ namespace Air
 		{
 			std::string name = processerNode->getAttribString("name");
 			PostProcessConfigPtr config = PostProcessChain::mProcesserCreators.find(name)->second->loadCfg(processerNode);
+			config->mChain = this;
 			config->mName = name;
 			mConfigs.push_back(config);
 
@@ -130,7 +141,7 @@ namespace Air
 			fmt = EF_ARGB8;
 		}
 
-		TexturePtr clr_tex = rf.MakeTexture2D(width, height, 1, 1, fmt, 1, 0, EAH_GPU_Read | EAH_GPU_Write);
+		TexturePtr clr_tex = rf.MakeTexture2D(width, height, 1, 1, fmt, 1, 0, EAH_GPU_Read | EAH_GPU_Write | EAH_GPU_Unordered);
 		RenderViewPtr clr_view = rf.Make2DRenderView(clr_tex, 0, 1, 0);
 		mSceneFrameBuffer->attach(FrameBuffer::ATT_Color0, clr_view);
 		mSceneFrameBuffer->attach(FrameBuffer::ATT_DepthStencil, dsView);
@@ -160,7 +171,7 @@ namespace Air
 				else
 				{
 					output = rf.makeFrameBuffer();
-					TexturePtr ct = rf.MakeTexture2D(width, height, 1, 1, fmt, 1, 0, EAH_GPU_Read | EAH_GPU_Write);
+					TexturePtr ct = rf.MakeTexture2D(width, height, 1, 1, fmt, 1, 0, EAH_GPU_Read | EAH_GPU_Write | EAH_GPU_Unordered);
 					output->attach(FrameBuffer::ATT_Color0, rf.Make2DRenderView(ct, 0, 1, 0));
 				}
 			}
@@ -195,7 +206,7 @@ namespace Air
 
 	PostProcesser* PostProcessChain::createPostProcesser(PostProcessConfigPtr config)
 	{
-		return mProcesserCreators.find(config->mName)->second->createInstance(config, this);
+		return mProcesserCreators.find(config->mName)->second->createInstance(config);
 	}
 
 	void PostProcessChain::registerProcesser(std::string name, PostProcesserCreator* creater)
@@ -204,6 +215,12 @@ namespace Air
 		{
 			mProcesserCreators.emplace(name, creater);
 		}
+	}
+
+	PostProcesserCreator* PostProcessChain::getProcesserCreator(std::string name)
+	{
+		BOOST_ASSERT(mProcesserCreators.find(name) != mProcesserCreators.end());
+		return mProcesserCreators.find(name)->second;
 	}
 
 	RenderablePtr const & PostProcessChain::getRenderable() const
