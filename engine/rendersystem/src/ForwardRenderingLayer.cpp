@@ -9,7 +9,7 @@ namespace Air
 
 	class ForwardLightingPass : RenderLayerPass
 	{
-
+		Engine::getInstance().getSceneManangerInstance().
 	};
 
 
