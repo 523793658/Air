@@ -3,25 +3,19 @@
 #pragma once
 #include "PreDeclare.h"
 #include <functional>
-
+#include "rendersystem/include/RenderLayer.hpp"
 
 namespace Air
 {
-	class AIR_CORE_API RenderingLayer : boost::noncopyable
-	{
-	public:
-		virtual void update(uint32_t pass) = 0;
-	};
 
-	class AIR_CORE_API ForwardRenderingLayer : public RenderingLayer
+	class AIR_CORE_API ForwardRenderingLayer : public RenderLayer
 	{
 	public:
 		ForwardRenderingLayer();
 
-		virtual void update(uint32_t pass) override;
-
 	private:
 		std::vector<LightSourcePtr> mLights;
+
 	};
 
 

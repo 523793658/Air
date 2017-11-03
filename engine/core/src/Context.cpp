@@ -117,8 +117,21 @@ namespace Air
 	{
 		if (mApp->getMainWnd()->getActive())
 		{
-			mRenderFactory->getRenderEngineInstance().refresh();
+			//时间处理引擎更新
 			mInputFactory->getInputEngineInstance().update();
+
+			//更新逻辑
+			mApp->update(0);
+
+			//UI更新
+
+			//更新场景
+			mSceneMgr->update();
+
+			//渲染引擎更新
+			mRenderFactory->getRenderEngineInstance().refresh();
+
+
 		}
 	}
 

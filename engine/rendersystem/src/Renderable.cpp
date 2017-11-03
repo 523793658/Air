@@ -47,7 +47,7 @@ namespace Air
 
 	void Renderable::addToRenderQueue()
 	{
-		Engine::getInstance().getSceneManangerInstance().addRenderable(this);
+		Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance().addRenderableToQueue(this);
 	}
 
 	void Renderable::render()

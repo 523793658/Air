@@ -46,6 +46,7 @@
 				"../basic/include/ArrayRef.hpp",
 				"../basic/include/Reflection.hpp",
 				"../basic/include/Json.hpp",
+				"../basic/include/Date.hpp",
 				
 				"../basic/src/Thread.cpp",
 				"../basic/src/CPP11.cpp",
@@ -73,6 +74,7 @@
 				"../basic/src/ArrayRef.cpp",
 				"../basic/src/Reflection.cpp",
 				"../basic/src/Json.cpp",
+				"../basic/src/Date.cpp",
 			],
 			"conditions":[
 				[

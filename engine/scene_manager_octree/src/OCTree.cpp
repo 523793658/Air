@@ -50,7 +50,7 @@ namespace Air
 		}
 	}
 
-	void OCTree::markNodeObjs(size_t index, bool force)
+	void OCTree::markNodeObjs(size_t index, bool force, uint32_t mask, std::vector<SceneObject*> & result)
 	{
 		BOOST_ASSERT(index < mNodes.size());
 		App3DFramework& app = Engine::getInstance().getAppInstance();
@@ -61,7 +61,7 @@ namespace Air
 		{
 			for (auto const & so : node.mSceneObjects)
 			{
-				if ((BO_No == so->getVisibleMark()) && so->isVisible())
+				if ((BO_No == so->getVisibleMark()) && (mask & so->getAttrib()))
 				{
 					BoundOverlap visible = this->visibleTestFromParent(so, camera.getForwardVec(), camera.getEyePos(), view_proj);
 					if (BO_Partial == visible)
@@ -77,6 +77,10 @@ namespace Air
 						}
 					}
 					so->setVisibleMark(visible);
+					if (visible != BO_No)
+					{
+						result.push_back(so);
+					}
 				}
 			}
 			if (node.mFirstChildIndex >= 0)
@@ -91,19 +95,23 @@ namespace Air
 		{
 			for (auto const & so : node.mSceneObjects)
 			{
-				so->setVisibleMark(BO_Yes);
+				if (mask & so->getAttrib())
+				{
+					so->setVisibleMark(BO_Yes);
+					result.push_back(so);
+				}
 			}
 			if (node.mFirstChildIndex >= 0)
 			{
 				for (int i = 0; i < 8; ++i)
 				{
-					this->markNodeObjs(node.mFirstChildIndex + i, true);
+					this->markNodeObjs(node.mFirstChildIndex + i, true, mask);
 				}
 			}
 		}
 	}
 
-	void OCTree::clipScene()
+	void OCTree::clipScene(uint32_t mask, std::vector<SceneObject*> & result)
 	{
 		for (auto it : mNodes)
 		{
@@ -125,7 +133,7 @@ namespace Air
 		{
 			if (!mNodes.empty())
 			{
-				this->markNodeObjs(0, false);
+				this->markNodeObjs(0, false, mask, result);
 			}
 		}
 		

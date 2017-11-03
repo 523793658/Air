@@ -27,7 +27,7 @@ float3 toneMap(float3 color, float3 blur, float adapted_lum)
 	}
 	float adapted_lum_dest = 2 / (max(0.1f, 1 + 10 * EyeAdaption(adapted_lum)));
 	//return ACESFilm(adapted_lum_dest * u_Params.y * color);
-	return adapted_lum;
+	return color;
 }
 
 void tonemappingVS(float4 pos : POSITION,

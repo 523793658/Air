@@ -74,7 +74,7 @@ namespace Air
 		void LookAt(float3 const & eye, float3 const & lookAt, float3 const & up);
 		void Proj(float nearPlane, float farPlane);
 
-	protected:
+	public:
 		uint32_t update(uint32_t pass);
 		//void UpdateStats();
 

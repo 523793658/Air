@@ -26,9 +26,10 @@ namespace Air
 
 	}
 
+	//更新节点等操作
 	void SceneManager::update()
 	{
-		RenderEngine& renderEngine = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		/*RenderEngine& renderEngine = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		renderEngine.beginFrame();
 		this->flushScene();
 
@@ -36,7 +37,7 @@ namespace Air
 
 		FrameBuffer& fb = *renderEngine.getScreenFrameBuffer();
 		fb.swapBuffers();
-		renderEngine.endFrame();
+		renderEngine.endFrame();*/
 	}
 
 	void SceneManager::prepareRenderQueue(std::vector<SceneObjectPtr> const & objs, bool visibleTest)
@@ -76,7 +77,7 @@ namespace Air
 	}
 
 
-	void SceneManager::flush(uint32_t urt)
+	/*void SceneManager::flush(uint32_t urt)
 	{
 		std::lock_guard<std::mutex> lock(mUpdateMutex);
 		mURT = urt;
@@ -144,6 +145,9 @@ namespace Air
 
 		prepareRenderQueue(mSceneObjs);
 
+
+
+
 		std::sort(mRenderQueue.begin(), mRenderQueue.end(), [](std::pair<RenderTechnique const *, std::vector<Renderable*>> const & lhs,
 			std::pair<RenderTechnique const *, std::vector<Renderable*>> const & rhs)
 		{
@@ -164,7 +168,7 @@ namespace Air
 		mNumPrimitivesRendered += re.getNumPrimitivesJustRendered();
 		mNumVerticesRendered += re.getNumVerticesJustRendered();
 		urt = 0;
-	}
+	}*/
 
 	BoundOverlap SceneManager::visibleTestFromParent(SceneObject* obj, float3 const & view_dir, float3 const & eye_pos, float4x4 const & view_proj)
 	{
@@ -208,7 +212,7 @@ namespace Air
 		return visible;
 	}
 
-	void SceneManager::clipScene()
+	void SceneManager::clipScene(uint32_t mask, std::vector<SceneObject*> & result)
 	{
 		App3DFramework& app = Engine::getInstance().getAppInstance();
 		Camera& camera = app.getActiveCamera();
@@ -218,32 +222,37 @@ namespace Air
 			auto so = obj.get();
 			BoundOverlap visible;
 			uint32_t const attr = so->getAttrib();
-			if (so->isVisible())
+			if (attr & mask)
 			{
-				visible = this->visibleTestFromParent(so, camera.getForwardVec(), camera.getEyePos(), viewProjMat);
-				if (BO_Partial == visible)
+				if (SceneObject::SOA_Cullable & attr)
 				{
-					if (attr & SceneObject::SOA_Moveable) 
+					visible = this->visibleTestFromParent(so, camera.getForwardVec(), camera.getEyePos(), viewProjMat);
+				
+					if (BO_Partial == visible)
 					{
-						so->updateWorldMatrix();
-					}
-					if (attr & SceneObject::SOA_Cullable)
-					{
+						if (attr & SceneObject::SOA_Moveable)
+						{
+							so->updateWorldMatrix();
+						}
 						visible = (MathLib::perspective_area(camera.getEyePos(), viewProjMat, so->getAABB()) > mSmallObjThreshold) ? BO_Yes : BO_No;
+						if (!camera.getOmniDirectionalMode() && (attr & SceneObject::SOA_Cullable) && (BO_Yes == visible))
+						{
+							visible = this->testAABBVisible(so->getAABB());
+						}
 					}
-					else
-					{
-						visible = BO_Yes;
-					}
-					if (!camera.getOmniDirectionalMode() && (attr & SceneObject::SOA_Cullable) && (BO_Yes == visible))
-					{
-						visible = this->testAABBVisible(so->getAABB());
-					}
+				}
+				else
+				{
+					visible = BO_Yes;
 				}
 			}
 			else
 			{
 				visible = BO_No;
+			}
+			if (visible != BO_No)
+			{
+				result.push_back(so);
 			}
 			so->setVisibleMark(visible);
 		}
@@ -251,7 +260,8 @@ namespace Air
 
 	void SceneManager::flushScene()
 	{
-		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+
+		/*RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
 		mVisibleMarksMap.clear();
 		uint32_t urt;
 		App3DFramework& app = Engine::getInstance().getAppInstance();
@@ -268,7 +278,7 @@ namespace Air
 			{
 				break;
 			}
-		}
+		}*/
 // 		re.postProcess((urt & App3DFramework::URV_SkipPostProcess) != 0);
 // 		if (re.getStereo() != STM_None)
 // 		{
@@ -277,8 +287,8 @@ namespace Air
 // 		}
 // 		this->flush(App3DFramework::URV_Overlay);
 // 		//re.ste
-		mNumDrawCalls = re.getNumDrawsJustCalled();
-		mNumDispatchCalls = re.getNumDispatchesJustCalled();
+		//mNumDrawCalls = re.getNumDrawsJustCalled();
+		//mNumDispatchCalls = re.getNumDispatchesJustCalled();
 	}
 
 	void SceneManager::addRenderable(Renderable* obj)
@@ -387,28 +397,17 @@ namespace Air
 		}
 	}
 
-	void SceneManager::markVisibleSceneObject(CameraPtr const & camera)
+	void SceneManager::querySceneObject(CameraPtr const & camera, uint32_t mask)
 	{
 		mFrustum = &camera->getViewFrustum();
-
-		std::vector<uint32_t> visible_list((mSceneObjs.size() + 31) / 32, 0);
-		for (size_t i = 0; i < mSceneObjs.size(); ++i)
-		{
-			if (mSceneObjs[i]->isVisible())
-			{
-				visible_list[i / 32] |= (1UL << (i & 31));
-			}
-		}
 		size_t seed = 0;
-		boost::hash_range(seed, visible_list.begin(), visible_list.end());
 		boost::hash_combine(seed, camera->getOmniDirectionalMode());
 		boost::hash_combine(seed, &camera);
 
 		auto vmiter = mVisibleMarksMap.find(seed);
 		if (vmiter == mVisibleMarksMap.end())
 		{
-			this->clipScene();
-
+			this->clipScene(mask);
 			auto visible_marks = MakeUniquePtr<std::vector<BoundOverlap>>(mSceneObjs.size());
 			for (size_t i = 0; i < mSceneObjs.size(); ++i)
 			{

@@ -141,7 +141,7 @@ namespace Air
 			fmt = EF_ARGB8;
 		}
 
-		TexturePtr clr_tex = rf.MakeTexture2D(width, height, 1, 1, fmt, 1, 0, EAH_GPU_Read | EAH_GPU_Write | EAH_GPU_Unordered);
+		TexturePtr clr_tex = rf.MakeTexture2D(width, height, 1, 1, fmt, 1, 0, EAH_GPU_Read | EAH_GPU_Write);
 		RenderViewPtr clr_view = rf.Make2DRenderView(clr_tex, 0, 1, 0);
 		mSceneFrameBuffer->attach(FrameBuffer::ATT_Color0, clr_view);
 		mSceneFrameBuffer->attach(FrameBuffer::ATT_DepthStencil, dsView);
@@ -171,7 +171,7 @@ namespace Air
 				else
 				{
 					output = rf.makeFrameBuffer();
-					TexturePtr ct = rf.MakeTexture2D(width, height, 1, 1, fmt, 1, 0, EAH_GPU_Read | EAH_GPU_Write | EAH_GPU_Unordered);
+					TexturePtr ct = rf.MakeTexture2D(width, height, 1, 1, fmt, 1, 0, EAH_GPU_Read | EAH_GPU_Write);
 					output->attach(FrameBuffer::ATT_Color0, rf.Make2DRenderView(ct, 0, 1, 0));
 				}
 			}

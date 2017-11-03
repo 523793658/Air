@@ -29,6 +29,8 @@
 #include "basic/include/Math.hpp"
 namespace Air
 {
+
+	void AIR_CORE_API initPlatform();
 	class AIR_CORE_API Window
 	{
 	public:

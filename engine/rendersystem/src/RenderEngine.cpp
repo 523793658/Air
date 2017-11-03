@@ -8,6 +8,9 @@
 #include "rendersystem/include/RenderStateObject.hpp"
 #include "scene_manager/include/SceneManager.hpp"
 #include "rendersystem/include/PostProcess.hpp"
+#include "rendersystem/include/RenderLayer.hpp"
+#include "rendersystem/include/Renderable.hpp"
+#include "scene_manager/include/SceneObject.hpp"
 
 #include "rendersystem/include/RenderEngine.hpp"
 namespace Air
@@ -89,7 +92,14 @@ namespace Air
 
 	void RenderEngine::refresh()
 	{
-		Engine::getInstance().getSceneManangerInstance().update();
+		beginFrame();
+		for (auto layer : mRenderLayers)
+		{
+			layer->update();
+		}
+		postProcess(false);
+		mScreenFrameBuffer->swapBuffers();
+		endFrame();
 	}
 
 	void RenderEngine::destroyRenderWindow()
@@ -169,6 +179,54 @@ namespace Air
 	void RenderEngine::beginPass()
 	{
 
+	}
+
+	void RenderEngine::addRenderableToQueue(Renderable* obj)
+	{
+		if (obj->isHWResourceReady())
+		{
+			RenderTechnique const * objTech = obj->getRenderTechnique();
+			BOOST_ASSERT(objTech);
+			bool found = false;
+			for (auto & items : mRenderQueue)
+			{
+				if (items.first == objTech)
+				{
+					items.second.push_back(obj);
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+			{
+				mRenderQueue.emplace_back(objTech, std::vector<Renderable*>(1, obj));
+			}
+		}
+	}
+
+	void RenderEngine::prepareRenderQueue(std::vector<SceneObjectPtr> const & objs, bool visibleTest)
+	{
+		for (auto const & obj : objs)
+		{
+			auto so = obj.get();
+			if (0 == so->getNumChildren())
+			{
+				auto renderable = so->getRenderable().get();
+				if (renderable)
+				{
+					if (0 == renderable->getNumInstances())
+					{
+						renderable->addToRenderQueue();
+					}
+					renderable->addInstance(so);
+				}
+			}
+		}
+	}
+
+	void RenderEngine::renderObjects(std::vector<SceneObjectPtr> const & objs)
+	{
+		prepareRenderQueue(objs, false);
 	}
 
 	void RenderEngine::render(RenderEffect const &effect, RenderTechnique const & tech, RenderLayout const & rl)

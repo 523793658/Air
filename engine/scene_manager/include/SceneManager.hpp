@@ -18,7 +18,7 @@ namespace Air
 // 
 // 		void setSmallObjectThreshold(float area);
 // 		void sceneObjectElapse(float elapse);
- 		virtual void clipScene();
+ 		virtual void clipScene(uint32_t mask, std::vector<SceneObject*> & result);
 // 
 // 		void addCamera(CameraPtr const & camera);
 // 		void delCamera(CameraPtr const & camera);
@@ -26,7 +26,7 @@ namespace Air
 // 		uint32_t getNumCameras() const;
 // 		CameraPtr& getCamera(uint32_t index);
 // 		CameraPtr const & getCamera(uint32_t index) const;
-		void markVisibleSceneObject(CameraPtr const & camera);
+		void querySceneObject(CameraPtr const & camera, uint32_t mask);
 
 		void addRenderable(Renderable* obj);
 

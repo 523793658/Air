@@ -4,21 +4,48 @@
 
 #include <basic/include/Math.hpp>
 #include <Basic/include/Util.h>
-
+#include <basic/include/Timer.hpp>
 #include <app/include/Window.hpp>
+#include "boost/date_time/posix_time/posix_time.hpp"
 
 #if (_WIN32_WINNT >= _WIN32_WINNT_WINBLUE)
 #include <VersionHelpers.h>
 #include <ShellScalingApi.h>
 #endif
-
+#include <ImageHlp.h>
+#include <windows.h>
 #include <windowsx.h>
 #ifndef GET_KEYSTATE_WPARAM
 #define GET_KEYSTATE_WPARAM(wParam) (LOWORD(wParam))
 #endif // !GET_KEYSTATE_WPARAM
 
+#pragma comment(lib, "dbghelp.lib")
+#define BOOST_DATE_TIME_SOURCE
+
 namespace Air
 {
+	LONG WINAPI UnhandledExceptionFilter2(struct _EXCEPTION_POINTERS* ExceptionInfo)
+	{
+		//std::wstring strDumpFile = boost::posix_time::to_iso_wstring(boost::posix_time::second_clock::local_time());
+		std::wstring strDumpFile = L"dump.dump";
+		HANDLE hFile = CreateFile(strDumpFile.c_str(), GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (hFile != INVALID_HANDLE_VALUE)
+		{
+			MINIDUMP_EXCEPTION_INFORMATION ExInfo;
+			ExInfo.ThreadId = ::GetCurrentThreadId();
+			ExInfo.ExceptionPointers = ExceptionInfo;
+			ExInfo.ClientPointers = NULL;
+			bool bOk = MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpWithFullMemory, &ExInfo, NULL, NULL);
+			CloseHandle(hFile);
+		}
+		return EXCEPTION_EXECUTE_HANDLER;
+	}
+
+	void initPlatform()
+	{
+		SetUnhandledExceptionFilter(UnhandledExceptionFilter2);
+	}
+
 	LRESULT Window::wndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 #ifdef AIR_COMPILER_MSVC

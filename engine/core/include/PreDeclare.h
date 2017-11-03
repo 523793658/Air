@@ -159,6 +159,11 @@ namespace Air
 	struct VertexElement;
 
 	class InputFactory;
+
+	class RenderLayer;
+
+	class RenderLayerPass;
+	typedef std::shared_ptr<RenderLayerPass> RenderLayerPassPtr;
 }
 
 

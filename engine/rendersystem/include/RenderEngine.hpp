@@ -94,7 +94,13 @@ namespace Air
 
 		virtual TexturePtr const & getScreenDepthStencilTexture() const = 0;
 
+		void addRenderableToQueue(Renderable* renderable);
+
+
+
 	private:
+		void prepareRenderQueue(std::vector<SceneObjectPtr> const & objs, bool visibleTest);
+
 		virtual void checkConfig(RenderSettings& settings);
 		virtual void doCreateRenderWindow(std::string const & name, RenderSettings const & settings) = 0;
 		virtual void doBindFrameBuffer(FrameBufferPtr const & fb) = 0;
@@ -106,10 +112,17 @@ namespace Air
 			uint32_t tgx, uint32_t tgy, uint32_t tgz) = 0;
 
 	protected:
+		void renderObjects(std::vector<SceneObjectPtr> const & objs);
+
+	protected:
+
+	protected:
 		FrameBufferPtr mCurrenFrameBuffer;
 		FrameBufferPtr mScreenFrameBuffer;
 		FrameBufferPtr mDefaultFrameBuffer;
 		FrameBufferPtr mOverlayFrameBuffer;
+
+		std::vector<RenderLayer*> mRenderLayers;
 
 		float mStereoSeparation;
 		RenderDeviceCaps mCaps;
@@ -134,6 +147,8 @@ namespace Air
 		RenderEnvironment mRenderEnvironment;
 
 		PostProcessChainPtr mPostProcessChain;
+
+		std::vector<std::pair<RenderTechnique const *, std::vector<Renderable*>>> mRenderQueue;
 
 		bool mForceLineMode;
 	};

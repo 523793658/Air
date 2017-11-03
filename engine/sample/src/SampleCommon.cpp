@@ -4,10 +4,12 @@
 #include "rendersystem/include/RenderableHelper.hpp"
 #include "rendersystem/include/Mesh.hpp"
 #include "rendersystem/include/RenderMaterial.hpp"
+#include "app/include/Window.hpp"
 #include "SampleCommon.hpp"
 
 int main()
 {
+	Air::initPlatform();
 	return entryFunc();
 }
 

@@ -23,7 +23,7 @@ namespace Air
 	public:
 		OCTree(AABBox &&size);
 		OCTree(AABBox const & size);
-		virtual void clipScene() override;
+		virtual void clipScene(uint32_t mask, std::vector<SceneObject*> & result) override;
 
 	protected:
 		virtual void onAddSceneObject(SceneObjectPtr const & obj);
@@ -35,7 +35,7 @@ namespace Air
 
 	private:
 		void markNodeVisible(size_t index);
-		void markNodeObjs(size_t index, bool force);
+		void markNodeObjs(size_t index, bool force, uint32_t mask, std::vector<SceneObject*> & result);
 	private:
 		std::vector<OCTreeNode> mNodes;
 	};
