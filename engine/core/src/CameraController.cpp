@@ -1,4 +1,6 @@
-#include "Engine.h"
+
+#include "Context.h"
+#include "SingletonManager.hpp"
 #include "input_system/include/InputFactory.hpp"
 #include "Camera.hpp"
 #include "CameraController.hpp"
@@ -47,7 +49,7 @@ namespace Air
 				InputActionDefine(Turn, TS_Pan),
 				InputActionDefine(ZoomInOut, TS_Zoom)
 			};
-			InputEngine& inputEngine = Engine::getInstance().getInputFactoryInstance().getInputEngineInstance();
+			InputEngine& inputEngine = SingletonManager::getInputFactoryInstance().getInputEngineInstance();
 			InputActionMap actionMap;
 			actionMap.addActions(actons, actons + std::size(actons));
 			ActionHandlerT input_handler = MakeSharedPtr<InputSignal>();

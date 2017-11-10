@@ -1,5 +1,6 @@
-#include "Engine.h"
+#include "Context.h"
 #include "scene_manager/include/SceneManager.hpp"
+#include "rendersystem/include/Texture.hpp"
 #include "rendersystem/include/Light.hpp"
 
 namespace Air
@@ -38,21 +39,11 @@ namespace Air
 		mEnable = enabled;
 	}
 
-	void LightSource::addToSceneManager()
-	{
-		Engine::getInstance().getSceneManangerInstance().addLight(this->shared_from_this());
-	}
-
-	void LightSource::delFromSceneManager()
-	{
-		Engine::getInstance().getSceneManangerInstance().delLight(this->shared_from_this());
-	}
-
-	Color const & LightSource::getColor() const
+	float3 const & LightSource::getColor() const
 	{
 		return mColor;
 	}
-	void LightSource::setColor(Color const & color)
+	void LightSource::setColor(float3 const & color)
 	{
 		mColor = color;
 	}
@@ -79,6 +70,23 @@ namespace Air
 
 	}
 
+	void AmbientLightSource::setSkyLightTexY(TexturePtr const & tex)
+	{
+		mSkyTexY = tex;
+	}
+
+	void AmbientLightSource::setSkyLightTexC(TexturePtr const & tex)
+	{
+		mSkyTexC = tex;
+	}
+
+
+	int2 AmbientLightSource::getMipmapNum() const
+	{
+		int32_t mip = mSkyTexY->getNumMipMaps();
+		return int2(mip, mip);
+	}
+
 
 	PointLightSource::PointLightSource() : LightSource(LT_Point)
 	{
@@ -96,6 +104,16 @@ namespace Air
 	DirectLightSource::~DirectLightSource()
 	{
 
+	}
+
+	float3 const & DirectLightSource::getDirection() const
+	{
+		return mDirection;
+	}
+
+	void DirectLightSource::setDirection(float3 const & dir)
+	{
+		mDirection = dir;
 	}
 
 

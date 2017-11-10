@@ -43,19 +43,15 @@ namespace Air
 		bool isEnabled() const;
 		void setEnabled(bool enabled);
 
-		virtual void addToSceneManager();
-
-		virtual void delFromSceneManager();
-
-		Color const & getColor() const;
-		void setColor(Color const & color);
+		float3 const & getColor() const;
+		void setColor(float3 const & color);
 
 		float3 const & getPosition() const;
 
 		void setPosition(float3 const & pos);
 
 	protected:
-		Color mColor;
+		float3 mColor;
 
 		float3 mPosition;
 		int32_t mAttr;
@@ -81,6 +77,16 @@ namespace Air
 	public:
 		AmbientLightSource();
 		virtual ~AmbientLightSource();
+
+		int2 getMipmapNum() const;
+
+		void setSkyLightTexY(TexturePtr const & tex);
+
+		void setSkyLightTexC(TexturePtr const & tex);
+
+	private:
+		mutable TexturePtr mSkyTexY;
+		mutable TexturePtr mSkyTexC;
 	};
 
 
@@ -89,6 +95,12 @@ namespace Air
 	public:
 		DirectLightSource();
 		virtual ~DirectLightSource();
+
+		float3 const & getDirection() const;
+
+		void setDirection(float3 const & dir);
+	private:
+		float3 mDirection;
 	};
 
 	class AIR_CORE_API PointLightSource : public LightSource

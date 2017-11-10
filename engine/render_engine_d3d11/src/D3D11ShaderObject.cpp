@@ -1,7 +1,7 @@
 
 #include <sstream>
-#include "Engine.h"
 #include "Context.h"
+#include "SingletonManager.hpp"
 #include "d3dcompiler.h"
 #include <boost/functional/hash.hpp>
 #include "core/include/ResLoader.h"
@@ -492,7 +492,7 @@ namespace Air
 	void D3D11ShaderObject::linkShaders(RenderEffect const & effect)
 	{
 		std::vector<uint32_t> all_cbuff_indices;
-		RenderEnvironment &env = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance().getRenderEnvironment();
+		RenderEnvironment &env = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance().getRenderEnvironment();
 		mIsvalidate = true;
 		for (size_t type = 0; type < ShaderObject::ST_NumShaderTypes; ++type)
 		{
@@ -703,7 +703,7 @@ namespace Air
 
 	void D3D11ShaderObject::bind()
 	{
-		D3D11RenderEngine& re = *checked_cast<D3D11RenderEngine*>(&Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance());
+		D3D11RenderEngine& re = *checked_cast<D3D11RenderEngine*>(&SingletonManager::getRenderFactoryInstance().getRenderEngineInstance());
 		re.setVertexShader(mSoTemplate->mVertexShader.get());
 		re.setGeometryShader(mSoTemplate->mGeometryShader.get());
 		re.setPixelShader(mSoTemplate->mPixelShader.get());
@@ -755,7 +755,7 @@ namespace Air
 	}
 	void D3D11ShaderObject::unbind()
 	{
-		D3D11RenderEngine& re = *checked_cast<D3D11RenderEngine*>(&Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance());
+		D3D11RenderEngine& re = *checked_cast<D3D11RenderEngine*>(&SingletonManager::getRenderFactoryInstance().getRenderEngineInstance());
 		if (mSoTemplate->mComputeShader && !mUAVS.empty())
 		{
 			std::vector<ID3D11UnorderedAccessView*> uavs(mUAVS.size(), nullptr);
@@ -776,7 +776,7 @@ namespace Air
 	std::string_view D3D11ShaderObject::getShaderProfile(ShaderType type, RenderEffect const & effect, uint32_t shader_desc_id)
 	{
 		auto const & sd = effect.getShaderDesc(shader_desc_id);
-		auto const & re = *checked_cast<D3D11RenderEngine const *>(&Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance());
+		auto const & re = *checked_cast<D3D11RenderEngine const *>(&SingletonManager::getRenderFactoryInstance().getRenderEngineInstance());
 		auto const & caps = re.getDeviceCaps();
 		std::string_view shader_prefile = sd.mProfile;
 		size_t const shader_profile_hash = boost::hash_range(shader_prefile.begin(), shader_prefile.end());
@@ -841,7 +841,7 @@ namespace Air
 	std::shared_ptr<std::vector<uint8_t>> D3D11ShaderObject::compiteToBytecode(ShaderType type, RenderEffect const & effect, RenderTechnique const & tech, RenderPass const & pass, std::array<uint32_t, ST_NumShaderTypes> const & ShaderDescIds)
 	{
 #ifdef AIR_PLATFORM_WINDOWS_DESKTOP
-		auto const & re = *checked_cast<D3D11RenderEngine const*>(&Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance());
+		auto const & re = *checked_cast<D3D11RenderEngine const*>(&SingletonManager::getRenderFactoryInstance().getRenderEngineInstance());
 		auto const & caps = re.getDeviceCaps();
 
 		auto const & sd = effect.getShaderDesc(ShaderDescIds[type]);
@@ -1099,7 +1099,7 @@ return std::shared_ptr<std::vector<uint8_t>>();
 	{
 		if (code_blob)
 		{
-			RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+			RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 			D3D11RenderEngine const & re = *checked_cast<D3D11RenderEngine const*>(&rf.getRenderEngineInstance());
 			ID3D11Device* d3d_device = re.getD3DDevice();
 			RenderDeviceCaps const & caps = re.getDeviceCaps();

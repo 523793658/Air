@@ -20,11 +20,13 @@ void postProcessVertexShader(float4 pos : POSITION,
 struct VS_INPUT
 {
 	float4 pos : POSITION;
+	float2 tex : TEXCOORD0;
 	float3 normal : NORMAL;
 };
 struct VS_OUTPUT
 {
 	float4 oPos : SV_Position;
+	float2 vTexcoord : TEXCOORD0;
 	float3 vNormal : NORMAL0;
 };
 
@@ -35,6 +37,7 @@ VS_OUTPUT defaultModelVertexShader(VS_INPUT input)
 	VS_OUTPUT output;
 	output.oPos = mul(input.pos, mvp);
 	output.vNormal = mul(input.normal, (float3x3)worldMatrix);
+	output.vTexcoord = input.tex;
 	return output;
 }
 #endif

@@ -52,43 +52,10 @@ namespace Air
 
 	enum PassType
 	{
-		PT_OpaqueDepth = MakePassType<PRT_None, PTB_Opaque, PC_Depth>::value,
-		PT_TransparencyBackDepth = MakePassType<PRT_None, PTB_TransparencyBack, PC_Depth>::value,
-		PT_TransparencyFrontDepth = MakePassType<PRT_None, PTB_TransparencyFront, PC_Depth>::value,
-
-		PT_OpaqueGBufferRT0 = MakePassType<PRT_RT0, PTB_Opaque, PC_GBuffer>::value,
-		PT_TransparencyBackGBufferRT0 = MakePassType<PRT_RT0, PTB_TransparencyBack, PC_GBuffer>::value,
-		PT_TransparencyFrontGBufferRT0 = MakePassType<PRT_RT0, PTB_TransparencyFront, PC_GBuffer>::value,
-		PT_OpaqueGBufferRT1 = MakePassType<PRT_RT1, PTB_Opaque, PC_GBuffer>::value,
-		PT_TransparencyBackGBufferRT1 = MakePassType<PRT_RT1, PTB_TransparencyBack, PC_GBuffer>::value,
-		PT_TransparencyFrontGBufferRT1 = MakePassType<PRT_RT1, PTB_TransparencyFront, PC_GBuffer>::value,
-		PT_OpaqueGBufferMRT = MakePassType<PRT_MRT, PTB_Opaque, PC_GBuffer>::value,
-		PT_TransparencyBackGBufferMRT = MakePassType<PRT_MRT, PTB_TransparencyBack, PC_GBuffer>::value,
-		PT_TransparencyFrontGBufferMRT = MakePassType<PRT_MRT, PTB_TransparencyFront, PC_GBuffer>::value,
-
 		PT_GenShadowMap = MakePassType<PRT_ShadowMap, PTB_None, PC_ShadowMap>::value,
-		PT_GenShadowMapWODepthTexture = MakePassType<PRT_ShadowMapWODepth, PTB_None, PC_ShadowMap>::value,
-		PT_GenCascadedShadowMap = MakePassType<PRT_CascadedShadowMap, PTB_None, PC_ShadowMap>::value,
-		PT_GenReflectiveShadowMap = MakePassType<PRT_ReflectiveShadowMap, PTB_None, PC_ShadowMap>::value,
+		PT_ForwardRendering = MakePassType<PRT_RT0, PTB_Opaque, PC_ForwardRendering>::value,
 
-		PT_Shadowing = MakePassType<PRT_None, PTB_None, PC_Shadowing>::value,
-
-		PT_IndirectLighting = MakePassType<PRT_None, PTB_None, PC_IndirectLighting>::value,
-
-		PT_OpaqueShading = MakePassType<PRT_None, PTB_Opaque, PC_Shading>::value,
-		PT_TransparencyBackShading = MakePassType<PRT_None, PTB_TransparencyBack, PC_Shading>::value,
-		PT_TransparencyFrontShading = MakePassType<PRT_None, PTB_TransparencyFront, PC_Shading>::value,
-
-		PT_OpaqueReflection = MakePassType<PRT_None, PTB_Opaque, PC_Reflection>::value,
-		PT_TransparencyBackReflection = MakePassType<PRT_None, PTB_TransparencyBack, PC_Reflection>::value,
-		PT_TransparencyFrontReflection = MakePassType<PRT_None, PTB_TransparencyFront, PC_Reflection>::value,
-
-		PT_OpaqueSpecialShading = MakePassType<PRT_None, PTB_Opaque, PC_SpecialShading>::value,
-		PT_TransparencyBackSpecialShading = MakePassType<PRT_None, PTB_TransparencyBack, PC_SpecialShading>::value,
-		PT_TransparencyFrontSpecialShading = MakePassType<PRT_None, PTB_TransparencyFront, PC_SpecialShading>::value,
-
-		PT_SimpleForward = MakePassType<PRT_None, PTB_None, PC_SimpleForward>::value,
-		PT_ForwardLighting = MakePassType<PRT_None, PTB_None, PC_ForwardRendering>::value
+		PT_Custom = MakePassType<PRT_None, PTB_None, PC_None>::value,
 	};
 
 	inline PassRT GetPassRT(PassType pt)
@@ -131,6 +98,7 @@ namespace Air
 			return mEffect;
 		}
 
+
 		virtual RenderTechnique* getRenderTechnique() const
 		{
 			return mTechnique;
@@ -152,8 +120,6 @@ namespace Air
 		virtual bool isSkinned() const = 0;
 
 		void addInstance(SceneObject const * obj);
-
-		virtual void addToRenderQueue();
 
 		virtual void render();
 		
@@ -228,6 +194,10 @@ namespace Air
 
 		virtual bool isTransparencyFrontFace() const;
 
+		virtual bool isOpaque() const;
+
+		void setPass(PassType type);
+
 
 	protected:
 		virtual void updateAABB();
@@ -265,6 +235,8 @@ namespace Air
 		RenderEffectParameter* mWorldParam;
 		RenderEffectParameter* mBaseColorRoughness;
 		RenderEffectParameter* mSpecularColorMetallic;
+
+		PassType mPassType{ PT_Custom };
 	protected:
 		
 

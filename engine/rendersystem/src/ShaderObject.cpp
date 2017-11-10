@@ -1,4 +1,7 @@
+#include "Context.h"
 #include "Engine.h"
+#include "basic/include/Log.hpp"
+#include "SingletonManager.hpp"
 #include "dxsdk/Include/d3dcommon.h"
 #include <boost/lexical_cast.hpp>
 #include "rendersystem/include/RenderEngine.hpp"
@@ -326,7 +329,7 @@ namespace Air
 #if AIR_IS_DEV_PLATFORM
 	std::vector<uint8_t> ShaderObject::compileToDXBC(ShaderType type, RenderEffect const & effect, RenderTechnique const & tech, RenderPass const & pass, std::vector<std::pair<char const *, char const *>> const & api_special_macros, char const * func_name, char const * shader_profile, uint32_t flags)
 	{
-		RenderEngine const & re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine const & re = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
 		RenderDeviceCaps const & caps = re.getDeviceCaps();
 		std::vector<uint8_t> code;
 		std::string const & hlsl_shader_text = effect.getHLSHShader();

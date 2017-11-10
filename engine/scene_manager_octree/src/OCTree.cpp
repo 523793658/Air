@@ -1,3 +1,4 @@
+#include "Context.h"
 #include "Engine.h"
 #include "Camera.hpp"
 #include "app/include/App3D.hpp"
@@ -61,7 +62,7 @@ namespace Air
 		{
 			for (auto const & so : node.mSceneObjects)
 			{
-				if ((BO_No == so->getVisibleMark()) && (mask & so->getAttrib()))
+				if (mask & so->getAttrib())
 				{
 					BoundOverlap visible = this->visibleTestFromParent(so, camera.getForwardVec(), camera.getEyePos(), view_proj);
 					if (BO_Partial == visible)
@@ -87,7 +88,7 @@ namespace Air
 			{
 				for (int i = 0; i < 8; ++i)
 				{
-					this->markNodeObjs(node.mFirstChildIndex + i, force);
+					this->markNodeObjs(node.mFirstChildIndex + i, force, mask, result);
 				}
 			}
 		}
@@ -105,7 +106,7 @@ namespace Air
 			{
 				for (int i = 0; i < 8; ++i)
 				{
-					this->markNodeObjs(node.mFirstChildIndex + i, true, mask);
+					this->markNodeObjs(node.mFirstChildIndex + i, true, mask, result);
 				}
 			}
 		}

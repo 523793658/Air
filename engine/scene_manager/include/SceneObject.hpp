@@ -16,10 +16,12 @@ namespace Air
 			SOA_Moveable = 1UL << 2,
 			SOA_Invisible = 1UL << 3,
 			SOA_NotCastShadow = 1UL << 4,
-			SOA_SSS = 1UL << 5
+			SOA_LightSource = 1UL << 5,
+			SOA_SSS = 1UL << 6,
+			SOA_Helper = 1UL << 7,
 		};
 	public:
-		explicit SceneObject(uint32_t attrib);
+		explicit SceneObject(uint32_t attrib = 0);
 		virtual ~SceneObject();
 
 		SceneObject* getParent() const;
@@ -67,6 +69,15 @@ namespace Air
 			return mSpaceNodeHandle;
 		}
 
+		void setCustomData(std::shared_ptr<void> data);
+
+		std::shared_ptr<void> const & getCustomData() const;
+
+		void setRenderable(RenderablePtr const & renderable)
+		{
+			mRenderable = renderable;
+		}
+
 	protected:
 		uint32_t mAttrib;
 
@@ -74,6 +85,7 @@ namespace Air
 		std::vector<SceneObjectPtr> mChildren;
 
 		RenderablePtr mRenderable;
+
 		bool mRenderableHWResReady;
 
 		float4x4 mWorldMatrix;
@@ -82,6 +94,8 @@ namespace Air
 		BoundOverlap mVisibleMark;
 
 		AABBoxPtr mAABB;
+
+		std::shared_ptr<void> mCustomData;
 
 		int mSpaceNodeHandle;
 	};

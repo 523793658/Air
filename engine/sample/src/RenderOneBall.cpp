@@ -1,5 +1,8 @@
-#include "Engine.h"
+
 #include "PreDeclare.h"
+#include "Context.h"
+#include "Engine.h"
+#include "SingletonManager.hpp"
 #include "SampleCommon.hpp"
 #include "core/include/Engine.h"
 #include "rendersystem/include/RenderFactory.h"
@@ -47,7 +50,7 @@ namespace Sample
 
 	uint32_t SampleRenderOneBall::doUpdate(uint32_t pass)
 	{
-		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
 		Color c(0.0, 0.0, 0.0, 1.0);
 		re.getCurrentFrameBuffer()->clear(FrameBuffer::CBM_Color | FrameBuffer::CBM_Depth | FrameBuffer::CBM_Stencil, c, 1.0, 0);
 		return App3DFramework::URV_NeedFlush | App3DFramework::URV_Finished;

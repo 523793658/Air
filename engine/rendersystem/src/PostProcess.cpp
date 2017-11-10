@@ -1,4 +1,6 @@
-#include "Engine.h"
+
+#include "Context.h"
+#include "SingletonManager.hpp"
 #include "core/include/ResLoader.h"
 #include "basic/include/XMLDom.hpp"
 #include "rendersystem/include/SimpleMeshFactory.hpp"
@@ -67,15 +69,24 @@ namespace Air
 
 	}
 
+	void PostProcessChain::setInputTarget(FrameBufferPtr const & fb)
+	{
+		mInputframeBuffer = fb;
+	}
+
+	void PostProcessChain::setOutputTarget(FrameBufferPtr const & fb)
+	{
+		mOutputFrameBuffer = fb;
+	}
+
+
 	PostProcessChain::PostProcessChain()
 	{
 		mRenderable = SimpleMeshFactory::createStaticQuat(1.0f);
 	}
 
-	void PostProcessChain::loadCfg(std::string cfgPath)
+	void PostProcessChain::loadCfg(XMLNodePtr root)
 	{
-		XMLDocument doc;
-		XMLNodePtr root = doc.parse(ResLoader::getInstance().open(cfgPath));
 		std::string format = root->getAttribString("colorFormat", "EF_ABGR8");
 		mColorFormat = parseFormat(format);
 
@@ -93,73 +104,42 @@ namespace Air
 		}
 	}
 
+	void PostProcessChain::loadCfg(std::string cfgPath)
+	{
+		XMLDocument doc;
+		XMLNodePtr root = doc.parse(ResLoader::getInstance().open(cfgPath));
+		loadCfg(root);
+	}
+
 	void PostProcessChain::assemblePostProcessChain()
 	{
 
 
 
-		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+		RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 		RenderEngine& engine = rf.getRenderEngineInstance();
 		RenderDeviceCaps const & caps = engine.getDeviceCaps();
 		FrameBufferPtr lastOutput;
-		FrameBufferPtr screenBuffer = engine.getScreenFrameBuffer();
 		uint32_t width, height;
-		width = screenBuffer->getWidth();
-		height = screenBuffer->getHeight();
-
 		for (auto it : mPostProcessers)
 		{
 			delete it;
 		}
 
-
-
-
-
-		mSceneFrameBuffer = rf.makeFrameBuffer();
-		mSceneFrameBuffer->getViewport()->mCamera = engine.getScreenFrameBuffer()->getViewport()->mCamera;
-		lastOutput = mSceneFrameBuffer;
-
-		TexturePtr const & depthStencilTex = engine.getScreenDepthStencilTexture();
-
-
-		RenderViewPtr dsView;
-		dsView = rf.Make2DDepthStencilRenderView(depthStencilTex, 0, 1, 0);
-
-		ElementFormat fmt = EF_Unknown;
-		if (caps.textureFormatSupport(mColorFormat) && caps.rendertargetFormatSupport(mColorFormat, 1, 0))
-		{
-			fmt = mColorFormat;
-		}
-		else if (caps.vertexFormatSupport(EF_ABGR8) && caps.rendertargetFormatSupport(EF_ABGR8, 1, 0))
-		{
-			fmt = EF_ABGR8;
-		}
-		else
-		{
-			BOOST_ASSERT(caps.textureFormatSupport(EF_ARGB8) && caps.rendertargetFormatSupport(EF_ARGB8, 1, 0));
-			fmt = EF_ARGB8;
-		}
-
-		TexturePtr clr_tex = rf.MakeTexture2D(width, height, 1, 1, fmt, 1, 0, EAH_GPU_Read | EAH_GPU_Write);
-		RenderViewPtr clr_view = rf.Make2DRenderView(clr_tex, 0, 1, 0);
-		mSceneFrameBuffer->attach(FrameBuffer::ATT_Color0, clr_view);
-		mSceneFrameBuffer->attach(FrameBuffer::ATT_DepthStencil, dsView);
-
-
-		engine.setDefaultFrameBuffer(mSceneFrameBuffer);
-
+		width = mInputframeBuffer->getWidth();
+		height = mInputframeBuffer->getHeight();
+		ElementFormat fmt = mInputframeBuffer->getAttached(FrameBuffer::ATT_Color0)->getFormat();
+		lastOutput = mInputframeBuffer;
 		for (size_t i = 0; i < mConfigs.size(); ++i)
 		{
 			PostProcessConfigPtr const & config = mConfigs[i];
 			PostProcesser* processer = createPostProcesser(config);
 			Texture* colorTex = lastOutput->getAttached(FrameBuffer::ATT_Color0)->getSrcTexture().get();
-			Texture* ds_tex = lastOutput->getAttached(FrameBuffer::ATT_DepthStencil)->getSrcTexture().get();
 
 			FrameBufferPtr output;
 			if (i == mConfigs.size() - 1)
 			{
-				output = screenBuffer;
+				output = mOutputFrameBuffer;
 			}
 			else
 			{
@@ -176,7 +156,6 @@ namespace Air
 				}
 			}
 			processer->setInputTexture(0, colorTex->shared_from_this());
-			processer->setInputTexture(1, colorTex->shared_from_this());
 			processer->setOutputFrameBuffer(output);
 			mPostProcessers.push_back(processer);
 			mTempFrameBuffers.push(lastOutput);

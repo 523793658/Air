@@ -1,4 +1,6 @@
-#include "Engine.h"
+
+#include "Context.h"
+#include "SingletonManager.hpp"
 #include <sstream>
 #include "ResLoader.h"
 #include "basic/include/Util.h"
@@ -77,7 +79,7 @@ namespace
 				mModelDesc.mModelData->mMaterialIds, mModelDesc.mModelData->mPosBox, mModelDesc.mModelData->mTexcoordBox, 
 				mModelDesc.mModelData->mMeshNumVertices, mModelDesc.mModelData->mMeshBaseVertices, 
 				mModelDesc.mModelData->mMeshNumIndices, mModelDesc.mModelData->mMeshBaseVertices);
-			RenderFactory&rf = Engine::getInstance().getRenderFactoryInstance();
+			RenderFactory&rf = SingletonManager::getRenderFactoryInstance();
 			RenderDeviceCaps const & caps = rf.getRenderEngineInstance().getDeviceCaps();
 			if (caps.mMultithreadResCreatingSupport)
 			{
@@ -189,7 +191,7 @@ namespace
 		void fillModel()
 		{
 			RenderModelPtr const & model = *mModelDesc.mModel;
-			RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+			RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 			mModelDesc.mModelData->mMergedVBs.resize(mModelDesc.mModelData->mMergedBuffer.size());
 			for (size_t i = 0; i < mModelDesc.mModelData->mMergedVBs.size(); ++i)
 			{
@@ -245,7 +247,7 @@ namespace Air
 	StaticMesh::StaticMesh(RenderModelPtr const & model, std::wstring const & name)
 		:mName(name), mModel(model), mHWResReady(false)
 	{
-		mRenderLayout = Engine::getInstance().getRenderFactoryInstance().MakeRenderLayout();
+		mRenderLayout = SingletonManager::getRenderFactoryInstance().MakeRenderLayout();
 		mRenderLayout->setTopologyType(RenderLayout::TT_TriangleList);
 	}
 
@@ -264,7 +266,7 @@ namespace Air
 
 	void StaticMesh::addVertexStream(void const * buf, uint32_t size, VertexElement const & ve, uint32_t access_hint)
 	{
-		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+		RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 		GraphicsBufferPtr vb = rf.makeVertexBuffer(BU_Static, access_hint, size, buf);
 		this->addVertexStream(vb, ve);
 	}
@@ -280,7 +282,7 @@ namespace Air
 
 	void StaticMesh::addIndexStream(void const * buf, uint32_t size, ElementFormat format, uint32_t access_hint)
 	{
-		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+		RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 		GraphicsBufferPtr ib = rf.makeIndexBuffer(BU_Static, access_hint, size, buf);
 		this->addIndexStream(ib, format);
 	}

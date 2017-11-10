@@ -1,0 +1,26 @@
+<?xml version='1.0'?>
+<pipeline>
+	<frameBuffer name="scene" width="1" height="1" sizeMode="rel" clearMask="3" camera="mainCamera">
+		<renderView name="SceneColorView" attachment="ATT_Color0" format="EF_ABGR32F" texName="SceneColorTex"/>
+		<renderView name="sceneDepthView" attachment="ATT_DepthStencil" format="EF_D24S8" texName="sceneDepthTex"/>
+	</frameBuffer>
+	<layer type="0">
+		<pass type="RLPT_ShadowMap"/>
+		<pass type="RLPT_ForwardRendering" renderTarget="scene"/>
+		<pass type="RLPT_SkyBox" renderTarget="scene"/>
+		<pass type="RLPT_Helper" renderTarget="scene"/>
+	</layer>
+
+
+	<postProcessChain name='test1' colorFormat='EF_ABGR32F' input="scene" output="finalTarget">
+		<postProcesser name='hdr'>
+			<luminanceConfig name="luminanceCS" shader="assets/shader/Luminance.asd">
+			</luminanceConfig>
+			
+			<toneMapping name="toneMapping" shader="assets/shader/toneMap.asd">
+			</toneMapping>
+		</postProcesser>
+	</postProcessChain>
+
+
+</pipeline>

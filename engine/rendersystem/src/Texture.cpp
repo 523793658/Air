@@ -1,5 +1,7 @@
-#include "Engine.h"
+
 #include "Context.h"
+#include "basic/include/Log.hpp"
+#include "SingletonManager.hpp"
 #include "core/include/ResLoader.h"
 #include "rendersystem/include/RenderDeviceCaps.hpp"
 #include "rendersystem/include/RenderFactory.h"
@@ -822,7 +824,7 @@ namespace
 				getImageInfo(mTexDesc.mResName, tex_data.type, tex_data.width, tex_data.height, tex_data.depth, tex_data.num_mipmap, tex_data.array_size, tex_data.format, row_pitch, slice_pitch);
 
 			}
-			RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+			RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 			RenderDeviceCaps const & caps = rf.getRenderEngineInstance().getDeviceCaps();
 			if ((Texture::TT_3D == tex_data.type) && (caps.mMaxTextureDepth < tex_data.depth))
 			{
@@ -973,7 +975,7 @@ namespace
 		{
 			TexDesc::TexData& tex_data = *mTexDesc.tex_data;
 			loadTexture(mTexDesc.mResName, tex_data.type, tex_data.width, tex_data.height, tex_data.depth, tex_data.num_mipmap, tex_data.array_size, tex_data.format, tex_data.init_data, tex_data.data_block);
-			RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+			RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 			RenderDeviceCaps const & caps = rf.getRenderEngineInstance().getDeviceCaps();
 			if ((Texture::TT_3D == tex_data.type) && (caps.mMaxTextureDepth < tex_data.depth))
 			{
@@ -1174,7 +1176,7 @@ namespace
 		{
 			TexDesc::TexData const & tex_data = *mTexDesc.tex_data;
 			TexturePtr texture;
-			RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+			RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 			switch (tex_data.type)
 			{
 			case Texture::TT_1D:

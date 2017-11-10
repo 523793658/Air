@@ -1,7 +1,7 @@
 #ifndef FLAMEMATH
 #define FLAMEMATH
-#endif
-#include "Engine.h"
+#include "Context.h"
+#include "SingletonManager.hpp"
 #include "rendersystem/include/RenderFactory.h"
 #include "D3D11RenderEngine.hpp"
 #include "D3D11RenderView.hpp"
@@ -56,7 +56,7 @@ namespace Air
 
 	void D3D11FrameBuffer::onBind()
 	{
-		D3D11RenderEngine& re = *checked_cast<D3D11RenderEngine*>(&Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance());
+		D3D11RenderEngine& re = *checked_cast<D3D11RenderEngine*>(&SingletonManager::getRenderFactoryInstance().getRenderEngineInstance());
 		std::vector<void*> rt_src;
 		std::vector<uint32_t> rt_first_subres;
 		std::vector<uint32_t> rt_num_subres;
@@ -90,7 +90,7 @@ namespace Air
 		{
 			re.detachSRV(rt_src[i], rt_first_subres[i], rt_num_subres[i]);
 		}
-		re.setRenderTargets(static_cast<UINT>(rt_view.size()), &rt_view[0], this->getD3DDSView());
+		re.setRenderTargets(static_cast<UINT>(rt_view.size()), rt_view.size() > 0 ? &rt_view[0] : nullptr, this->getD3DDSView());
 		mD3DViewport.TopLeftX = static_cast<float>(mViewport->mLeft);
 		mD3DViewport.TopLeftY = static_cast<float>(mViewport->mTop);
 		mD3DViewport.Width = static_cast<float>(mViewport->mWidth);
@@ -104,6 +104,10 @@ namespace Air
 
 	void D3D11FrameBuffer::clear(uint32_t flags, Color const& clr, float depth, int32_t stencil)
 	{
+		if (!mNeedClear)
+		{
+			return;
+		}
 		if (flags & CBM_Color)
 		{
 			for (uint32_t i = 0; i < mColorViews.size(); ++i)
@@ -144,3 +148,6 @@ namespace Air
 
 	}
 }
+
+
+#endif

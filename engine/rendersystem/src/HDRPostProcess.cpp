@@ -1,4 +1,6 @@
-#include "Engine.h"
+
+#include "Context.h"
+#include "SingletonManager.hpp"
 #include "basic/include/Math.hpp"
 
 #include "basic/include/XMLDom.hpp"
@@ -63,7 +65,7 @@ namespace Air
 
 	LuminanceCS::LuminanceCS()
 	{
-		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+		RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 
 		m2DOuputTexture = rf.MakeTexture2D(GroupCount, GroupCount, 1, 1, EF_R32F, 1, 0, EAH_GPU_Read | EAH_GPU_Write | EAH_GPU_Unordered);
 	}
@@ -93,7 +95,7 @@ namespace Air
 	}
 	void LuminanceCS::render()
 	{
-		RenderEngine& engine = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& engine = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
 		//Éú³É1DÎÆÀí
 		this->onRenderBegin();
 		engine.dispatch(*mEffect, *mTechnique, GroupCount, GroupCount, 1);
@@ -164,7 +166,7 @@ namespace Air
 
 	HDRPostProcesser::HDRPostProcesser()
 	{
-		RenderFactory & factory = Engine::getInstance().getRenderFactoryInstance();
+		RenderFactory & factory = SingletonManager::getRenderFactoryInstance();
 		mLuminance = MakeSharedPtr<LuminanceCS>();
 		mBloom = MakeSharedPtr<BloomProcesser>();
 		mTonemap = MakeSharedPtr<ToneMapping>();

@@ -11,11 +11,19 @@ namespace Air
 	class AIR_CORE_API ForwardRenderingLayer : public RenderLayer
 	{
 	public:
-		ForwardRenderingLayer();
+		ForwardRenderingLayer(RenderPipeline* pipeline);
+
+		void loadFromXml(XMLNodePtr node);
+
+		virtual void beforeUpdate() override;
+
+		virtual void endUpdate() override;
 
 	private:
+		std::vector<SceneObject*> mLightObjects;
 		std::vector<LightSourcePtr> mLights;
 
+		RenderEnvironment* mEnv;
 	};
 
 

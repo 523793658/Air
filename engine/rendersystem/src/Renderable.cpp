@@ -1,5 +1,6 @@
-#include "Engine.h"
+
 #include "Context.h"
+#include "SingletonManager.hpp"
 #include "rendersystem/include/RenderFactory.h"
 #include "rendersystem/include/FrameBuffer.hpp"
 #include "rendersystem/include/RenderEngine.hpp"
@@ -38,6 +39,10 @@ namespace Air
 	{
 		return mEffectAttrs & EA_TransparencyFront ? true : false;
 	}
+	bool Renderable::isOpaque() const
+	{
+		return !(mEffectAttrs & (EA_TransparencyFront | EA_TransparencyBack));
+	}
 
 
 	void Renderable::addInstance(SceneObject const * obj)
@@ -45,20 +50,33 @@ namespace Air
 
 	}
 
-	void Renderable::addToRenderQueue()
+	void Renderable::setPass(PassType type)
 	{
-		Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance().addRenderableToQueue(this);
+		switch (type)
+		{
+		case Air::PT_GenShadowMap:
+			mTechnique = mEffect->getTechniqueByName("genShadowMap");
+			break;
+
+		case Air::PT_ForwardRendering:
+			mTechnique = mEffect->getTechniqueByName("forwardRendering");
+			break;
+
+		default:
+			break;
+		}
+		mPassType = type;
 	}
 
 	void Renderable::render()
 	{
 		this->updateInstanceStream();
-		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
 		RenderLayout const & layout = this->getRenderLayout();
 		GraphicsBufferPtr const & inst_stream = layout.getInstanceStream();
 		RenderTechnique const & tech = *this->getRenderTechnique();
 		auto const & effect = *this->getRenderEffect();
-		if (inst_stream)
+ 		if (inst_stream)
 		{
 			if (layout.getNumIndices() > 0)
 			{
@@ -94,19 +112,30 @@ namespace Air
 
 	void Renderable::onRenderBegin()
 	{
-		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
 		Camera const & camera = *re.getCurrentFrameBuffer()->getViewport()->mCamera;
 		float4x4 const & vp = camera.getViewProjMatrix();
 		float4x4 mvp = mModelMat * vp;
 		AABBox const & pos_bb = this->getPosAABB();
 		AABBox const & tc_bb = this->getTexcoordAABB();
 		*mMVPParam = mvp;
-		*mWorldParam = mModelMat;
-		if (mMaterial)
+		switch (mPassType)
 		{
-			*mSpecularColorMetallic = mMaterial->mSpecularMetalness;
-			*mBaseColorRoughness = mMaterial->mAlbedoRoughness;
+		case Air::PT_GenShadowMap:
+			break;
+		case Air::PT_ForwardRendering:
+			*mWorldParam = mModelMat;
+			if (mMaterial)
+			{
+				*mSpecularColorMetallic = mMaterial->mSpecularMetalness;
+				*mBaseColorRoughness = mMaterial->mAlbedoRoughness;
+			}
+			break;
+		default:
+			break;
 		}
+
+		
 	}
 
 	void Renderable::onRenderEnd()
@@ -158,62 +187,8 @@ namespace Air
 	{
 		switch (type)
 		{
-		case Air::PT_OpaqueDepth:
-			break;
-		case Air::PT_TransparencyBackDepth:
-			break;
-		case Air::PT_TransparencyFrontDepth:
-			break;
-		case Air::PT_OpaqueGBufferRT0:
-			break;
-		case Air::PT_TransparencyBackGBufferRT0:
-			break;
-		case Air::PT_TransparencyFrontGBufferRT0:
-			break;
-		case Air::PT_OpaqueGBufferRT1:
-			break;
-		case Air::PT_TransparencyBackGBufferRT1:
-			break;
-		case Air::PT_TransparencyFrontGBufferRT1:
-			break;
-		case Air::PT_OpaqueGBufferMRT:
-			break;
-		case Air::PT_TransparencyBackGBufferMRT:
-			break;
-		case Air::PT_TransparencyFrontGBufferMRT:
-			break;
+		
 		case Air::PT_GenShadowMap:
-			break;
-		case Air::PT_GenShadowMapWODepthTexture:
-			break;
-		case Air::PT_GenCascadedShadowMap:
-			break;
-		case Air::PT_GenReflectiveShadowMap:
-			break;
-		case Air::PT_Shadowing:
-			break;
-		case Air::PT_IndirectLighting:
-			break;
-		case Air::PT_OpaqueShading:
-			break;
-		case Air::PT_TransparencyBackShading:
-			break;
-		case Air::PT_TransparencyFrontShading:
-			break;
-		case Air::PT_OpaqueReflection:
-			break;
-		case Air::PT_TransparencyBackReflection:
-			break;
-		case Air::PT_TransparencyFrontReflection:
-			break;
-		case Air::PT_OpaqueSpecialShading:
-			break;
-		case Air::PT_TransparencyBackSpecialShading:
-			break;
-		case Air::PT_TransparencyFrontSpecialShading:
-			break;
-		case Air::PT_SimpleForward:
-			return mSimpleForwardTech;
 			break;
 		default:
 			break;

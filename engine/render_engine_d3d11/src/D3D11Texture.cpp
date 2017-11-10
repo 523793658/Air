@@ -1,5 +1,5 @@
-#include "Engine.h"
-#include "boost/functional/hash.hpp"
+#include "Context.h"
+#include "SingletonManager.hpp"
 #include "ElementFormat.h"
 #include "Context.h"
 #include "D3D11RenderFactory.hpp"
@@ -17,7 +17,7 @@ namespace Air
 			BOOST_ASSERT(!(access_hint & EAH_CPU_Read));
 			BOOST_ASSERT(!(access_hint & EAH_CPU_Write));
 		}
-		D3D11RenderEngine& renderEngine(*checked_cast<D3D11RenderEngine*>(&Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance()));
+		D3D11RenderEngine& renderEngine(*checked_cast<D3D11RenderEngine*>(&SingletonManager::getRenderFactoryInstance().getRenderEngineInstance()));
 		mD3DDevice = renderEngine.getD3DDevice();
 		mD3DImmContext = renderEngine.getD3DDeviceContext();
 	}
@@ -262,7 +262,7 @@ namespace Air
 				bind_flags |= D3D11_BIND_RENDER_TARGET;
 			}
 		}
-		D3D11RenderEngine const & engine = *checked_cast<D3D11RenderEngine const*>(&Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance());
+		D3D11RenderEngine const & engine = *checked_cast<D3D11RenderEngine const*>(&SingletonManager::getRenderFactoryInstance().getRenderEngineInstance());
 
 		if (engine.getDeviceFeatureLevel() >= D3D_FEATURE_LEVEL_11_0)
 		{

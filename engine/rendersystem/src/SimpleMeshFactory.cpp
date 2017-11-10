@@ -1,4 +1,5 @@
-#include "Engine.h"
+#include "Context.h"
+#include "SingletonManager.hpp"
 #include "rendersystem/include/RenderFactory.h"
 #include "rendersystem/include/SimpleMeshFactory.hpp"
 #include "basic/include/Quaternion.hpp"
@@ -12,7 +13,7 @@ namespace Air
 
 	StaticMeshPtr SimpleMeshFactory::createStaticShpere(float radius)
 	{
-		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+		RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 		StaticMeshPtr mesh = MakeSharedPtr<StaticMesh>(nullptr, L"sphere");
 		int n = 20;
 		int rows = n * 2 + 1;
@@ -62,7 +63,7 @@ namespace Air
 
 	StaticMeshPtr SimpleMeshFactory::createStaticCube()
 	{
-		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+		RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 		StaticMeshPtr mesh = MakeSharedPtr<StaticMesh>(nullptr, L"cube");
 		VertexData* data = new VertexData[24]{
 			//Ç°Ãæ
@@ -120,18 +121,18 @@ namespace Air
 
 	StaticMeshPtr SimpleMeshFactory::createStaticQuat(float halfWidth /* = 0.5f */)
 	{
-		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+		RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 		StaticMeshPtr mesh = MakeSharedPtr<StaticMesh>(nullptr, L"quat");
-		float2 pos[4][2] =
+		VertexData pos[4] =
 		{
-			{float2(-halfWidth, +halfWidth), float2(0.0, 0.0)},
-			{float2(+halfWidth, +halfWidth), float2(1.0, 0.0)},
-			{float2(-halfWidth, -halfWidth), float2(0.0, 1.0)},
-			{float2(+halfWidth, -halfWidth), float2(1.0, 1.0)}
+			{ float3(-halfWidth, +halfWidth, 0.0f), float3(0, 0, 1),float2(0.0, 0.0)},
+			{ float3(+halfWidth, +halfWidth, 0.0f), float3(0, 0, 1),float2(1.0, 0.0)},
+			{ float3(-halfWidth, -halfWidth, 0.0f), float3(0, 0, 1),float2(0.0, 1.0)},
+			{ float3(+halfWidth, -halfWidth, 0.0f), float3(0, 0, 1),float2(1.0, 1.0)}
 		};
 
-		GraphicsBufferPtr vb = rf.makeVertexBuffer(BU_Static, EAH_GPU_Read | EAH_Immutable, sizeof(float2) * 4 * 2, pos);
-		mesh->addVertexStream(vb, { VertexElement(VEU_Position, 0, EF_GR32F), VertexElement(VEU_TextureCoord, 0, EF_GR32F) });
+		GraphicsBufferPtr vb = rf.makeVertexBuffer(BU_Static, EAH_GPU_Read | EAH_Immutable, sizeof(VertexData) * 4, pos);
+		mesh->addVertexStream(vb, { VertexElement(VEU_Position, 0, EF_BGR32F),VertexElement(VEU_Normal, 0, EF_BGR32F), VertexElement(VEU_TextureCoord, 0, EF_GR32F) });
 		mesh->setPosAABB(AABBox(float3(-halfWidth, -halfWidth, 0.0), float3(halfWidth, halfWidth, 0.0)));
 		mesh->setTopologyType(RenderLayout::TT_TriangleStrip);
 		return mesh;

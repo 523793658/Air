@@ -28,7 +28,7 @@ float3 standardShading(float3 diffuseColor, float3 specularColor, float3 lobeRou
 	float Vis = Vis_SmithJointApprox(lobeRoughness[1], NoV, NoL);
 	float3 F = F_Schlick(specularColor, VoH);
 	float3 diffuse = diffuse_lambert(diffuseColor);
-	return (D * Vis) *F;
+	return diffuse + (D * Vis) *F;
 }
 
 
@@ -118,7 +118,7 @@ float4 standardSurfaceShading(SurfaceOutputStandard input)
 	float3 L = u_DirLightDir;
 	float3 toLight = L;
 
-	float NoL = saturate(dot(N, L));
+	float NoL = saturate(dot(N, normalize(L)));
 
 
 	float3 lobeRoughness = float3(GBuffer.customData.y, GBuffer.roughness, 1);

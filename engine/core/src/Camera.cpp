@@ -1,5 +1,6 @@
-#include "Engine.h"
+
 #include "Context.h"
+#include "SingletonManager.hpp"
 #include "rendersystem/include/RenderFactory.h"
 #include "rendersystem/include/RenderEngine.hpp"
 #include "Camera.hpp"
@@ -15,7 +16,7 @@ namespace Air
 	Camera::Camera()
 		:mViewProjMatDirty(true), mViewProjMatrixWoAdjustDirty(true), mFrustumDirty(true), mMode(0), mCurJitterIndex(0)
 	{
-		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
 		uint32_t num_motion_frames = re.getNumMotionFrames();
 		mPrevProjMats.resize(num_motion_frames);
 		mPrevProjMats.resize(num_motion_frames);
@@ -47,7 +48,7 @@ namespace Air
 		mProjectMatrix = float4x4::createPerspectiveFOVLH(fov, aspect, near_plane, far_plane);
 		mProjectMatrixWoAdjust = mProjectMatrix;
 
-		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
 		re.adjustProjectionMatrix(mProjectMatrix);
 		mInvProjectMatrix = mProjectMatrix.inverse();
 		mInvProjectMatrixWoAdjust = mProjectMatrixWoAdjust.inverse();
@@ -65,7 +66,7 @@ namespace Air
 
 		mProjectMatrix = float4x4::createOrthoLH(w, h, near_plane, far_plane);
 		mProjectMatrixWoAdjust = mProjectMatrix;
-		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
 		re.adjustProjectionMatrix(mProjectMatrix);
 		mInvProjectMatrix = mProjectMatrix.inverse();
 		mInvProjectMatrixWoAdjust = mProjectMatrixWoAdjust.inverse();
@@ -83,7 +84,7 @@ namespace Air
 		mProjectMatrix = float4x4::createOrthoCenterLH(left, right, bottom, top, near_plane, far_plane);
 		mProjectMatrixWoAdjust = mProjectMatrix;
 
-		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
 		re.adjustProjectionMatrix(mProjectMatrix);
 		mInvProjectMatrix = mProjectMatrix.inverse();
 		mInvProjectMatrixWoAdjust = mProjectMatrixWoAdjust.inverse();
@@ -99,7 +100,6 @@ namespace Air
 		if (mFrustumDirty)
 		{
 			mFrustum.clipMatrix(getViewProjMatrixWOAdjust(), getInverseViewProjMatrixWOAdjust());
-			BoundOverlap bo = mFrustum.intersect(AABBox(float3(-5.0f, -0.5f, 4.0f), float3(-4.0f, 0.5f, 5.0f)));
 			mFrustumDirty = false;
 		}
 		return mFrustum;
@@ -142,6 +142,12 @@ namespace Air
 	{
 		return mViewMatrix;
 	}
+
+	float4x4 const & Camera::getInverseViewMatirx() const
+	{
+		return mInvViewMatrix;
+	}
+
 	float4x4 const & Camera::getProjMatrix() const
 	{
 		return mProjectMatrix;

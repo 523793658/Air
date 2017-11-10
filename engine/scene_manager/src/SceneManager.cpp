@@ -1,3 +1,4 @@
+#include "Context.h"
 #include "Engine.h"
 #include "Camera.hpp"
 #include "rendersystem/include/RenderFactory.h"
@@ -29,146 +30,9 @@ namespace Air
 	//更新节点等操作
 	void SceneManager::update()
 	{
-		/*RenderEngine& renderEngine = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
-		renderEngine.beginFrame();
-		this->flushScene();
-
-		renderEngine.postProcess(false);
-
-		FrameBuffer& fb = *renderEngine.getScreenFrameBuffer();
-		fb.swapBuffers();
-		renderEngine.endFrame();*/
+		mVisibleMarksMap.clear();
 	}
 
-	void SceneManager::prepareRenderQueue(std::vector<SceneObjectPtr> const & objs, bool visibleTest)
-	{
-		for (auto const & obj : objs)
-		{
-			auto so = obj.get();
-			if ((!visibleTest ||( so->getVisibleMark() != BO_No)) && (0 == so->getNumChildren()))
-			{
-				auto renderable = so->getRenderable();
-				if (renderable)
-				{
-					renderable->clearInstance();
-				}
-			}
-		}
-
-
-		for (auto const & obj : objs)
-		{
-			auto so = obj.get();
-			if (((!visibleTest || so->getVisibleMark() != BO_No)) && (0 == so->getNumChildren()))
-			{
-				auto renderable = so->getRenderable().get();
-				if (renderable)
-				{
-					if (0 == renderable->getNumInstances())
-					{
-						renderable->addToRenderQueue();
-					}
-					renderable->addInstance(so);
-					++mNumObjectsRendered;
-				}
-
-			}
-		}
-	}
-
-
-	/*void SceneManager::flush(uint32_t urt)
-	{
-		std::lock_guard<std::mutex> lock(mUpdateMutex);
-		mURT = urt;
-		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
-		App3DFramework& app = Engine::getInstance().getAppInstance();
-		float const app_time = app.getAppTime();
-		float const frame_time = app.getFrameTime();
-
-		mNumObjectsRendered = 0;
-		mNumRenderablesRendered = 0;
-		mNumPrimitivesRendered = 0;
-		mNumVerticesRendered = 0;
-		Camera& camera = app.getActiveCamera();
-		auto const & scene_objs = (urt & App3DFramework::URV_Overlay) ? mOverlaySceneObjs : mSceneObjs;
-		for (auto const & scene_obj : scene_objs)
-		{
-			scene_obj->setVisibleMark(BO_No);
-		}
-		if (urt & App3DFramework::URV_NeedFlush)
-		{
-			mFrustum = &camera.getViewFrustum();
-			std::vector<uint32_t> visible_list((mSceneObjs.size() + 31) / 32, 0);
-			for (size_t i = 0; i < mSceneObjs.size(); ++i)
-			{
-				if (mSceneObjs[i]->isVisible())
-				{
-					visible_list[i / 32] |= (1UL << (i & 31));
-				}
-			}
-			size_t seed = 0;
-			boost::hash_range(seed, visible_list.begin(), visible_list.end());
-			boost::hash_combine(seed, camera.getOmniDirectionalMode());
-			boost::hash_combine(seed, &camera);
-
-			auto vmiter = mVisibleMarksMap.find(seed);
-			if (vmiter == mVisibleMarksMap.end())
-			{
-				this->clipScene();
-				std::shared_ptr<std::vector<BoundOverlap>> visible_marks
-					= MakeSharedPtr<std::vector<BoundOverlap>>(scene_objs.size());
-				for (size_t i = 0; i < scene_objs.size(); ++i)
-				{
-					(*visible_marks)[i] = scene_objs[i]->getVisibleMark();
-				}
-				mVisibleMarksMap.emplace(seed, visible_marks);
-			}
-			else
-			{
-				for (size_t i = 0; i < scene_objs.size(); ++i)
-				{
-					scene_objs[i]->setVisibleMark((*vmiter->second)[i]);
-				}
-			}
-
-			prepareRenderQueue(mNoCullableSceneObjects, false);
-		}
-		if (urt & App3DFramework::URV_Overlay)
-		{
-			for (auto const & scene_obj : scene_objs)
-			{
-				scene_obj->mainThreadUpdate(app_time, frame_time);
-				scene_obj->setVisibleMark(scene_obj->isVisible() ? BO_Yes : BO_No);
-			}
-		}
-
-		prepareRenderQueue(mSceneObjs);
-
-
-
-
-		std::sort(mRenderQueue.begin(), mRenderQueue.end(), [](std::pair<RenderTechnique const *, std::vector<Renderable*>> const & lhs,
-			std::pair<RenderTechnique const *, std::vector<Renderable*>> const & rhs)
-		{
-			BOOST_ASSERT(lhs.first);
-			BOOST_ASSERT(rhs.first);
-			return lhs.first->getWeight() < rhs.first->getWeight();
-		});
-		float4 const & view_mat_z = camera.getViewMatrix().col(2);
-		for (auto & items : mRenderQueue)
-		{
-			for (auto const & item : items.second)
-			{
-					item->render();
-			}
-			mNumRenderablesRendered += static_cast<uint32_t>(items.second.size());
-		}
-		mRenderQueue.resize(0);
-		mNumPrimitivesRendered += re.getNumPrimitivesJustRendered();
-		mNumVerticesRendered += re.getNumVerticesJustRendered();
-		urt = 0;
-	}*/
 
 	BoundOverlap SceneManager::visibleTestFromParent(SceneObject* obj, float3 const & view_dir, float3 const & eye_pos, float4x4 const & view_proj)
 	{
@@ -258,39 +122,6 @@ namespace Air
 		}
 	}
 
-	void SceneManager::flushScene()
-	{
-
-		/*RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
-		mVisibleMarksMap.clear();
-		uint32_t urt;
-		App3DFramework& app = Engine::getInstance().getAppInstance();
-		for (uint32_t pass = 0; ; ++pass)
-		{
-			re.beginPass();
-			urt = app.update(pass);
-			if (urt & App3DFramework::URV_NeedFlush)
-			{
-				this->flush(urt);
-			}
-			re.endPass();
-			if (urt & App3DFramework::URV_Finished)
-			{
-				break;
-			}
-		}*/
-// 		re.postProcess((urt & App3DFramework::URV_SkipPostProcess) != 0);
-// 		if (re.getStereo() != STM_None)
-// 		{
-// 			re.bindFrameBuffer(re.getOverlayFrameBuffer());
-// 			re.getCurrentFrameBuffer()->clear(FrameBuffer::CBM_Color | FrameBuffer::CBM_Depth, Color(0, 0, 0, 0), 1.0f, 0);
-// 		}
-// 		this->flush(App3DFramework::URV_Overlay);
-// 		//re.ste
-		//mNumDrawCalls = re.getNumDrawsJustCalled();
-		//mNumDispatchCalls = re.getNumDispatchesJustCalled();
-	}
-
 	void SceneManager::addRenderable(Renderable* obj)
 	{
 		if (obj->isHWResourceReady())
@@ -353,27 +184,36 @@ namespace Air
 		App3DFramework& app = Engine::getInstance().getAppInstance();
 		float const app_time = app.getAppTime();
 		float const frame_time = app.getFrameTime();
+		uint32_t const attr = obj->getAttrib();
 
+		if (!(attr & SceneObject::SOA_Moveable))
+		{
+			obj->updateWorldMatrix();
+		}
 		//todo 更新渲染线程数据
 		obj->mainThreadUpdate(app_time, frame_time);
 
-		uint32_t const attr = obj->getAttrib();
 		if (attr & SceneObject::SOA_Overlay)
 		{
 			mOverlaySceneObjs.push_back(obj);
 		}
 		else if(attr & SceneObject::SOA_Cullable)
 		{
-			if (!(attr & SceneObject::SOA_Moveable))
-			{
-				obj->updateWorldMatrix();
-			}
+			
 			mSceneObjs.push_back(obj);
 			this->onAddSceneObject(obj);
 		}
 		else
 		{
 			mNoCullableSceneObjects.push_back(obj);
+		}
+	}
+
+	void SceneManager::getNoCullableObject(std::vector<SceneObject*> & result)
+	{
+		for (auto it : mNoCullableSceneObjects)
+		{
+			result.push_back(it.get());
 		}
 	}
 
@@ -397,30 +237,20 @@ namespace Air
 		}
 	}
 
-	void SceneManager::querySceneObject(CameraPtr const & camera, uint32_t mask)
+	void SceneManager::querySceneObject(Camera const & camera, uint32_t mask, std::vector<SceneObject*> & result)
 	{
-		mFrustum = &camera->getViewFrustum();
-		size_t seed = 0;
-		boost::hash_combine(seed, camera->getOmniDirectionalMode());
-		boost::hash_combine(seed, &camera);
 
-		auto vmiter = mVisibleMarksMap.find(seed);
-		if (vmiter == mVisibleMarksMap.end())
-		{
-			this->clipScene(mask);
-			auto visible_marks = MakeUniquePtr<std::vector<BoundOverlap>>(mSceneObjs.size());
-			for (size_t i = 0; i < mSceneObjs.size(); ++i)
-			{
-				(*visible_marks)[i] = mSceneObjs[i]->getVisibleMark();
-			}
+		mFrustum = &camera.getViewFrustum();
 
-			mVisibleMarksMap.emplace(seed, std::move(visible_marks));
-		}
-		else
+
+
+		this->clipScene(mask, result);
+
+		for (auto it : mNoCullableSceneObjects)
 		{
-			for (size_t i = 0; i < mVisibleMarksMap.size(); ++i)
+			if (it->getAttrib() & mask)
 			{
-				mSceneObjs[i]->setVisibleMark((*vmiter->second)[i]);
+				result.push_back(it.get());
 			}
 		}
 	}

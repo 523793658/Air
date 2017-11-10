@@ -368,6 +368,9 @@ namespace Air
 
 		template <typename T>
 		T perspective_area(Vector_T<T, 3> const & view_pos, Matrix4_T<T> const & view_proj, AABBox_T<T> const & aabbox) AIR_NOEXCEPT;
+
+		template <typename T, int N>
+		Vector_T<T, N> vectorLerp(Vector_T<T, N> const & src1, Vector_T<T, N> const & src2, float factor) AIR_NOEXCEPT;
 	}
 }
 

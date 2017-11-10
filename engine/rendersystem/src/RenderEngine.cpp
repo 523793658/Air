@@ -1,4 +1,6 @@
-#include "Engine.h"
+
+#include "Context.h"
+#include "SingletonManager.hpp"
 #include "basic/include/Math.hpp"
 #include "rendersystem/include/FrameBuffer.hpp"
 #include "rendersystem/include/RenderFactory.h"
@@ -11,6 +13,7 @@
 #include "rendersystem/include/RenderLayer.hpp"
 #include "rendersystem/include/Renderable.hpp"
 #include "scene_manager/include/SceneObject.hpp"
+#include "rendersystem/include/RenderPipeline.hpp"
 
 #include "rendersystem/include/RenderEngine.hpp"
 namespace Air
@@ -60,10 +63,6 @@ namespace Air
 		uint32_t const newScreenHeight = height;
 		uint32_t const newRenderWidth = static_cast<uint32_t>(newScreenWidth * mDefaultRenderWidthScale + 0.5f);
 		uint32_t const newRenderHeight = static_cast<uint32_t>(newScreenHeight * mDefaultRenderHeightScale + 0.5f);
-// 		if ((oldScreenWidth != newScreenWidth) || (oldScreenHeight != newScreenHeight))
-// 		{
-// 			this->do
-// 		}
 
 	}
 
@@ -93,11 +92,10 @@ namespace Air
 	void RenderEngine::refresh()
 	{
 		beginFrame();
-		for (auto layer : mRenderLayers)
+		for (auto pipeline : mPipelines)
 		{
-			layer->update();
+			pipeline->update();
 		}
-		postProcess(false);
 		mScreenFrameBuffer->swapBuffers();
 		endFrame();
 	}
@@ -157,15 +155,7 @@ namespace Air
 		}
 	}
 
-	void RenderEngine::postProcess(bool skip)
-	{
-		if (mPostProcessChain)
-		{
-			mPostProcessChain->update();
-		}
-
-
-	}
+	
 
 	void RenderEngine::updateGPUTimestampsFrequency()
 	{
@@ -174,59 +164,11 @@ namespace Air
 	void RenderEngine::beginFrame()
 	{
 		mRenderEnvironment.update();
-		this->bindFrameBuffer(mDefaultFrameBuffer);
+		//this->bindFrameBuffer(mDefaultFrameBuffer);
 	}
 	void RenderEngine::beginPass()
 	{
 
-	}
-
-	void RenderEngine::addRenderableToQueue(Renderable* obj)
-	{
-		if (obj->isHWResourceReady())
-		{
-			RenderTechnique const * objTech = obj->getRenderTechnique();
-			BOOST_ASSERT(objTech);
-			bool found = false;
-			for (auto & items : mRenderQueue)
-			{
-				if (items.first == objTech)
-				{
-					items.second.push_back(obj);
-					found = true;
-					break;
-				}
-			}
-			if (!found)
-			{
-				mRenderQueue.emplace_back(objTech, std::vector<Renderable*>(1, obj));
-			}
-		}
-	}
-
-	void RenderEngine::prepareRenderQueue(std::vector<SceneObjectPtr> const & objs, bool visibleTest)
-	{
-		for (auto const & obj : objs)
-		{
-			auto so = obj.get();
-			if (0 == so->getNumChildren())
-			{
-				auto renderable = so->getRenderable().get();
-				if (renderable)
-				{
-					if (0 == renderable->getNumInstances())
-					{
-						renderable->addToRenderQueue();
-					}
-					renderable->addInstance(so);
-				}
-			}
-		}
-	}
-
-	void RenderEngine::renderObjects(std::vector<SceneObjectPtr> const & objs)
-	{
-		prepareRenderQueue(objs, false);
 	}
 
 	void RenderEngine::render(RenderEffect const &effect, RenderTechnique const & tech, RenderLayout const & rl)
@@ -272,7 +214,7 @@ namespace Air
 		{
 			settings.width = static_cast<uint32_t>(settings.height * screen_aspect + 0.5f);
 		}
-		RenderFactory& renderFactory = Engine::getInstance().getRenderFactoryInstance();
+		RenderFactory& renderFactory = SingletonManager::getRenderFactoryInstance();
 
 		uint32_t const render_width = static_cast<uint32_t>(settings.width * mDefaultRenderWidthScale + 0.5);
 		uint32_t const render_height = static_cast<uint32_t>(settings.height * mDefaultRenderHeightScale + 0.5);
@@ -305,14 +247,14 @@ namespace Air
 
 		//mPPRenderLayout = renderFactory.MakeRenderLayout();
 		//mPPRenderLayout->setTopologyType(RenderLayout::TT_TriangleList);
-		
+		this->setDefaultFrameBuffer(mScreenFrameBuffer);
+		mCurrenFrameBuffer = mScreenFrameBuffer;
 		//后处理相关数据
+		mPipelines.push_back(MakeSharedPtr<RenderPipeline>());
+		mScreenFrameBuffer->setDebugInfo("screenBuffer");
+		mPipelines.back()->setFrameBuffer(mScreenFrameBuffer);
 
-
-		mDefaultFrameBuffer = mScreenFrameBuffer;
-		this->bindFrameBuffer(mDefaultFrameBuffer);
-		mPostProcessChain = MakeSharedPtr<PostProcessChain>();
-		mPostProcessChain->loadCfg(settings.mPostProcessCfgPath);
+		mPipelines.back()->loadConfig(settings.mPipelineConfigPath);
 	}
 
 	void RenderEngine::setStateObject(RenderStateObjectPtr const & rs_obj)
@@ -326,7 +268,7 @@ namespace Air
 				auto const & bs_desc = rs_obj->getBlendStateDesc();
 
 				rs_desc.mPolygonMode = PM_Line;
-				mCurrentLineRenderStateObject = Engine::getInstance().getRenderFactoryInstance().makeRenderStateObject(rs_desc, dds_desc, bs_desc);
+				mCurrentLineRenderStateObject = SingletonManager::getRenderFactoryInstance().makeRenderStateObject(rs_desc, dds_desc, bs_desc);
 				mCurrentLineRenderStateObject->active();
 			}
 			else

@@ -51,7 +51,7 @@ namespace Air
 
 			static void doSub(T out[N], T const lhs[N], T const & rhs) AIR_NOEXCEPT
 			{
-				out[0] = lhs[0] + rhs;
+				out[0] = lhs[0] - rhs;
 				vector_helper<T, N - 1>::doSub(out + 1, lhs + 1, rhs);
 			}
 
@@ -80,6 +80,12 @@ namespace Air
 			{
 				std::swap(lhs[0], rhs[0]);
 				vector_helper<T, N - 1>::doSwap(lhs + 1, rhs + 1);
+			}
+
+			static void doLerp(T out[N], T const lhs[N], T const rhs[N], float factor, float inv_factor) AIR_NOEXCEPT
+			{
+				out[0] = lhs[0] * inv_factor + rhs[0] * factor;
+				vector_helper<T, N - 1>::doLerp(out + 1, lhs + 1, rhs + 1, factor, inv_factor);
 			}
 		};
 
@@ -148,6 +154,11 @@ namespace Air
 			static void doAssign(T out[1], T const & rhs) AIR_NOEXCEPT
 			{
 				out[0] = rhs;
+			}
+
+			static void doLerp(T out[1], T const lhs[1], T const rhs[1], float factor, float inv_factor) AIR_NOEXCEPT
+			{
+				out[0] = lhs[0] * inv_factor + rhs[0] * factor;
 			}
 
 		};

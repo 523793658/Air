@@ -47,6 +47,7 @@
 				"../basic/include/Reflection.hpp",
 				"../basic/include/Json.hpp",
 				"../basic/include/Date.hpp",
+				"../basic/include/ClassManager.hpp",
 				
 				"../basic/src/Thread.cpp",
 				"../basic/src/CPP11.cpp",
@@ -75,6 +76,7 @@
 				"../basic/src/Reflection.cpp",
 				"../basic/src/Json.cpp",
 				"../basic/src/Date.cpp",
+				"../basic/src/ClassManager.cpp",
 			],
 			"conditions":[
 				[

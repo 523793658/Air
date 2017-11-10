@@ -30,6 +30,7 @@
 				"<(shaderPath)/util.hlsl",
 				"<(shaderPath)/toneMap.hlsl",
 				"<(shaderPath)/Luminance.hlsl",
+				"<(shaderPath)/shadowPCF.hlsl",
 			],
 		},
 	],

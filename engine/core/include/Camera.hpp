@@ -50,6 +50,7 @@ namespace Air
 		Frustum const & getViewFrustum() const;
 
 		float4x4 const & getViewMatrix() const;
+		float4x4 const & getInverseViewMatirx() const;
 		float4x4 const & getProjMatrix() const;
 		float4x4 const & getProjMatrixWOAdjust() const;
 		float4x4 const & getViewProjMatrix() const;

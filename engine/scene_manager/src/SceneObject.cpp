@@ -1,5 +1,6 @@
-#include "Engine.h"
+
 #include "Context.h"
+#include "SingletonManager.hpp"
 #include "scene_manager/include/SceneManager.hpp"
 #include "scene_manager/include/SceneObject.hpp"
 #include "rendersystem/include/Renderable.hpp"
@@ -40,6 +41,16 @@ namespace Air
 		return mChildren[index];
 	}
 
+	void SceneObject::setCustomData(std::shared_ptr<void> data)
+	{
+		mCustomData = data;
+	}
+
+	std::shared_ptr<void> const & SceneObject::getCustomData() const
+	{
+		return mCustomData;
+	}
+
 
 	bool SceneObject::isVisible() const
 	{
@@ -68,7 +79,7 @@ namespace Air
 
 	void SceneObject::addToSceneManager()
 	{
-		Engine::getInstance().getSceneManangerInstance().addSceneObject(this->shared_from_this());
+		SingletonManager::getSceneManagerInstance().addSceneObject(this->shared_from_this());
 		for (auto const & child : mChildren)
 		{
 			child->addToSceneManager();
@@ -77,7 +88,7 @@ namespace Air
 
 	void SceneObject::addToSceneManagerLocked()
 	{
-		Engine::getInstance().getSceneManangerInstance().addSceneObjectLocked(this->shared_from_this());
+		SingletonManager::getSceneManagerInstance().addSceneObjectLocked(this->shared_from_this());
 		for (auto const & child : mChildren)
 		{
 			child->addToSceneManagerLocked();

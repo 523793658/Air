@@ -1,4 +1,6 @@
+#include "Context.h"
 #include "Engine.h"
+#include "SingletonManager.hpp"
 #include "SampleCommon.hpp"
 #include "CameraController.hpp"
 #include "input_system/include/InputFactory.hpp"
@@ -6,6 +8,10 @@
 #include "rendersystem/include/FrameBuffer.hpp"
 #include "rendersystem/include/Light.hpp"
 #include "app/include/App3D.hpp"
+#include "rendersystem/include/RenderMaterial.hpp"
+#include "rendersystem/include/Mesh.hpp"
+#include "rendersystem/include/SimpleMeshFactory.hpp"
+#include "rendersystem/include/RenderableHelper.hpp"
 #include "rendersystem/include/RenderEffect.hpp"
 #include "rendersystem/include/Renderable.hpp"
 
@@ -71,8 +77,6 @@ namespace Sample
 
 		uint32_t doUpdate(uint32_t pass)
 		{
-			RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
-			re.getCurrentFrameBuffer()->clear(FrameBuffer::CBM_Color | FrameBuffer::CBM_Depth | FrameBuffer::CBM_Stencil, Color(0.0f, 0.0f, 0.0f, 1.0f), 1.0f, 0);
 			return App3DFramework::URV_NeedFlush | App3DFramework::URV_Finished;
 		}
 		void onCreate()
@@ -88,13 +92,21 @@ namespace Sample
 
 			TexturePtr sky_box_tex = aSyncLoadTexture("assets/texture/uffizi_cross.dds", EAH_GPU_Read | EAH_Immutable);
 
-			Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance().getRenderEnvironment().setEnvironmentTexMips(int2(y_cube_map->getNumMipMaps(), 7));
-
 			AmbientLightSourcePtr ambient_light = MakeSharedPtr<AmbientLightSource>();
+			SceneObjectPtr ambientLightObject = MakeSharedPtr<SceneObject>(SceneObject::SOA_LightSource);
+			ambient_light->setColor(float3(0.3, 0.3, 0.3) * 0.8f);
+			ambient_light->setSkyLightTexC(c_cube_map);
+			ambient_light->setSkyLightTexY(y_cube_map);
+			ambientLightObject->setCustomData(ambient_light);
+			ambientLightObject->addToSceneManager();
 
-			ambient_light->addToSceneManager();
 
-
+			DirectLightSourcePtr direction_light = MakeSharedPtr<DirectLightSource>();
+			direction_light->setColor(float3(1, 1, 1) * 0.8f);
+			direction_light->setDirection(float3(1, 1, 1));
+			SceneObjectPtr directLightObject = MakeSharedPtr<SceneObject>(SceneObject::SOA_LightSource);
+			directLightObject->setCustomData(direction_light);
+			directLightObject->addToSceneManager();
 			uint32_t spheres_row = 10;
 			uint32_t spheres_column = 10;
 			mSpheres.resize(spheres_row * spheres_column);
@@ -112,23 +124,27 @@ namespace Sample
 					*effect->getParameterByName("u_SkyBoxTex") = y_cube_map;
 					*effect->getParameterByName("u_SkyBoxCcubeTex") = c_cube_map;
 					*effect->getParameterByName("u_IntegratedBRDFTex") = integratedBRDFTex;
-
 					mSpheres[i * spheres_column + j]->addToSceneManager();
 				}
 			}
 			mSkyBox = MakeSharedPtr<SceneObjectSkyBox>(0);
-			
 			checked_pointer_cast<SceneObjectSkyBox>(mSkyBox)->setCubeMap(sky_box_tex);
-
 			mSkyBox->addToSceneManager();
 
-
+			mTerrainBlock = MakeSharedPtr<SceneObject>(SceneObject::SOA_Cullable);
+			StaticMeshPtr terrain = SimpleMeshFactory::createStaticQuat();
+			/*RenderEffectPtr effect = syncLoadRenderEffect("assets/shader/simpleforward.asd");
+			terrain->setTechnique(effect, effect->getTechniqueByName("forwardRendering"));*/
+			terrain->setMaterial(MakeSharedPtr<RenderMaterial>(float3(1.0f, 1.0f, 1.0f), float3(1.0f, 1.0f, 1.0f), 1.0f, 0.0f));
+			mTerrainBlock->setRenderable(terrain);
+			mTerrainBlock->setLocalMatrix(MathLib::scaling(float3(50, 50, 50)) * MathLib::translation(float3(1, 1, 1)) * MathLib::to_matrix(MathLib::rotation_axis(float3(1, 0, 0), PI / 4)));
+			//mTerrainBlock->addToSceneManager();
 			this->LookAt(float3(0.0f, 0.0f, -10.0f), float3(0.0f, 0.0f, 0.0f));
-			this->Proj(0.05f, 1000);
+			this->Proj(0.05f, 500);
 			mCameraController.attachCamera(this->getActiveCamera());
 			mCameraController.setScalers(0.003f, 0.003f);
 
-			InputEngine& inputEngine = Engine::getInstance().getInputFactoryInstance().getInputEngineInstance();
+			InputEngine& inputEngine = SingletonManager::getInputFactoryInstance().getInputEngineInstance();
 			InputActionMap actionMap;
 			actionMap.addActions(actions, actions + std::size(actions));
 			ActionHandlerT input_handler = MakeSharedPtr<InputSignal>();
@@ -144,6 +160,7 @@ namespace Sample
 		}
 	private:
 		std::vector<Air::SceneObjectPtr> mSpheres;
+		Air::SceneObjectPtr mTerrainBlock;
 		SceneObjectPtr mSkyBox;
 		Air::TrackballCameraController mCameraController;
 	};

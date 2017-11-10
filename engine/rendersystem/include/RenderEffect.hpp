@@ -172,7 +172,7 @@ namespace Air
 #define SMT_Num 10
 
 
-	template<typename T>
+template<typename T>
 class RenderVariableConcrete : public RenderVariable
 {
 public:

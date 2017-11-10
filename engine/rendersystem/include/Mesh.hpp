@@ -6,6 +6,10 @@
 #include "rendersystem\include\RenderLayout.hpp"
 namespace Air
 {
+	class AIR_CORE_API Mesh
+	{
+
+	};
 
 	class AIR_CORE_API StaticMesh : public Renderable
 	{

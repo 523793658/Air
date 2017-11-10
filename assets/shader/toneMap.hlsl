@@ -19,13 +19,13 @@ float3 ACESFilm(float3 x)
 
 float3 toneMap(float3 color, float3 blur, float adapted_lum)
 {
-	color += blur * u_Params.x;
+	/*color += blur * u_Params.x;
 	if (u_BlueShift)
 	{
 		float lum = dot(color, RGB_TO_LUM);
 		color = lerp(lum * BLUE_SHIFT, color, saturate(16.0f * lum));
 	}
-	float adapted_lum_dest = 2 / (max(0.1f, 1 + 10 * EyeAdaption(adapted_lum)));
+	float adapted_lum_dest = 2 / (max(0.1f, 1 + 10 * EyeAdaption(adapted_lum)));*/
 	//return ACESFilm(adapted_lum_dest * u_Params.y * color);
 	return color;
 }

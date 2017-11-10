@@ -1,10 +1,17 @@
+
+#include "Context.h"
 #include "Engine.h"
 #include "app/include/App3D.hpp"
 #include "Camera.hpp"
+#include "rendersystem/include/Light.hpp"
 #include "rendersystem/include/RenderEnvironment.hpp"
 
 namespace Air
 {
+	const size_t RenderEnvironment::RE_EVENT_UPDATE_DIRECTION_LIGHT = CT_HASH("updateDirectionLight");
+
+
+
 	RenderEnvironment::RenderEnvironment()
 	{
 
@@ -26,19 +33,45 @@ namespace Air
 		return cb->second.get();
 		return nullptr;
 	}
+	void RenderEnvironment::updateLights(std::vector<LightSourcePtr> const & lights)
+	{
+		auto b = mSharedConstanBuffers.find("cb_RenderEnvironment");
+		if (b != mSharedConstanBuffers.end())
+		{
+			for (auto l : lights)
+			{
+				switch (l->getType())
+				{
+				case LT_Directional:
+				{
+					DirectLightSourcePtr light = std::static_pointer_cast<DirectLightSource>(l);
+					*b->second->getParameterByName("u_DirLightDir") = light->getDirection();
+					*b->second->getParameterByName("u_DirLightColor") = light->getColor();
+					this->notify(RE_EVENT_UPDATE_DIRECTION_LIGHT, light.get());
+				}
+
+				break;
+
+				case LT_Ambient:
+				{
+					AmbientLightSourcePtr light = std::static_pointer_cast<AmbientLightSource>(l);
+					*b->second->getParameterByName("u_DiffuseSpecularMip") = light->getMipmapNum();
+					*b->second->getParameterByName("u_AmbientCubemapColor") = light->getColor();
+				}
+				break;
+				default:
+					break;
+				}
+			}
+		}
+	}
 
 	void RenderEnvironment::update()
 	{
 		auto b = mSharedConstanBuffers.find("cb_RenderEnvironment");
 		if (b != mSharedConstanBuffers.end())
 		{
-			*b->second->getParameterByName("u_DirLightDir") = float3(1, 2, 3).normalize();
-			*b->second->getParameterByName("u_DirLightColor") = float3(1.0, 1.0, 1.0);
-
 			*b->second->getParameterByName("u_CameraDir") = Engine::getInstance().getAppInstance().getActiveCamera().getForwardVec();
-
-			*b->second->getParameterByName("u_AmbientCubemapColor") = float3(0.3, 0.3, 0.3);
-			*b->second->getParameterByName("u_DiffuseSpecularMip") = mEnvironmentTexMips;
 		}
 	}
 

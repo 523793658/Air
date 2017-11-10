@@ -66,8 +66,12 @@ namespace Air
 
 		virtual void clear(uint32_t flags, Color const& clr, float depth, int32_t stencil) = 0;
 
+		void setClearFlag(bool needClear, uint32_t clearFlag);
+
 	protected:
 		bool mViewsDirty;
+		bool mNeedClear{ false };
+		uint32_t mClearFlag;
 		uint32_t mLeft;
 		uint32_t mTop;
 		uint32_t mWidth;
@@ -75,6 +79,25 @@ namespace Air
 		ViewportPtr mViewport;
 		std::vector<RenderViewPtr> mColorViews;
 		RenderViewPtr mDepthStencilView;
+
+	public:
+#ifdef AIR_DEBUG
+		void setDebugInfo(std::string info)
+		{
+			mDebugInfo = info;
+		}
+#else
+		void inline setDebugInfo(std::string_view info)
+		{
+			AIR_UNREACHABLE(info);
+		}
+#endif
+
+#ifdef AIR_DEBUG
+	private:
+		std::string mDebugInfo;
+#endif
+
 	};
 
 

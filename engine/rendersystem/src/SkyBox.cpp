@@ -1,4 +1,6 @@
+#include "Context.h"
 #include "Engine.h"
+#include "SingletonManager.hpp"
 #include "basic/include/Math.hpp"
 #include "rendersystem/include/GraphicsBuffer.hpp"
 #include "rendersystem/include/RenderEngine.hpp"
@@ -13,7 +15,7 @@ namespace Air
 	RenderableSkyBox::RenderableSkyBox()
 		:RenderableHelper(L"SkyBox")
 	{
-		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+		RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 
 		RenderEffectPtr effect = syncLoadRenderEffect("assets/shader/skyBox.asd");
 
@@ -61,19 +63,6 @@ namespace Air
 		*mSkyCubeTex = y_cube;
 		*mSkyCcubeTex = c_cube;
 		*mSkyCompressed = static_cast<int32_t>(1);
-	}
-
-	void RenderableSkyBox::setPass(PassType type)
-	{
-		switch (type)
-		{
-		case Air::PT_OpaqueGBufferMRT:
-			break;
-		case Air::PT_OpaqueSpecialShading:
-			break;
-		default:
-			break;
-		}
 	}
 
 	void RenderableSkyBox::onRenderBegin()

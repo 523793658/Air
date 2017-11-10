@@ -1,4 +1,5 @@
-#include "Engine.h"
+#include "Context.h"
+#include "SingletonManager.hpp"
 #include "rendersystem/include/RenderFactory.h"
 #include "D3D11Mapping.hpp"
 #include "D3D11RenderEngine.hpp"
@@ -8,7 +9,7 @@ namespace Air
 {
 	D3D11RenderStateObject::D3D11RenderStateObject(RasterizerStateDesc const & rs_desc, DepthStencilStateDesc const & dss_desc, BlendStateDesc const & bs_desc): RenderStateObject(rs_desc, dss_desc, bs_desc)
 	{
-		D3D11RenderEngine& re = *checked_cast<D3D11RenderEngine*>(&Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance());
+		D3D11RenderEngine& re = *checked_cast<D3D11RenderEngine*>(&SingletonManager::getRenderFactoryInstance().getRenderEngineInstance());
 		ID3D11Device* d3d_device = re.getD3DDevice();
 		RenderDeviceCaps const & caps = re.getDeviceCaps();
 		D3D11_RASTERIZER_DESC d3d_rs_desc;
@@ -117,7 +118,7 @@ namespace Air
 	}
 	void D3D11RenderStateObject::active()
 	{
-		D3D11RenderEngine& re = *checked_cast<D3D11RenderEngine*>(&Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance());
+		D3D11RenderEngine& re = *checked_cast<D3D11RenderEngine*>(&SingletonManager::getRenderFactoryInstance().getRenderEngineInstance());
 		re.setRasterizerState(mRasterizerState.get());
 		re.setDepthStencilState(mDepthStencilState.get(), mDSSDesc.mFrontStencilRef);
 		re.setBlendState(mBlendState.get(), mBSDesc.mBlendFactor, mBSDesc.mSampleMask);
@@ -126,7 +127,7 @@ namespace Air
 	D3D11SamplerStateObject::D3D11SamplerStateObject(SamplerStateDesc const & desc)
 		:SamplerStateObject(desc)
 	{
-		D3D11RenderEngine& re = *checked_cast<D3D11RenderEngine*>(&Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance());
+		D3D11RenderEngine& re = *checked_cast<D3D11RenderEngine*>(&SingletonManager::getRenderFactoryInstance().getRenderEngineInstance());
 		ID3D11Device* d3d_device = re.getD3DDevice();
 		D3D11_SAMPLER_DESC d3d_desc;
 		d3d_desc.AddressU = D3D11Mapping::mapping(desc.mAddrModeU);

@@ -27,6 +27,15 @@ namespace Air
 		RenderLayoutPtr mRenderlayout;
 		RenderEffectParameter* mColor;
 	};
+
+	class AIR_CORE_API WireFrame : public RenderableHelper
+	{
+	public:
+		explicit WireFrame();
+		~WireFrame();
+		void setGeometryData(std::vector<float3> mPosition, std::vector<uint16_t> indices);
+
+	};
 }
 
 #endif

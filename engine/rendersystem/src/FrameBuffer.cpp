@@ -1,4 +1,6 @@
-#include "Engine.h"
+
+#include "Context.h"
+#include "SingletonManager.hpp"
 #include "basic/include/ErrorHanding.hpp"
 #include "rendersystem/include/RenderView.hpp"
 #include "rendersystem/include/RenderFactory.h"
@@ -67,7 +69,7 @@ namespace Air
 		default:
 		{
 			BOOST_ASSERT(att >= ATT_Color0);
-			RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+			RenderEngine& re = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
 			if (att >= static_cast<uint32_t>(ATT_Color0 + re.getDeviceCaps().mMaxSimultaneousRts))
 			{
 				TERRC(std::errc::function_not_supported);
@@ -120,7 +122,7 @@ namespace Air
 		break;
 		default:
 		{
-			RenderEngine &re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+			RenderEngine &re = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
 			if (att >= static_cast<uint32_t>(ATT_Color0 + re.getDeviceCaps().mMaxSimultaneousRts))
 			{
 				TERRC(std::errc::function_not_supported);
@@ -136,6 +138,12 @@ namespace Air
 		}
 		mViewsDirty = true;
 	}
+	void FrameBuffer::setClearFlag(bool needClear, uint32_t clearFlag)
+	{
+		mNeedClear = needClear;
+		mClearFlag = clearFlag;
+	}
+
 	RenderViewPtr FrameBuffer::getAttached(uint32_t att) const
 	{
 		switch (att)

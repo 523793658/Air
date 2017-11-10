@@ -2,7 +2,9 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <fstream>
-#include "Engine.h"
+
+#include "Context.h"
+#include "SingletonManager.hpp"
 #include "rendersystem/include/RenderFactory.h"
 #include "basic/include/ErrorHanding.hpp"
 #include "basic/include/ResIdentifier.h"
@@ -1074,7 +1076,7 @@ namespace
 				}
 			}
 			var = MakeUniquePtr<RenderVariableSampler>();
-			*var = Engine::getInstance().getRenderFactoryInstance().MakeSamplerStateObject(desc);
+			*var = SingletonManager::getRenderFactoryInstance().MakeSamplerStateObject(desc);
 		}
 		break;
 		case REDT_shader:
@@ -1818,7 +1820,7 @@ namespace
 			desc.mCmpFunc = LE2Native(desc.mCmpFunc);
 
 			var = MakeUniquePtr<RenderVariableSampler>();
-			*var = Engine::getInstance().getRenderFactoryInstance().MakeSamplerStateObject(desc);
+			*var = SingletonManager::getRenderFactoryInstance().MakeSamplerStateObject(desc);
 		}
 		break;
 
@@ -3018,10 +3020,12 @@ namespace Air
 		AIR_UNREACHABLE("Can't be called");
 	}
 
+
 	RenderVariable& RenderVariable::operator=(std::vector<float4x4> const & /*value*/)
 	{
 		AIR_UNREACHABLE("Can't be called");
 	}
+
 
 	void RenderVariable::getValue(bool& /*value*/) const
 	{
@@ -3087,6 +3091,7 @@ namespace Air
 	{
 		AIR_UNREACHABLE("Can't be called");
 	}
+
 
 	void RenderVariable::getValue(float4x4& /*value*/) const
 	{
@@ -3662,7 +3667,7 @@ namespace Air
 	uint32_t RenderEffect::addShaderObject()
 	{
 		uint32_t index = static_cast<uint32_t>(mShaderObjs.size());
-		mShaderObjs.push_back(Engine::getInstance().getRenderFactoryInstance().makeShaderObject());
+		mShaderObjs.push_back(SingletonManager::getRenderFactoryInstance().makeShaderObject());
 		return index;
 	}
 
@@ -3690,7 +3695,7 @@ namespace Air
 
 	bool RenderEffectTemplate::streamIn(ResIdentifierPtr const & source, RenderEffect& effect)
 	{
-		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
 		bool ret = false;
 		if (source)
 		{
@@ -3824,7 +3829,7 @@ namespace Air
 	void RenderEffectTemplate::streamOut(std::ostream& os, RenderEffect const & effect)
 		const
 	{
-		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
 		uint32_t fourcc = Native2LE(MakeFourCC<'K', 'F', 'X', ' '>::value);
 		os.write(reinterpret_cast<char const *>(&fourcc), sizeof(fourcc));
 
@@ -4037,7 +4042,7 @@ namespace Air
 
 	void RenderEffectTemplate::load(std::string const & name, RenderEffect& effect)
 	{
-		RenderEnvironment & env = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance().getRenderEnvironment();
+		RenderEnvironment & env = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance().getRenderEnvironment();
 		std::string fxml_name = ResLoader::getInstance().locate(name);
 		if (fxml_name.empty())
 		{
@@ -4778,7 +4783,7 @@ namespace Air
 		{
 			if (!mHWBuffer || (size > mHWBuffer->getSize()))
 			{
-				RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+				RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 				mHWBuffer = rf.makeConstantBuffer(BU_Dynamic, 0, size, nullptr);
 			}
 		}
@@ -5061,7 +5066,7 @@ namespace Air
 #if AIR_IS_DEV_PLATFORM
 	void RenderPass::load(RenderEffect& effect, XMLNodePtr const & node, uint32_t tech_index, uint32_t pass_index, RenderPass const * inherit_pass)
 	{
-		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+		RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 		mName = node->getAttrib("name")->getValueString();
 		mNameHash = boost::hash_range(mName.begin(), mName.end());
 
@@ -5646,7 +5651,7 @@ namespace Air
 
 	void RenderPass::bind(RenderEffect const & effect) const
 	{
-		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
 		re.setStateObject(mRenderStateObject);
 		this->getShaderObject(effect)->bind();
 	}
@@ -5658,7 +5663,7 @@ namespace Air
 
 	bool RenderPass::streamIn(RenderEffect& effect, ResIdentifierPtr const & res, uint32_t tech_index, uint32_t pass_index)
 	{
-		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+		RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 
 		mName =readShortString(res);
 		mNameHash = boost::hash_range(mName.begin(), mName.end());

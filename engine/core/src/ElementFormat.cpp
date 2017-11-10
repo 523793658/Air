@@ -1,9 +1,12 @@
-#include "Engine.h"
+#include "Context.h"
 #include "ElementFormat.h"
 #include "boost/functional/hash.hpp"
 
 namespace Air
 {
+	
+
+
 	ElementFormat parseFormat(std::string formatStr)
 	{
 		size_t hash_value = boost::hash_range(formatStr.begin(), formatStr.end());

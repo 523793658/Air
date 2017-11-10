@@ -1,18 +1,15 @@
-
-#include "Engine.h"
-
+#include "Context.h"
+#include "SingletonManager.hpp"
 #include <basic/include/Util.h>
-
+#include "Engine.h"
 
 
 #include "app/include/Window.hpp"
 #include "Camera.hpp"
-
 #include "rendersystem/include/RenderFactory.h"
 #include "rendersystem/include/RenderEngine.hpp"
 #include "rendersystem/include/Viewport.hpp"
 #include "rendersystem/include/FrameBuffer.hpp"
-
 #include "app/include/App3D.hpp"
 
 
@@ -59,7 +56,7 @@ namespace Air
 	{
 #endif
 		ContextCfg cfg = Engine::getInstance().getConfig();
-		RenderFactory& factory = Engine::getInstance().getRenderFactoryInstance();
+		RenderFactory& factory = SingletonManager::getRenderFactoryInstance();
 		factory.getRenderEngineInstance().createRenderWindow(mName, cfg.mGraphicsCfg);
 		Engine::getInstance().setConfig(cfg);
 		this->onCreate();
@@ -107,7 +104,7 @@ namespace Air
 	}
 	Camera const & App3DFramework::getActiveCamera() const
 	{
-		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
 		CameraPtr const & camera = re.getCurrentFrameBuffer()->getViewport()->mCamera;
 		BOOST_ASSERT(camera);
 		return *camera;
@@ -115,7 +112,7 @@ namespace Air
 
 	Camera& App3DFramework::getActiveCamera()
 	{
-		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
 		CameraPtr const & camera = re.getCurrentFrameBuffer()->getViewport()->mCamera;
 		BOOST_ASSERT(camera);
 		return *camera;
@@ -158,7 +155,7 @@ namespace Air
 	{
 		BOOST_ASSERT(nearPlane != 0);
 		BOOST_ASSERT(farPlane != 0);
-		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
 		FrameBuffer& fb = *re.getCurrentFrameBuffer();
 
 		this->getActiveCamera().setProjParams(re.getDefaultFov(), static_cast<float>(fb.getWidth()) / fb.getHeight(), nearPlane, farPlane);

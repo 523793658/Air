@@ -35,13 +35,14 @@
     <parameter type="float4" name="u_SpecularColorMetallic"/>
 	<shader>
 		<![CDATA[
-
+#include "shadowPCF.hlsl"
 
 #include "shadingModels.hlsl"
 
 struct PS_INPUT
 {
     float4 oPos : SV_Position;
+	float2 vTexcoord : TEXCOORD0;
 	float3 vNormal : NORMAL0;
 };
 
@@ -71,7 +72,17 @@ PS_OUTPUT simplestPS(PS_INPUT input)
 }
 		]]>
 	</shader>
-	<technique name="simplest">
+    
+    <technique name="genShadowMap">
+        <pass name="p0" domain="surface" blendModel="opaque" shadingModel="defaultLit">
+            <state name="vertex_shader" value="genShadowMapVS()"/>
+            <state name="pixel_shader" value="genShadowMapPS()"/>
+			<state name="depth_clip_enable" value="false" />
+            <state name="cull_mode" value="back"/>
+        </pass>
+    </technique>
+    
+	<technique name="forwardRendering">
 		<pass name="p0" domain="surface" blendMode="opaque" shadingModel="defaultLit">
 			<state name = "pixel_shader" value="simplestPS()"/>
 			<state name = "cull_mode" value="back" />

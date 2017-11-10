@@ -31,6 +31,12 @@
 				"../core/include/ResourcePlugin.h",
 				"../core/include/SALWrapper.hpp",
 				"../core/include/CameraController.hpp",
+				"../core/include/ConfigTranslator.hpp",
+				"../core/include/Event.hpp",
+				"../core/include/GameObject.hpp",
+				"../core/include/ComponentBase.hpp",
+				"../core/include/Type.hpp",
+				"../core/include/SingletonManager.hpp",
 
 				
 				"../core/src/Engine.cpp",
@@ -40,6 +46,12 @@
 				"../core/src/Camera.cpp",
 				"../core/src/ResourcePlugin.cpp",
 				"../core/src/CameraController.cpp",
+				"../core/src/ConfigTranslator.cpp",
+				"../core/src/Event.cpp",
+				"../core/src/GameObject.cpp",
+				"../core/src/Type.cpp",
+				"../core/src/ComponentBase.cpp",
+				"../core/src/SingletonManager.cpp",
 
 				
 				"../rendersystem/include/RenderFactory.h",
@@ -73,6 +85,11 @@
 				"../rendersystem/include/MaterialCompiler.hpp",
 				"../rendersystem/include/RenderLayer.hpp",
 				"../rendersystem/include/RenderLayerPass.hpp",
+				"../rendersystem/include/RenderPipeline.hpp",
+				"../rendersystem/include/ShadowMap.hpp",
+				"../rendersystem/include/SceneRenderer.hpp",
+				"../rendersystem/include/ScenePrivate.hpp",
+				"../rendersystem/include/SceneInterface.hpp",
 				
 				"../rendersystem/src/RenderSettings.cpp",
 				"../rendersystem/src/RenderFactory.cpp",
@@ -104,6 +121,11 @@
 				"../rendersystem/src/MaterialCompiler.cpp",
 				"../rendersystem/src/RenderLayer.cpp",
 				"../rendersystem/src/RenderLayerPass.cpp",
+				"../rendersystem/src/RenderPipeline.cpp",
+				"../rendersystem/src/ShadowMap.cpp",
+				"../rendersystem/src/SceneRenderer.cpp",
+				"../rendersystem/src/ScenePrivate.cpp",
+				"../rendersystem/src/SceneInterface.cpp",
 				
 				"../scene_manager/include/SceneManager.hpp",
 				"../scene_manager/include/SceneObject.hpp",
@@ -124,6 +146,15 @@
 				"../app/include/App3D.hpp",
 				"../app/src/WindowWin.cpp",
 				"../app/src/App3D.cpp",
+				
+				"../component/include/StaticMeshRenderer.hpp",
+				"../component/include/Renderer.hpp",
+				"../component/include/SkinMeshRenderer.hpp",
+				
+				
+				"../component/src/Renderer.cpp",
+				"../component/src/StaticMeshRenderer.cpp",
+				"../component/src/SkinMeshRenderer.cpp",
 			],
 			"conditions":[
 				[

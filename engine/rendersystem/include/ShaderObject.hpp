@@ -2,7 +2,7 @@
 #define _ShaderObject_H_
 #pragma once
 #include <boost/noncopyable.hpp>
-#include "Engine.h"
+
 
 #include "rendersystem/include/RenderLayout.hpp"
 

@@ -26,7 +26,7 @@ namespace Air
 // 		uint32_t getNumCameras() const;
 // 		CameraPtr& getCamera(uint32_t index);
 // 		CameraPtr const & getCamera(uint32_t index) const;
-		void querySceneObject(CameraPtr const & camera, uint32_t mask);
+		void querySceneObject(Camera const & camera, uint32_t mask, std::vector<SceneObject*> & result);
 
 		void addRenderable(Renderable* obj);
 
@@ -37,6 +37,8 @@ namespace Air
 		void addLight(LightSourcePtr const & light);
 		void addLightLocked(LightSourcePtr const & light);
 		void delLight(LightSourcePtr const & light);
+
+		void getNoCullableObject(std::vector<SceneObject*> & result);
 
 
 		void update();
@@ -55,15 +57,10 @@ namespace Air
 
 
 	protected:
-		void flush(uint32_t urt);
-		void prepareRenderQueue(std::vector<SceneObjectPtr> const & objs, bool visibleTest = true);
 		virtual void onAddSceneObject(SceneObjectPtr const & obj) = 0;
 		virtual void onDelSceneObject(std::vector<SceneObjectPtr>::iterator iter) = 0;
 
 		BoundOverlap visibleTestFromParent(SceneObject* obj, float3 const & view_dir, float3 const & eye_pos, float4x4 const & view_proj);
-	private:
-		void flushScene();
-
 	private:
 		uint32_t mURT;
 

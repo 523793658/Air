@@ -1,4 +1,6 @@
+#include "Context.h"
 #include "Engine.h"
+#include "SingletonManager.hpp"
 #include "D3D11RenderView.hpp"
 #include <boost/lexical_cast.hpp>
 #include "basic/include/ErrorHanding.hpp"
@@ -11,6 +13,7 @@
 #include "D3D11Texture.hpp"
 #include "D3D11RenderFactoryInternal.hpp"
 #include "D3D11RenderWindow.hpp"
+
 
 
 namespace Air
@@ -48,7 +51,7 @@ namespace Air
 		mViewport->mWidth = mWidth;
 		mViewport->mHeight = mHeight;
 
-		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+		RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 		D3D11RenderEngine& d3d11_re = *checked_cast<D3D11RenderEngine*>(&rf.getRenderEngineInstance());
 		ID3D11Device* d3d_device = d3d11_re.getD3DDevice();
 		ID3D11DeviceContext* d3d_imm_context = nullptr;
@@ -367,7 +370,7 @@ namespace Air
 
 	void D3D11RenderWindow::updateSurfacesPtrs()
 	{
-		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+		RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 #if defined AIR_PLATFORM_WINDOWS_DESKTOP
 		if (mDXGIAllowTearing)
 #endif
@@ -431,7 +434,7 @@ namespace Air
 
 	void D3D11RenderWindow::createSwapChain(ID3D11Device* d3d_device)
 	{
-		RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+		RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 		D3D11RenderEngine& d3d11_re = *checked_cast<D3D11RenderEngine*>(&rf.getRenderEngineInstance());
 		if (d3d11_re.getDXGISubVer() >= 2)
 		{
@@ -493,7 +496,7 @@ namespace Air
 			UINT const present_flags = (mDXGIAllowTearing && !mIsFullScreen) ? DXGI_PRESENT_ALLOW_TEARING : 0;
 			TIFHR(mSwapChain->Present(mSyncInterval, present_flags));
 
-			RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+			RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 			D3D11RenderEngine& d3d11_re = *checked_cast<D3D11RenderEngine*>(&rf.getRenderEngineInstance());
 			if (d3d11_re.getDXGISubVer() >= 2)
 			{

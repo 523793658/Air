@@ -2,8 +2,27 @@
 #define _RenderSettings_H_
 #include <vector>
 #include "ElementFormat.h"
+
 namespace Air
 {
+	struct RenderPassConfig
+	{
+		uint32_t mType;
+		std::string mOutputTargetName;
+	};
+
+	struct RenderLayerConfig
+	{
+		std::vector<RenderPassConfig> mPassesConfig;
+	};
+
+	struct PipelineConfigs
+	{
+		std::string mPostProcessPath;
+		std::vector<RenderLayerConfig> mLayersConfig;
+	};
+
+
 	struct RenderSettings
 	{
 		
@@ -23,7 +42,9 @@ namespace Air
 		float mStereoSeparation;
 		bool mHdr;
 		bool mPostProcessEnable;
+
 		std::string mPostProcessCfgPath;
+		std::string mPipelineConfigPath;
 		std::vector<std::pair<std::string, std::string>> options;
 	};
 }

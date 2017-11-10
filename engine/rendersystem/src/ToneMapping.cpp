@@ -1,4 +1,6 @@
-#include "Engine.h"
+
+#include "Context.h"
+#include "SingletonManager.hpp"
 #include "basic/include/XMLDom.hpp"
 #include "rendersystem/include/mesh.hpp"
 #include "rendersystem/include/RenderEffect.hpp"
@@ -56,12 +58,13 @@ namespace Air
 			*mEffect->getParameterByName("u_LuminanceTex") = mSrcTextures[1];
 			*mEffect->getParameterByName("u_Params") = float2(0, 1);
 			*mEffect->getParameterByName("u_BlueShift") = 0;
+			mDirty = false;
 		}
 	}
 
 	void ToneMapping::render()
 	{
-		RenderEngine& re = Engine::getInstance().getRenderFactoryInstance().getRenderEngineInstance();
+		RenderEngine& re = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
 		re.bindFrameBuffer(mOutputFrameBuffer);
 		mOutputFrameBuffer->discard(FrameBuffer::CBM_Color);
 

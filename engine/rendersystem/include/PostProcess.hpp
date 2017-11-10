@@ -74,7 +74,13 @@ namespace Air
 
 		void loadCfg(std::string cfgPath);
 
+		void loadCfg(XMLNodePtr node);
+
 		RenderablePtr const & getRenderable() const;
+
+		void setInputTarget(FrameBufferPtr const & fb);
+
+		void setOutputTarget(FrameBufferPtr const & fb);
 
 
 	public:
@@ -94,10 +100,14 @@ namespace Air
 
 		float mIsDirty{ true };
 
-		FrameBufferPtr mSceneFrameBuffer;
+		FrameBufferPtr mInputframeBuffer;
+		FrameBufferPtr mOutputFrameBuffer;
+
 		std::stack<FrameBufferPtr> mTempFrameBuffers;
 
 		std::vector<PostProcesser*> mPostProcessers;
+
+
 	};
 }
 

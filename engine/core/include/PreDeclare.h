@@ -9,11 +9,14 @@ namespace Air
 	struct ConfextCfg;
 	class Engine;
 
+	enum ElementFormat;
+	struct ElementInitData;
+
 
 	class SceneManager;
 	class RenderFactory;
 	class ResourcePlugin;
-
+	class ResLoader;
 	class App3DFramework;
 	class Window;
 	typedef std::shared_ptr<Window> WindowPtr;
@@ -106,6 +109,9 @@ namespace Air
 	class RenderMaterial;
 	typedef std::shared_ptr<RenderMaterial> RenderMaterialPtr;
 
+	class RenderPipeline;
+	typedef std::shared_ptr<RenderPipeline> RenderPipelinePtr;
+
 	struct SamplerStateDesc;
 	struct RasterizerStateDesc;
 	struct DepthStencilStateDesc;
@@ -155,6 +161,9 @@ namespace Air
 	class AmbientLightSource;
 	typedef std::shared_ptr<AmbientLightSource> AmbientLightSourcePtr;
 
+	class DirectLightSource;
+	typedef std::shared_ptr<DirectLightSource> DirectLightSourcePtr;
+
 
 	struct VertexElement;
 
@@ -164,6 +173,31 @@ namespace Air
 
 	class RenderLayerPass;
 	typedef std::shared_ptr<RenderLayerPass> RenderLayerPassPtr;
+
+	class ComponentBase;
+	typedef std::shared_ptr<ComponentBase> ComponentBasePtr;
+
+	class Mesh;
+	typedef std::shared_ptr<Mesh> MeshPtr;
+
+	class StaticMeshComponent;
+	typedef std::shared_ptr<StaticMeshComponent> StaticMeshComponentPtr;
+
+	class PrimitiveComponent;
+
+	class FPrimitiveSceneInfo;
+
+	class LightComponent;
+
+	class SkyLightSceneProxy;
+
+	class DecalComponent;
+
+	class ReflectionCaptureComponent;
+
+	class SkyLightComponent;
+	
+	class WorldSettings;
 }
 
 

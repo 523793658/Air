@@ -1,4 +1,5 @@
 #include <dxgi1_5.h>
+#include "Context.h"
 #include "Engine.h"
 #include "basic/include/Util.h"
 #include "basic/include/ErrorHanding.hpp"
@@ -1051,7 +1052,7 @@ namespace Air
 
 		case Air::RenderLayout::TT_LineList:
 		case Air::RenderLayout::TT_LineList_Adj:
-			prim_count = vertex_count / 3;
+			prim_count = vertex_count / 2;
 			break;
 
 		case Air::RenderLayout::TT_LineStrip:
@@ -1178,7 +1179,7 @@ namespace Air
 
 	void D3D11RenderEngine::setRenderTargets(UINT num_rtvs, ID3D11RenderTargetView* const * rtvs, ID3D11DepthStencilView* dsv)
 	{
-		if ((mRenderCache.mRTVPtr.size() != num_rtvs) || (mRenderCache.mDSVPtr != dsv) || (memcmp(&mRenderCache.mRTVPtr[0], rtvs, num_rtvs * sizeof(rtvs[0])) != 0))
+		if ((mRenderCache.mRTVPtr.size() != num_rtvs) || (mRenderCache.mDSVPtr != dsv) || ((num_rtvs > 0 ) && (memcmp(&mRenderCache.mRTVPtr[0], rtvs, num_rtvs * sizeof(rtvs[0])) != 0)))
 		{
 			mD3DIMMContext->OMSetRenderTargets(num_rtvs, rtvs, dsv);
 			mRenderCache.mRTVPtr.assign(rtvs, rtvs + num_rtvs);

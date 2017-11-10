@@ -10,6 +10,7 @@ namespace Air
 		TMA_Read_Write
 	};
 
+	
 	class AIR_CORE_API Texture : public std::enable_shared_from_this<Texture>
 	{
 	public:

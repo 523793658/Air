@@ -60,6 +60,7 @@ namespace Air
 		mCorners[1] = MathLib::transform_coord(Vector_T<T, 3>(1, -1, 0), inv_clip);
 		mCorners[2] = MathLib::transform_coord(Vector_T<T, 3>(-1, 1, 0), inv_clip);
 		mCorners[3] = MathLib::transform_coord(Vector_T<T, 3>(1, 1, 0), inv_clip);
+
 		mCorners[4] = MathLib::transform_coord(Vector_T<T, 3>(-1, -1, 1), inv_clip);
 		mCorners[5] = MathLib::transform_coord(Vector_T<T, 3>(1, -1, 1), inv_clip);
 		mCorners[6] = MathLib::transform_coord(Vector_T<T, 3>(-1, 1, 1), inv_clip);
@@ -75,7 +76,7 @@ namespace Air
 		mPlanes[2] = column4 - column2;
 		mPlanes[3] = column4 + column2;
 		mPlanes[4] = column4 - column3;
-		mPlanes[5] = column4 + column3;
+		mPlanes[5] = column3;
 
 		for (auto & plane : mPlanes)
 		{

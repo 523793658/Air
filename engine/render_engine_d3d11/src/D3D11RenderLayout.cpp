@@ -1,4 +1,5 @@
-#include "Engine.h"
+#include "Context.h"
+#include "SingletonManager.hpp"
 #include "rendersystem/include/RenderFactory.h"
 #include "D3D11RenderEngine.hpp"
 #include "D3D11ShaderObject.hpp"
@@ -27,7 +28,7 @@ namespace Air
 			}
 
 			auto& vs_code = *shader.getVSCode();
-			RenderFactory& rf = Engine::getInstance().getRenderFactoryInstance();
+			RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
 			D3D11RenderEngine& re = *checked_cast<D3D11RenderEngine*>(&rf.getRenderEngineInstance());
 			ID3D11Device* d3d_device = re.getD3DDevice();
 			ID3D11InputLayout* ia;

@@ -22,8 +22,6 @@ namespace Air
 
 		void onRenderBegin();
 
-		virtual void setPass(PassType type);
-
 	protected:
 		RenderEffectParameter* mDepthFar;
 		RenderEffectParameter* mInvMVP;

@@ -24,6 +24,8 @@ namespace Air
 
 		void clear(uint32_t flags, Color const &clr, float depth, int32_t stencil);
 		virtual void discard(uint32_t flags) override;
+
+
 	private:
 		D3D11_VIEWPORT mD3DViewport;
 	};
