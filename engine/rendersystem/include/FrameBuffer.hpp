@@ -7,6 +7,8 @@
 
 namespace Air
 {
+	class UnorderAccessView;
+
 	class AIR_CORE_API FrameBuffer
 	{
 	public:
@@ -79,6 +81,8 @@ namespace Air
 		ViewportPtr mViewport;
 		std::vector<RenderViewPtr> mColorViews;
 		RenderViewPtr mDepthStencilView;
+
+		std::vector<std::shared_ptr<UnorderAccessView>> mUAViews;
 
 	public:
 #ifdef AIR_DEBUG

@@ -19,15 +19,14 @@ float3 ACESFilm(float3 x)
 
 float3 toneMap(float3 color, float3 blur, float adapted_lum)
 {
-	/*color += blur * u_Params.x;
+	color += blur * u_Params.x;
 	if (u_BlueShift)
 	{
 		float lum = dot(color, RGB_TO_LUM);
 		color = lerp(lum * BLUE_SHIFT, color, saturate(16.0f * lum));
 	}
-	float adapted_lum_dest = 2 / (max(0.1f, 1 + 10 * EyeAdaption(adapted_lum)));*/
-	//return ACESFilm(adapted_lum_dest * u_Params.y * color);
-	return color;
+	float adapted_lum_dest = 2 / (max(0.1f, 1 + 10 * EyeAdaption(adapted_lum)));
+	return ACESFilm(adapted_lum_dest * u_Params.y * color);
 }
 
 void tonemappingVS(float4 pos : POSITION,
@@ -44,7 +43,7 @@ void tonemappingVS(float4 pos : POSITION,
 float4 toneMapPS(float3 v_Texcoord : TEXCOORD0) : SV_Target
 {
 	float3 color = toneMap(u_SceneTex.SampleLevel(s_LinearSampler, v_Texcoord.xy, 0).rgb, 0.0f, v_Texcoord.z);
-	return float4(color, 1.0f);
+	return float4(color, 1.0);
 }
 
 

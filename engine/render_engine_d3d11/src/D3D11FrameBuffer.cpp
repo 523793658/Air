@@ -85,12 +85,40 @@ namespace Air
 			rt_first_subres.push_back(p->getRTFirstSubRes());
 			rt_num_subres.push_back(p->getRTNumSubRes());
 		}
+		std::vector<ID3D11UnorderedAccessView*> ua_view(mUAViews.size());
+		std::vector<UINT> ua_init_count(ua_view.size());
+		for (uint32_t i = 0; i < mUAViews.size(); ++i)
+		{
+			if (mUAViews[i])
+			{
+				D3D11UnorderedAccessView* p = checked_cast<D3D11UnorderedAccessView*>(mUAViews[i].get());
+				rt_src.push_back(p->getUAsrc());
+				rt_first_subres.push_back(p->getUAFirstSubRes());
+				rt_num_subres.push_back(p->getUANumSubres());
+				ua_view[i] = this->getD3DUAView(i);
+				ua_init_count[i] = mUAViews[i]->getInitCount();
+			}
+			else
+			{
+				ua_view[i] = nullptr;
+				ua_init_count[i] = 0;
+			}
+		}
+
 
 		for (size_t i = 0; i < rt_src.size(); ++i)
 		{
 			re.detachSRV(rt_src[i], rt_first_subres[i], rt_num_subres[i]);
 		}
-		re.setRenderTargets(static_cast<UINT>(rt_view.size()), rt_view.size() > 0 ? &rt_view[0] : nullptr, this->getD3DDSView());
+		if (mUAViews.empty())
+		{
+			re.setRenderTargets(static_cast<UINT>(rt_view.size()), rt_view.size() > 0 ? &rt_view[0] : nullptr, this->getD3DDSView());
+		}
+		else
+		{
+			ID3D11RenderTargetView** rts = rt_view.empty() ? nullptr : &rt_view[0];
+			re.setRenderTargetsAndUnorderedAccessViews(static_cast<UINT>(rt_view.size()), rts, this->getD3DDSView(), static_cast<UINT>(rt_view.size()), static_cast<UINT>(ua_view.size()), &ua_view[0], &ua_init_count[0]);
+		}
 		mD3DViewport.TopLeftX = static_cast<float>(mViewport->mLeft);
 		mD3DViewport.TopLeftY = static_cast<float>(mViewport->mTop);
 		mD3DViewport.Width = static_cast<float>(mViewport->mWidth);

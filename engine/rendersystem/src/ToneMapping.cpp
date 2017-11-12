@@ -56,7 +56,7 @@ namespace Air
 			mTechnique = mEffect->getTechniqueByName("toneMap");
 			*mEffect->getParameterByName("u_SceneTex") = mSrcTextures[0];
 			*mEffect->getParameterByName("u_LuminanceTex") = mSrcTextures[1];
-			*mEffect->getParameterByName("u_Params") = float2(0, 1);
+			*mEffect->getParameterByName("u_Params") = float2(0.25, 1);
 			*mEffect->getParameterByName("u_BlueShift") = 0;
 			mDirty = false;
 		}

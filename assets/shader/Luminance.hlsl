@@ -18,15 +18,17 @@ static const float4 LUM_VECTOR = float4(.299, .587, .114, 0);
 [numthreads(BlockSizeX, BlockSizeY, 1)]
 void reduceTo1DCS(uint3 Gid : SV_GroupID, uint3 DTid : SV_DispatchThreadID, uint3 GTid : SV_GroupThreadID, uint GI : SV_GroupIndex)
 {
-	uint2 offset = DTid.xy * 4;
-	float2 texCoord0 = (offset + float2(0.5, 0.5)) / u_LuminanceParams.xy;
-	float2 texCoord1 = (offset + float2(2.5, 0.5)) / u_LuminanceParams.xy;
-	float2 texCoord2 = (offset + float2(0.5, 2.5)) / u_LuminanceParams.xy;
-	float2 texCoord3 = (offset + float2(2.5, 2.5)) / u_LuminanceParams.xy;
+	float2 texCoord0 = (DTid.xy * 2.0 +float2(0.0, 0.0)) / 256.0;
+	float2 texCoord1 = (DTid.xy * 2.0 + float2(1.0, 0.0)) / 256.0;
+	float2 texCoord2 = (DTid.xy * 2.0 + float2(0.0, 1.0)) / 256.0;
+	float2 texCoord3 = (DTid.xy * 2.0 + float2(1.0, 1.0)) / 256.0;
+
 	accum[GI] = dot(u_SceneColorTex.SampleLevel(s_SceneTexSampler, texCoord0, 0), LUM_VECTOR) +
 		dot(u_SceneColorTex.SampleLevel(s_SceneTexSampler, texCoord1, 0), LUM_VECTOR) +
 		dot(u_SceneColorTex.SampleLevel(s_SceneTexSampler, texCoord2, 0), LUM_VECTOR) +
 		dot(u_SceneColorTex.SampleLevel(s_SceneTexSampler, texCoord3, 0), LUM_VECTOR);
+
+
 	GroupMemoryBarrierWithGroupSync();
 
 	if (GI < 32)

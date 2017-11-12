@@ -109,6 +109,8 @@ namespace Air
 	class RenderMaterial;
 	typedef std::shared_ptr<RenderMaterial> RenderMaterialPtr;
 
+	class MaterialInstanceDynamic;
+
 	class RenderPipeline;
 	typedef std::shared_ptr<RenderPipeline> RenderPipelinePtr;
 
@@ -198,6 +200,8 @@ namespace Air
 	class SkyLightComponent;
 	
 	class WorldSettings;
+
+
 }
 
 

@@ -70,7 +70,14 @@ namespace Air
 			return nullptr;
 		}
 
-		virtual void updateSceneSetting(WorldSettings* worldSettings) {}
+		virtual void updateSceneSettings(WorldSettings* worldSettings) {}
+
+		virtual void setFXSystem(class FFXSystemInterface* inFXSystem) = 0;
+
+		virtual class FFXSystemInterface* getFXSystem() = 0;
+
+		virtual void dumpUnbuiltLightIteractions();
+
 
 
 	};

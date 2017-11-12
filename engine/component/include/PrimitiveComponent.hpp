@@ -4,6 +4,8 @@
 #include "ComponentBase.hpp"
 namespace Air
 {
+	class MaterialInstanceDynamic;
+
 	class AIR_CORE_API PrimitiveComponent : public ComponentBase
 	{
 		virtual void setMaterial(int32_t elementIndex, class MaterialInterface* material);
@@ -36,7 +38,7 @@ namespace Air
 		class PrimitiveComponent* mLODParentPrimitive;
 
 	public:
-		void setLODParentPrimitive()
+		void setLODParentPrimitive();
 
 	};
 

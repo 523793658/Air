@@ -10,7 +10,7 @@
 #include "rendersystem/include/PostProcess.hpp"
 
 #include "rendersystem/include/HDRPostProcess.hpp"
-
+#include "rendersystem/include/FrameBuffer.hpp"
 #define ThreadGroupSize 8
 #define GroupCount 16
 
@@ -97,6 +97,9 @@ namespace Air
 	{
 		RenderEngine& engine = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
 		//Éú³É1DÎÆÀí
+		engine.bindFrameBuffer(engine.getScreenFrameBuffer());
+		engine.getScreenFrameBuffer()->discard(FrameBuffer::CBM_Color);
+
 		this->onRenderBegin();
 		engine.dispatch(*mEffect, *mTechnique, GroupCount, GroupCount, 1);
 		this->onRenderEnd();

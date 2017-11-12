@@ -43,10 +43,12 @@ namespace Air
 		std::array<std::vector<ID3D11ShaderResourceView*>, ShaderObject::ST_NumShaderTypes> mShaderSRVPtr;
 		std::array<std::vector<ID3D11SamplerState*>, ShaderObject::ST_NumShaderTypes> mShaderSamplerPrt;
 		std::array<std::vector<ID3D11Buffer*>, ShaderObject::ST_NumShaderTypes> mShaderCBPtr;
-		std::vector<ID3D11UnorderedAccessView*> mRenderUAVPrt;
-		std::vector<uint32_t> mRenderUavInitCount;
+		std::vector<ID3D11UnorderedAccessView*> mRenderUAVPtr;
+		std::vector<uint32_t> mRenderUAVInitCount;
+
 		std::vector<ID3D11UnorderedAccessView*> mComputeUavPtr;
 		std::vector<uint32_t> mComputeUavInitCount;
+
 		std::vector<ID3D11RenderTargetView*> mRTVPtr;
 		ID3D11DepthStencilView* mDSVPtr;
 	};
@@ -117,6 +119,9 @@ namespace Air
 		void setHullShader(ID3D11HullShader* shader);
 		void setDomainShader(ID3D11DomainShader* shader);
 		void setRenderTargets(UINT num_rtvs, ID3D11RenderTargetView* const * rtvs, ID3D11DepthStencilView* dsv);
+
+		void setRenderTargetsAndUnorderedAccessViews(UINT num_rtvs, ID3D11RenderTargetView* const * rtvs, ID3D11DepthStencilView* dsv, UINT uav_start_slot, UINT num_uavs, ID3D11UnorderedAccessView* const * uavs, UINT const * uav_init_counts);
+
 		void setViewports(UINT num_viewports, D3D11_VIEWPORT const * pViewports);
 
 		void setShaderResources(ShaderObject::ShaderType st, std::vector<std::tuple<void*, uint32_t, uint32_t>> const & srv_srcs, std::vector<ID3D11ShaderResourceView*> const & srvs);

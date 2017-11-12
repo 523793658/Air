@@ -37,6 +37,7 @@
 				"../core/include/ComponentBase.hpp",
 				"../core/include/Type.hpp",
 				"../core/include/SingletonManager.hpp",
+				"../core/include/World.hpp",
 
 				
 				"../core/src/Engine.cpp",
@@ -52,6 +53,7 @@
 				"../core/src/Type.cpp",
 				"../core/src/ComponentBase.cpp",
 				"../core/src/SingletonManager.cpp",
+				"../core/src/World.cpp",
 
 				
 				"../rendersystem/include/RenderFactory.h",
@@ -90,6 +92,9 @@
 				"../rendersystem/include/SceneRenderer.hpp",
 				"../rendersystem/include/ScenePrivate.hpp",
 				"../rendersystem/include/SceneInterface.hpp",
+				"../rendersystem/include/DeferredShadingRenderer.hpp",
+				"../rendersystem/include/CommandList.hpp",
+				"../rendersystem/include/SceneView.hpp",
 				
 				"../rendersystem/src/RenderSettings.cpp",
 				"../rendersystem/src/RenderFactory.cpp",
@@ -126,6 +131,10 @@
 				"../rendersystem/src/SceneRenderer.cpp",
 				"../rendersystem/src/ScenePrivate.cpp",
 				"../rendersystem/src/SceneInterface.cpp",
+				"../rendersystem/src/DeferredShadingRenderer.cpp",
+				"../rendersystem/src/CommandList.cpp",
+				"../rendersystem/src/SceneView.cpp",
+				"../rendersystem/src/SceneVisibility.cpp",
 				
 				"../scene_manager/include/SceneManager.hpp",
 				"../scene_manager/include/SceneObject.hpp",
@@ -148,11 +157,11 @@
 				"../app/src/App3D.cpp",
 				
 				"../component/include/StaticMeshRenderer.hpp",
-				"../component/include/Renderer.hpp",
+				"../component/include/PrimitiveComponent.hpp",
 				"../component/include/SkinMeshRenderer.hpp",
 				
 				
-				"../component/src/Renderer.cpp",
+				"../component/src/PrimitiveComponent.cpp",
 				"../component/src/StaticMeshRenderer.cpp",
 				"../component/src/SkinMeshRenderer.cpp",
 			],

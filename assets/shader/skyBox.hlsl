@@ -12,6 +12,8 @@ void skyBoxVS(float4 pos : POSITION,
 
 float4 skyBoxPS(float3 texcoord0 : TEXCOORD0) : SV_Target
 {
+	//float x = 1.0;
+	//return float(x, x, x, 1.0);
 	if (u_SkyBoxCompressed)
 	{
 		return decode_hdr_yc(u_SkyBoxTex.Sample(s_SkyboxSampler, texcoord0).r,
