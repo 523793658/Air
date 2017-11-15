@@ -48,6 +48,10 @@
 				"../basic/include/Json.hpp",
 				"../basic/include/Date.hpp",
 				"../basic/include/ClassManager.hpp",
+				"../basic/include/AlignmentTemplates.hpp",
+				"../basic/include/ThreadSafeCounter.hpp",
+				"../basic/include/PlatformAtomics.hpp",
+				"../basic/include/GenericPlatformAtomics.hpp",
 				
 				"../basic/src/Thread.cpp",
 				"../basic/src/CPP11.cpp",
@@ -77,6 +81,15 @@
 				"../basic/src/Json.cpp",
 				"../basic/src/Date.cpp",
 				"../basic/src/ClassManager.cpp",
+				"../basic/src/AlignmentTemplates.cpp",
+				"../basic/src/ThreadSafeCounter.cpp",
+				"../basic/src/PlatformAtomics.cpp",
+				"../basic/src/GenericPlatformAtomics.cpp",
+				
+				
+				"../basic/windows/WindowsPlatformAtomics.cpp",
+				"../basic/windows/WindowsPlatformAtomics.hpp",
+				"../basic/windows/WindowsSystemIncludes.h",
 			],
 			"conditions":[
 				[

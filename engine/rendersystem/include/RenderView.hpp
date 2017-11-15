@@ -8,9 +8,15 @@
 
 namespace Air
 {
+	class SceneViewStateInterface;
+
 	class AIR_CORE_API RenderView
 	{
+
+
+
 	public:
+
 		virtual ~RenderView()
 		{
 

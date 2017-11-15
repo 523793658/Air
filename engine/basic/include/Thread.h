@@ -44,7 +44,7 @@ namespace Air
 
 	typedef std::thread::id thread_id;
 
-	inline thread_id threadof(int)
+	inline thread_id threadof(int = 0)
 	{
 		return std::this_thread::get_id();
 	}
@@ -561,6 +561,9 @@ namespace Air
 	private:
 		std::shared_ptr<thread_pool_common_data_t> data_;
 	};
+
+
+	bool isInRenderingThread();
 }
 
 #endif

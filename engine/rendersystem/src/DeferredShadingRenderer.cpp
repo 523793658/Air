@@ -8,6 +8,6 @@ namespace Air
 
 	void DeferredShadingSceneRenderer::render(CommandListImmediate& cmdList)
 	{
-		bool bDoInitViewAftersPrepass = 
+		//bool bDoInitViewAftersPrepass = 
 	}
 }

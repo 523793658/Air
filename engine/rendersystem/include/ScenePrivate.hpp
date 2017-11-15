@@ -21,7 +21,7 @@ namespace Air
 		};
 
 		World* mWrold;
-		class FFXSystemInterface* FXSystem;
+		class FFXSystemInterface* mFXSystem;
 
 
 

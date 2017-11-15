@@ -130,6 +130,8 @@
 #	define AIR_COMPLIER_NAME	vc
 #	define AIR_SYMBOL_EXPORT	__declspec(dllexport)
 #	define AIR_SYMBOL_IMPORT	__declspec(dllimport)
+#	define AIR_ALIGN(n)			__declspec(align(n))
+#	define FORCEINLINE			__forceinline
 
 #	if _MSC_VER >= 1910
 #		define AIR_COMPILER_VERSION 141
@@ -397,4 +399,15 @@
 #define AIR_IS_DEV_PLATFORM 0
 #endif
 
+#if !defined(TEXT)
+#define TEXT_PASTE(x) L ## x
+#define TEXT(x) TEXT_PASTE(x)
 #endif
+
+#define STRUCT_OFFSET(struc, member) offsetof(struc, member)
+#include <stdint.h>
+
+
+#endif
+
+
