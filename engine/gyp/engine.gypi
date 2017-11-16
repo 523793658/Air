@@ -95,6 +95,9 @@
 				"../rendersystem/include/DeferredShadingRenderer.hpp",
 				"../rendersystem/include/CommandList.hpp",
 				"../rendersystem/include/SceneView.hpp",
+				"../rendersystem/include/Material.hpp",
+				"../rendersystem/include/MaterialInterface.hpp",
+				"../rendersystem/include/RHIDefinitions.hpp",
 				
 				"../rendersystem/src/RenderSettings.cpp",
 				"../rendersystem/src/RenderFactory.cpp",
@@ -135,6 +138,8 @@
 				"../rendersystem/src/CommandList.cpp",
 				"../rendersystem/src/SceneView.cpp",
 				"../rendersystem/src/SceneVisibility.cpp",
+				"../rendersystem/src/Material.cpp",
+				"../rendersystem/src/MaterialInterface.cpp",
 				
 				"../scene_manager/include/SceneManager.hpp",
 				"../scene_manager/include/SceneObject.hpp",
