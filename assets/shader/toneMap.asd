@@ -9,14 +9,14 @@
     <parameter type="float2" name="u_Params"/>
     <parameter type="int" name="u_BlueShift"/>
 
-    <parameter type="sampler" name="s_PointSampler">
+    <parameter type="SamplerState" name="s_PointSampler">
         <state name="filtering" value="min_mag_mip_point"/>
         <state name="address_u" value="clamp"/>
         <state name="address_v" value="clamp"/>
         <state name="address_w" value="clamp"/>
     </parameter>
     
-    <parameter type="sampler" name="s_LinearSampler">
+    <parameter type="SamplerState" name="s_LinearSampler">
         <state name="filtering" value="min_mag_linear_mip_point"/>
         <state name="address_u" value="clamp"/>
         <state name="address_v" value="clamp"/>

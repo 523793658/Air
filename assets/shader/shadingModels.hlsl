@@ -28,7 +28,7 @@ float3 standardShading(float3 diffuseColor, float3 specularColor, float3 lobeRou
 	float Vis = Vis_SmithJointApprox(lobeRoughness[1], NoV, NoL);
 	float3 F = F_Schlick(specularColor, VoH);
 	float3 diffuse = diffuse_lambert(diffuseColor);
-	return diffuse + (D * Vis) *F;
+	return diffuse +(D * Vis) *F;
 }
 
 
@@ -48,7 +48,8 @@ struct SurfaceOutputStandard
 	float metallic;
 	float3 baseColor;
 	float3 localSpecular;
-
+	float4 viewPosition;
+	float4 worldPosition;
 	float3 normal;				//这里拿到的应该是法线贴图的值。需要进一步计算才能得到最后的法线（目前线这么久认为是法线吧，后面在改；
 };
 
@@ -127,14 +128,20 @@ float4 standardSurfaceShading(SurfaceOutputStandard input)
 
 	FLightAccumulator lightAccumulator = (FLightAccumulator)0;
 	float surfaceAttenuation = 1.0;        //阴影等的削减
+	int index = step(u_ViewDistanceClip.x, input.viewPosition.z) + step(u_ViewDistanceClip.y, input.viewPosition.z) + step(u_ViewDistanceClip.z, input.viewPosition.z) + step(u_ViewDistanceClip.w, input.viewPosition.z);
+
+	float4 shadowProPos = mul(input.worldPosition, u_ShadowMatrix[0]);
+	float shadow = step(u_ShadowMap.Sample(s_BilinearSampler, float3(shadowProPos.xy / shadowProPos.w, 0)).r, shadowProPos.z / shadowProPos.w + 0.0001);
+	surfaceAttenuation = shadow;
 	lightAccumulatorAdd(lightAccumulator, surfaceLighting, (1.0 / PI), u_DirLightColor * (NoL * surfaceAttenuation), false);
 
 	float3 nonSpecularContribution = prefilteredDiffuseIBL(GBuffer.diffuseColor, N);
 	float3 specularContribution = pBPrefilteredSpecularIBL(GBuffer.specularColor, GBuffer.roughness, N, V);
 
 	lightAccumulatorAdd(lightAccumulator, nonSpecularContribution + specularContribution, nonSpecularContribution, u_AmbientCubemapColor, false);
-
-	return lightAccumulatorGetResult(lightAccumulator);
+	float4 proPos = mul(float4(input.worldPosition.xyz, 1.0), u_ViewProjMatrix);
+	return float4(shadow, shadow, shadow, 1.0);
+	//return lightAccumulatorGetResult(lightAccumulator);
 }
 
 

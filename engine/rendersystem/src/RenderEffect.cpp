@@ -46,7 +46,7 @@ namespace
 					return i;
 				}
 			}
-			AIR_UNREACHABLE("Invalid type name");
+			AIR_UNREACHABLE("Invalid type name"); 
 		}
 
 		std::string const & getTypeName(uint32_t code) const
@@ -70,7 +70,8 @@ namespace
 			mTypes.push_back("texture2DArray");
 			mTypes.push_back("texture3DArray");
 			mTypes.push_back("textureCUBEArray");
-			mTypes.push_back("sampler");
+			mTypes.push_back("SamplerState");
+			mTypes.push_back("SamplerComparisonState");
 			mTypes.push_back("shader");
 			mTypes.push_back("uint");
 			mTypes.push_back("uint2");
@@ -1015,6 +1016,7 @@ namespace
 			}
 			break;
 		case REDT_sampler:
+		case REDT_SamplerCmp:
 		{
 			SamplerStateDesc desc;
 			for (XMLNodePtr state_node = node->getFirstNode("state"); state_node; state_node = state_node->getNextSibling("state"))
@@ -4225,7 +4227,7 @@ namespace Air
 						&& (type != REDT_rw_texture2D) && (type != REDT_rw_texture3D)
 						&& (type != REDT_rw_texture1DArray) && (type != REDT_rw_texture2DArray)
 						&& (type != REDT_rw_byte_address_buffer) && (type != REDT_append_structured_buffer)
-						&& (type != REDT_consume_structured_buffer))
+						&& (type != REDT_consume_structured_buffer) && (type != REDT_SamplerCmp))
 					{
 						RenderEffectConstantBuffer* cbuff = nullptr;
 						XMLNodePtr parent_node = node->getParent();
@@ -4290,6 +4292,7 @@ namespace Air
 			case REDT_texture3DArray:
 			case REDT_textureCUBEArray:
 			case REDT_sampler:
+			case REDT_SamplerCmp:
 			case REDT_buffer:
 			case REDT_structured_buffer:
 			case REDT_byte_address_buffer:
@@ -4411,7 +4414,10 @@ namespace Air
 				str += "Buffer<" + elem_type + "> " + param_name + ";\n";
 				break;
 			case REDT_sampler:
-				str += "sampler " + param_name + ";\n";
+				str += "SamplerState " + param_name + ";\n";
+				break;
+			case REDT_SamplerCmp:
+				str += "SamplerComparisonState " + param_name + ";\n";
 				break;
 			case REDT_structured_buffer:
 				str += "StructuredBuffer<" + elem_type + "> " + param_name + ";\n";
@@ -4519,7 +4525,7 @@ namespace Air
 	}
 	std::string const & RenderEffectTemplate::getHLSLShaderText() const
 	{
-		//logWarn("hlsl:\n%s", str.c_str());
+		//logWarn("hlsl:\n%s", mHLSLShader.c_str());
 		return mHLSLShader;
 	}
 #endif

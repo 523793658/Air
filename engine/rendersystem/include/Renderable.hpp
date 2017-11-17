@@ -198,8 +198,6 @@ namespace Air
 
 		void setPass(PassType type);
 
-
-	protected:
 		virtual void updateAABB();
 
 		virtual void updateInstanceStream();
@@ -232,6 +230,8 @@ namespace Air
 		//²ÎÊý
 		RenderEffectParameter* mMVPParam;
 		RenderEffectParameter* mMVParam;
+		RenderEffectParameter* mViewMatrix;
+		RenderEffectParameter* mViewProjMatrixInv;
 		RenderEffectParameter* mWorldParam;
 		RenderEffectParameter* mBaseColorRoughness;
 		RenderEffectParameter* mSpecularColorMetallic;

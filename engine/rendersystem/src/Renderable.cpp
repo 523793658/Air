@@ -119,6 +119,7 @@ namespace Air
 		AABBox const & pos_bb = this->getPosAABB();
 		AABBox const & tc_bb = this->getTexcoordAABB();
 		*mMVPParam = mvp;
+
 		switch (mPassType)
 		{
 		case Air::PT_GenShadowMap:
@@ -178,6 +179,9 @@ namespace Air
 		this->updateTechniques();
 
 		mMVPParam = effect->getParameterByName("mvp");
+		mViewMatrix = effect->getParameterByName("u_ViewMatrix");
+		mViewProjMatrixInv = effect->getParameterByName("u_viewProjMatrixInv");
+
 		mWorldParam = effect->getParameterByName("worldMatrix");
 		mSpecularColorMetallic = effect->getParameterByName("u_SpecularColorMetallic");
 		mBaseColorRoughness = effect->getParameterByName("u_BaseColorRoughness");

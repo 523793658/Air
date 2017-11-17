@@ -33,4 +33,9 @@ namespace Air
 	{
 
 	}
+
+	RenderEnvironment* RenderLayer::getRenderEnv()
+	{
+		return mEnv;
+	}
 }

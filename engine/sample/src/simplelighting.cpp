@@ -94,7 +94,7 @@ namespace Sample
 
 			AmbientLightSourcePtr ambient_light = MakeSharedPtr<AmbientLightSource>();
 			SceneObjectPtr ambientLightObject = MakeSharedPtr<SceneObject>(SceneObject::SOA_LightSource);
-			ambient_light->setColor(float3(0.3, 0.3, 0.3) * 0.8f);
+			ambient_light->setColor(float3(0.3, 0.3, 0.3) * 0.5f);
 			ambient_light->setSkyLightTexC(c_cube_map);
 			ambient_light->setSkyLightTexY(y_cube_map);
 			ambientLightObject->setCustomData(ambient_light);
@@ -102,7 +102,7 @@ namespace Sample
 
 
 			DirectLightSourcePtr direction_light = MakeSharedPtr<DirectLightSource>();
-			direction_light->setColor(float3(1, 1, 1) * 0.8f);
+			direction_light->setColor(float3(1, 1, 1) * 1.2f);
 			direction_light->setDirection(float3(1, 1, 1));
 			SceneObjectPtr directLightObject = MakeSharedPtr<SceneObject>(SceneObject::SOA_LightSource);
 			directLightObject->setCustomData(direction_light);
@@ -133,12 +133,18 @@ namespace Sample
 
 			mTerrainBlock = MakeSharedPtr<SceneObject>(SceneObject::SOA_Cullable);
 			StaticMeshPtr terrain = SimpleMeshFactory::createStaticQuat();
-			/*RenderEffectPtr effect = syncLoadRenderEffect("assets/shader/simpleforward.asd");
-			terrain->setTechnique(effect, effect->getTechniqueByName("forwardRendering"));*/
+			RenderEffectPtr effect = syncLoadRenderEffect("assets/shader/simpleforward.asd");
+			//terrain->setTechnique(effect, effect->getTechniqueByName("forwardRendering"));
+			*effect->getParameterByName("u_SkyBoxTex") = y_cube_map;
+			*effect->getParameterByName("u_SkyBoxCcubeTex") = c_cube_map;
+			*effect->getParameterByName("u_IntegratedBRDFTex") = integratedBRDFTex;
+			terrain->bindEffect(effect);
 			terrain->setMaterial(MakeSharedPtr<RenderMaterial>(float3(1.0f, 1.0f, 1.0f), float3(1.0f, 1.0f, 1.0f), 1.0f, 0.0f));
 			mTerrainBlock->setRenderable(terrain);
-			mTerrainBlock->setLocalMatrix(MathLib::scaling(float3(50, 50, 50)) * MathLib::translation(float3(1, 1, 1)) * MathLib::to_matrix(MathLib::rotation_axis(float3(1, 0, 0), PI / 4)));
-			//mTerrainBlock->addToSceneManager();
+			mTerrainBlock->setLocalMatrix(MathLib::scaling(float3(50, 50, 50)) * MathLib::to_matrix(MathLib::rotation_axis(float3(1, 0, 0), -PI / 2))* MathLib::translation(float3(0, -1, 0)));
+			mTerrainBlock->addToSceneManager();
+
+
 			this->LookAt(float3(0.0f, 0.0f, -10.0f), float3(0.0f, 0.0f, 0.0f));
 			this->Proj(0.05f, 500);
 			mCameraController.attachCamera(this->getActiveCamera());

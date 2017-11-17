@@ -7,13 +7,18 @@
         <parameter type="float3" name="u_CameraDir"/>
         <parameter type="float3" name="u_AmbientCubemapColor"/>
         <parameter type="int2" name="u_DiffuseSpecularMip"/>
+        <parameter type="float4" name="u_ViewDistanceClip"/>
+        <parameter type="float4x4" array_size="4" name="u_ShadowMatrix"/>
+        <parameter type="float4x4" name="u_ViewProjMatrixInv"/>
+        <parameter type="float4x4" name="u_ViewProjMatrix" />
+        <parameter type="float4x4" name="u_ViewMatrix" />
     </cbuffer>
 
 
 
     <parameter type="textureCUBE" name="u_SkyBoxTex"/>
     <parameter type="textureCUBE" name="u_SkyBoxCcubeTex"/>
-    <parameter type="sampler" name="s_SkyboxSampler">
+    <parameter type="SamplerState" name="s_SkyboxSampler">
         <state name="filtering" value="min_mag_mip_linear"/>
         <state name="address_u" value="clamp"/>
         <state name="address_v" value="clamp"/>
@@ -22,12 +27,23 @@
 
 
     <parameter type="texture2D" name="u_IntegratedBRDFTex"/>
-    <parameter type="sampler" name="s_BilinearSampler">
+    <parameter type="SamplerState" name="s_BilinearSampler">
         <state name="filtering" value="min_mag_linear_mip_point"/>
         <state name="address_u" value="clamp"/>
         <state name="address_v" value="clamp"/>
         <state name="address_w" value="clamp"/>
     </parameter>
+
+    <parameter type="SamplerComparisonState" name="s_ShadowSampler">
+        <state name="filtering" value="min_mag_linear_mip_point"/>
+        <state name="address_u" value="clamp"/>
+        <state name="address_v" value="clamp"/>
+        <state name="address_w" value="clamp"/>
+        <state name="cmp_func" value="greater"/>
+    </parameter>
+  
+    
+    <parameter type="texture2DArray" name="u_ShadowMap" />
 
     <parameter type="float4x4" name="mvp"/>
 	<parameter type="float4x4" name="worldMatrix"/>
@@ -44,6 +60,8 @@ struct PS_INPUT
     float4 oPos : SV_Position;
 	float2 vTexcoord : TEXCOORD0;
 	float3 vNormal : NORMAL0;
+	float4 vWorldPos : TEXCOORD1;
+    float4 vProjPos : TEXCOORD2;
 };
 
 
@@ -64,10 +82,15 @@ PS_OUTPUT simplestPS(PS_INPUT input)
     params.normal = input.vNormal;
 	params.localSpecular = u_SpecularColorMetallic.rgb;
     params.baseColor = u_BaseColorRoughness.rgb;
+    params.worldPosition = input.vWorldPos;
+    params.viewPosition = mul(params.worldPosition ,u_ViewMatrix);
     output.color = standardSurfaceShading(params);
 #else
     output.color = float4(1.0, 0.0, 0.0, 1.0);
 #endif
+	
+    //output.color.rgb = mul(mul(float4(input.vWorldPos, 1.0), u_ViewProjMatrix), u_ViewProjMatrixInv).rgb;
+    
     return output;
 }
 		]]>

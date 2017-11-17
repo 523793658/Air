@@ -1136,7 +1136,8 @@ namespace Air
 			{
 				auto& pass = tech.getPass(i);
 				pass.bind(effect);
-				mD3DIMMContext->DrawIndexedInstanced(num_indices, num_instance, rl.getStartIndexLocation(), rl.getStartVertexLocation(), rl.getStartInstanceLocation());
+				//mD3DIMMContext->DrawIndexedInstanced(num_indices, num_instance, rl.getStartIndexLocation(), rl.getStartVertexLocation(), rl.getStartInstanceLocation());
+				mD3DIMMContext->DrawIndexed(num_indices, rl.getStartIndexLocation(), rl.getStartVertexLocation());
 				pass.unbind(effect);
 			}
 		}

@@ -16,6 +16,8 @@ namespace Air
 
 	class AIR_CORE_API RenderLayerPass
 	{
+	
+
 	public:
 
 		void setRenderTarget(FrameBufferPtr const & target);
@@ -23,7 +25,7 @@ namespace Air
 
 		virtual void doPass();
 
-		virtual void initialize();
+		virtual void initialize(RenderLayer* layer);
 
 	protected:
 		virtual void addToRenderQueue(Renderable* obj);
@@ -38,6 +40,7 @@ namespace Air
 		std::vector<SceneObject*> mSceneObjects;
 		std::vector<Renderable*> mRenderQueue;
 		FrameBufferPtr mRenderTarget;
+		RenderLayer* mLayer;
 	};
 }
 

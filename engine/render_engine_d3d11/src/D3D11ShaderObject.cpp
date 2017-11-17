@@ -930,8 +930,11 @@ namespace Air
 			macros.emplace_back("AIR_D3D11", "1");
 			macros.emplace_back("AIR_FRAG_DEPTH", "1");
 			uint32_t flags = D3DCOMPILE_ENABLE_STRICTNESS;
+			
 #if  !defined(AIR_DEBUG)
 			flags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
+#else
+			flags |= D3DCOMPILE_DEBUG;
 #endif
 			*code = this->compileToDXBC(type, effect, tech, pass, macros, sd.mFunctionName.c_str(), shader_profile, flags);
 			if (!code->empty())

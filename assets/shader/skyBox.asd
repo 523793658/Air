@@ -6,7 +6,7 @@
     <parameter type="int" name="u_SkyBoxCompressed"/>
     <parameter type="textureCUBE" name="u_SkyBoxTex"/>
     <parameter type="textureCUBE" name="u_SkyBoxCcubeTex"/>
-    <parameter type="sampler" name="s_SkyboxSampler">
+    <parameter type="SamplerState" name="s_SkyboxSampler">
         <state name="filtering" value="min_mag_linear_mip_point"/>
         <state name="address_u" value="clamp"/>
         <state name="address_v" value="clamp"/>

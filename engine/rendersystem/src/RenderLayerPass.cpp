@@ -10,9 +10,9 @@
 
 namespace Air
 {
-	void RenderLayerPass::initialize()
+	void RenderLayerPass::initialize(RenderLayer* layer)
 	{
-
+		mLayer = layer;
 	}
 
 	void RenderLayerPass::doPass()
@@ -66,6 +66,7 @@ namespace Air
 		}
 		mRenderQueue.clear();
 	}
+
 
 	void RenderLayerPass::setRenderTarget(FrameBufferPtr const & target)
 	{

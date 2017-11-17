@@ -130,11 +130,21 @@ namespace Air
 			{ float3(-halfWidth, -halfWidth, 0.0f), float3(0, 0, 1),float2(0.0, 1.0)},
 			{ float3(+halfWidth, -halfWidth, 0.0f), float3(0, 0, 1),float2(1.0, 1.0)}
 		};
+		uint16_t indexData[6] = {
+			0, 2, 1,
+			1, 2, 3
+		};
+		uint16_t* index = static_cast<uint16_t*>(malloc(sizeof(uint16_t) * 6));
+		memcpy(index, indexData, sizeof(uint16_t) * 6);
 
 		GraphicsBufferPtr vb = rf.makeVertexBuffer(BU_Static, EAH_GPU_Read | EAH_Immutable, sizeof(VertexData) * 4, pos);
 		mesh->addVertexStream(vb, { VertexElement(VEU_Position, 0, EF_BGR32F),VertexElement(VEU_Normal, 0, EF_BGR32F), VertexElement(VEU_TextureCoord, 0, EF_GR32F) });
+
+		GraphicsBufferPtr ib = rf.makeIndexBuffer(BU_Static, EAH_GPU_Read | EAH_Immutable, sizeof(uint16_t) * 6, index);
+		mesh->addIndexStream(ib, EF_R16UI);
+
 		mesh->setPosAABB(AABBox(float3(-halfWidth, -halfWidth, 0.0), float3(halfWidth, halfWidth, 0.0)));
-		mesh->setTopologyType(RenderLayout::TT_TriangleStrip);
+		mesh->setTopologyType(RenderLayout::TT_TriangleList);
 		return mesh;
 	}
 }

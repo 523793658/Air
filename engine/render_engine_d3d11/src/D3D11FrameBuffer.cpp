@@ -15,6 +15,8 @@ namespace Air
 
 		mViewport->mLeft = mLeft;
 		mViewport->mTop = mTop;
+		mViewport->mWidth = mWidth;
+		mViewport->mHeight = mHeight;
 		mD3DViewport.MinDepth = 0.0f;
 		mD3DViewport.MaxDepth = 1.0f;
 

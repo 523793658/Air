@@ -32,7 +32,10 @@ namespace Air
 	protected:
 		void prepareObject()
 		{
-			
+			RenderEnvironment* env = mLayer->getRenderEnv();
+			env->setCamera(*mRenderTarget->getViewport()->mCamera);
+			env->updateShadowData();
+
 			SingletonManager::getSceneManagerInstance().querySceneObject(*mRenderTarget->getViewport()->mCamera, SceneObject::SOA_Cullable, mSceneObjects);
 		}
 		void prepareRenderQueue()
@@ -49,6 +52,7 @@ namespace Air
 						if (0 == renderable->getNumInstances())
 						{
 							addToRenderQueue(renderable);
+							*renderable->getRenderEffect()->getParameterByName("u_ShadowMap") = mLayer->getRenderEnv()->getShadowMapData().mShadowMap;
 						}
 						renderable->addInstance(obj);
 					}
@@ -79,28 +83,44 @@ namespace Air
 			mNumShadowMap = num;
 		}
 
-		void initialize() override
+		void initialize(RenderLayer* layer) override
 		{
+			RenderLayerPass::initialize(layer);
 			RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
-			mShadowMaps = rf.MakeTexture2D(512, 512, 1, mNumShadowMap, EF_D16, 1, 0, EAH_GPU_Read | EAH_GPU_Write);
+			mShadowMapsDepth = rf.MakeTexture2D(512, 512, 1, mNumShadowMap, EF_D16, 1, 0, EAH_GPU_Read | EAH_GPU_Write);
+			mShadowMaps = rf.MakeTexture2D(512, 512, 1, mNumShadowMap, EF_R16F, 1, 0, EAH_GPU_Write | EAH_GPU_Read);
+
 			mFrameBuffers.resize(mNumShadowMap);
+			ShadowMapData & data = mLayer->getRenderEnv()->getShadowMapData();
+			float near = mReferenceCamera->getNearPlane();
+			float far = mReferenceCamera->getFarPlane();
+			data.mViewDistances = float4::getMaxVector();
 			for (int i = 0; i < mNumShadowMap; ++i)
 			{
+				float f = (i + 1.0f) / mNumShadowMap;
+				data.mViewDistances[i] = near * (1.0f - f) + f * far;
 				mFrameBuffers[i] = rf.makeFrameBuffer();
-				RenderViewPtr view = rf.Make2DDepthStencilRenderView(mShadowMaps, i, 1, 0);
+				mFrameBuffers[i]->setClearFlag(true, FrameBuffer::CBM_Depth | FrameBuffer::CBM_Color);
+				RenderViewPtr view = rf.Make2DDepthStencilRenderView(mShadowMapsDepth, i, 1, 0);
 				mFrameBuffers[i]->attach(FrameBuffer::ATT_DepthStencil, view);
-				
+				view = rf.Make2DRenderView(mShadowMaps, i, 1, 0);
+				mFrameBuffers[i]->attach(FrameBuffer::ATT_Color0, view);
 			}
+			data.mShadowMap = mShadowMaps;
+			data.mShadowMatrix.resize(mNumShadowMap);
 		}
 
 		virtual void doPass() override
 		{
 			RenderEngine& re = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
+			ShadowMapData & data = mLayer->getRenderEnv()->getShadowMapData();
 			for (int index = 0; index < mNumShadowMap; ++index)
 			{
-				ShadowUtil::adjustShadowCamera(mReferenceCamera.get(), mFrameBuffers[index]->getViewport()->mCamera.get(), float3(0, 0, 1), static_cast<float>(index) / mNumShadowMap, (index + 1.0f) / mNumShadowMap);
-
+				Camera* shadowCamera = mFrameBuffers[index]->getViewport()->mCamera.get();
+				ShadowUtil::adjustShadowCamera(mReferenceCamera.get(), shadowCamera, -mLightDirection, static_cast<float>(index) / mNumShadowMap, (index + 1.0f) / mNumShadowMap);
+				data.mShadowMatrix[index] = shadowCamera->getViewProjMatrix();
 				mRenderTarget = mFrameBuffers[index];
+				mRenderTarget->clear(FrameBuffer::CBM_Depth | FrameBuffer::CBM_Color, Color(1, 1, 1, 1), 1.0, 0);
 				mSceneObjects.clear();
 				prepareObject();
 				prepareRenderQueue();
@@ -133,7 +153,8 @@ namespace Air
 
 	private:
 		CameraPtr mReferenceCamera;
-		uint32_t mNumShadowMap{ 3 };
+		uint32_t mNumShadowMap{ 1 };
+		TexturePtr mShadowMapsDepth;
 		TexturePtr mShadowMaps;
 		std::vector<FrameBufferPtr> mFrameBuffers;
 		float3 mLightDirection{ 1, 1, 1 };
@@ -201,7 +222,7 @@ namespace Air
 				FrameBufferPtr const & target = std::static_pointer_cast<FrameBuffer>(mPipeline->getGlobalResource(renderTargetName));
 				mPasses.back()->setRenderTarget(target);
 			}
-			mPasses.back()->initialize();
+			mPasses.back()->initialize(this);
 			passNode = passNode->getNextSibling("pass");
 		}
 	}

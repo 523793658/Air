@@ -28,6 +28,8 @@ struct VS_OUTPUT
 	float4 oPos : SV_Position;
 	float2 vTexcoord : TEXCOORD0;
 	float3 vNormal : NORMAL0;
+	float4 vWorldPos : TEXCOORD1;
+	float4 vProjPos : TEXCOORD2;
 };
 
 
@@ -38,6 +40,8 @@ VS_OUTPUT defaultModelVertexShader(VS_INPUT input)
 	output.oPos = mul(input.pos, mvp);
 	output.vNormal = mul(input.normal, (float3x3)worldMatrix);
 	output.vTexcoord = input.tex;
+	output.vWorldPos = mul(input.pos, worldMatrix);
+	output.vProjPos = output.oPos;
 	return output;
 }
 #endif

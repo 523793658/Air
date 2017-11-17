@@ -22,6 +22,7 @@ namespace Air
 		REDT_texture3DArray,
 		REDT_textureCUBEArray,
 		REDT_sampler,
+		REDT_SamplerCmp,
 		REDT_shader,
 		REDT_uint,
 		REDT_uint2,

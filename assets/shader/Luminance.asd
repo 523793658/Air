@@ -4,7 +4,7 @@
 	<parameter type="uint4" name="u_LuminanceParams" />
 
     <parameter type="texture2D" name="u_SceneColorTex"/>
-    <parameter type="sampler" name="s_SceneTexSampler">
+    <parameter type="SamplerState" name="s_SceneTexSampler">
         <state name="filtering" value="min_mag_linear_mip_point"/>
         <state name="address_u" value="clamp"/>
         <state name="address_v" value="clamp"/>

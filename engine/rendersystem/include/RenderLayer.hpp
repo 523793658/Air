@@ -6,6 +6,8 @@ namespace Air
 	class AIR_CORE_API RenderLayer : boost::noncopyable
 	{
 	public:
+
+
 		RenderLayer(RenderPipeline* pipeline);
 		virtual ~RenderLayer() = 0;
 		
@@ -17,9 +19,12 @@ namespace Air
 
 		virtual void endUpdate();
 
+		RenderEnvironment* getRenderEnv();
+
 	protected:
 		std::vector<RenderLayerPassPtr> mPasses;
 		RenderPipeline* mPipeline;
+		RenderEnvironment* mEnv;
 	};
 }
 

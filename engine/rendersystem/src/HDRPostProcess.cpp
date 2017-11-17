@@ -78,7 +78,7 @@ namespace Air
 
 	void LuminanceCS::update()
 	{
-		if (mDirty)
+		if (mDirty)  
 		{
 			uint32_t width, height;
 			width = mSrcTextures[0]->getWidth();

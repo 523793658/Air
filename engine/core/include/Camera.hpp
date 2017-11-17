@@ -69,6 +69,11 @@ namespace Air
 			return mFarPlane;
 		}
 
+		float getNearPlane() const
+		{
+			return mNearPlane;
+		}
+
 	private:
 		float mLookDistance;
 		float4x4 mViewMatrix;

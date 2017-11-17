@@ -3,7 +3,7 @@
 
 half3 envBRDF(half3 specularColor, half roughness, half NoV)
 {
-	float2 AB = u_IntegratedBRDFTex.SampleLevel(s_BilinearSampler, float2(NoV, roughness), 0).rg;
+	float2 AB = u_IntegratedBRDFTex.SampleLevel(s_BilinearSampler, float2(NoV, 1 - roughness), 0).rg;
 	float3 GF = specularColor * AB.x + saturate(50.0 * specularColor.g) * AB.y;
 	return GF;
 }

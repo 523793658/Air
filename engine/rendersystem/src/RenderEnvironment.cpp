@@ -66,13 +66,43 @@ namespace Air
 		}
 	}
 
+	ShadowMapData& RenderEnvironment::getShadowMapData()
+	{
+		return mShadowMapData;
+	}
+	void RenderEnvironment::updateShadowData()
+	{
+		auto b = mSharedConstanBuffers.find("cb_RenderEnvironment");
+		if (b != mSharedConstanBuffers.end())
+		{
+			*b->second->getParameterByName("u_ShadowMatrix") = mShadowMapData.mShadowMatrix;
+			*b->second->getParameterByName("u_ViewDistanceClip") = mShadowMapData.mViewDistances;
+		}
+	}
+
 	void RenderEnvironment::update()
 	{
 		auto b = mSharedConstanBuffers.find("cb_RenderEnvironment");
 		if (b != mSharedConstanBuffers.end())
 		{
-			*b->second->getParameterByName("u_CameraDir") = Engine::getInstance().getAppInstance().getActiveCamera().getForwardVec();
+			SharedConstantBuffer* cb = b->second.get();
+			*cb->getParameterByName("u_CameraDir") = Engine::getInstance().getAppInstance().getActiveCamera().getForwardVec();
+
+			if (mCamera)
+			{
+				*cb->getParameterByName("u_ViewProjMatrix") = mCamera->getViewProjMatrixWOAdjust();
+
+				*cb->getParameterByName("u_ViewProjMatrixInv") = mCamera->getInverseViewProjMatrixWOAdjust();
+
+				*cb->getParameterByName("u_ViewMatrix") = mCamera->getViewMatrix();
+			}
+			
 		}
 	}
 
+	void RenderEnvironment::setCamera(Camera & camera)
+	{
+		//
+		mCamera = &camera;
+	}
 }

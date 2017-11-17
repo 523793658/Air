@@ -22,8 +22,6 @@ namespace Air
 	private:
 		std::vector<SceneObject*> mLightObjects;
 		std::vector<LightSourcePtr> mLights;
-
-		RenderEnvironment* mEnv;
 	};
 
 

@@ -7,6 +7,14 @@
 #include "rendersystem/include/RenderEffect.hpp"
 namespace Air
 {
+
+	struct ShadowMapData
+	{
+		TexturePtr mShadowMap;
+		std::vector<float4x4> mShadowMatrix;
+		float4 mViewDistances;
+	};
+
 	class AIR_CORE_API RenderEnvironment : boost::noncopyable, public EventTable
 	{
 
@@ -22,10 +30,20 @@ namespace Air
 
 		void updateLights(std::vector<LightSourcePtr> const & lights);
 
+		void updateShadowData();
+
 		void update();
+
+		ShadowMapData&  getShadowMapData();
+
+		void setCamera(Camera & camera);
+
+
 	private:
 
 		std::unordered_map<std::string, std::unique_ptr<SharedConstantBuffer>> mSharedConstanBuffers;
+		Camera * mCamera{ nullptr };
+		ShadowMapData mShadowMapData;
 	};
 
 
