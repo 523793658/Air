@@ -7,7 +7,7 @@ namespace Air
 	{
 	public:
 		static void adjustShadowCamera(Camera* srcCamera, Camera* dstCamera, float3 const & dir, float factor, float factor2);
-
+		static AABBox calcFrustumExtents(Camera const & camera, float nearPlane, float farPlane, float4x4 const & light_view_proj);
 	};
 }
 

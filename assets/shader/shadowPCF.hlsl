@@ -5,16 +5,14 @@
 
 
 
-void genShadowMapVS(float4 g_Position : POSITION0, out float4 v_Position : SV_Position, out float zfar : TEXCOORD0)
+void genShadowMapVS(float4 g_Position : POSITION0, out float4 v_Position : SV_Position)
 {
 	v_Position = mul(g_Position, mvp);
-	zfar = v_Position.z / v_Position.w;
 }
 
-float4 genShadowMapPS(float4 v_Position : SV_Position, float zfar : TEXCOORD0) : SV_Target
+float4 genShadowMapPS() : SV_Target
 {
-	float3 color = zfar;
-	return float4(color, 1.0);
+	return 1.0;
 }
 
 

@@ -87,18 +87,18 @@ namespace Air
 		{
 			RenderLayerPass::initialize(layer);
 			RenderFactory& rf = SingletonManager::getRenderFactoryInstance();
-			mShadowMapsDepth = rf.MakeTexture2D(512, 512, 1, mNumShadowMap, EF_D16, 1, 0, EAH_GPU_Read | EAH_GPU_Write);
-			mShadowMaps = rf.MakeTexture2D(512, 512, 1, mNumShadowMap, EF_R16F, 1, 0, EAH_GPU_Write | EAH_GPU_Read);
+			mShadowMapsDepth = rf.MakeTexture2D(2048, 2048, 1, mNumShadowMap, EF_D16, 1, 0, EAH_GPU_Read | EAH_GPU_Write);
+			mShadowMaps = rf.MakeTexture2D(2048, 2048, 1, mNumShadowMap, EF_R16F, 1, 0, EAH_GPU_Write | EAH_GPU_Read);
 
 			mFrameBuffers.resize(mNumShadowMap);
 			ShadowMapData & data = mLayer->getRenderEnv()->getShadowMapData();
 			float near = mReferenceCamera->getNearPlane();
 			float far = mReferenceCamera->getFarPlane();
 			data.mViewDistances = float4::getMaxVector();
+			float const range = far - near;
+			float const ratio = far / near;
 			for (int i = 0; i < mNumShadowMap; ++i)
 			{
-				float f = (i + 1.0f) / mNumShadowMap;
-				data.mViewDistances[i] = near * (1.0f - f) + f * far;
 				mFrameBuffers[i] = rf.makeFrameBuffer();
 				mFrameBuffers[i]->setClearFlag(true, FrameBuffer::CBM_Depth | FrameBuffer::CBM_Color);
 				RenderViewPtr view = rf.Make2DDepthStencilRenderView(mShadowMapsDepth, i, 1, 0);
@@ -106,7 +106,7 @@ namespace Air
 				view = rf.Make2DRenderView(mShadowMaps, i, 1, 0);
 				mFrameBuffers[i]->attach(FrameBuffer::ATT_Color0, view);
 			}
-			data.mShadowMap = mShadowMaps;
+			data.mShadowMap = mShadowMapsDepth;
 			data.mShadowMatrix.resize(mNumShadowMap);
 		}
 
@@ -114,10 +114,29 @@ namespace Air
 		{
 			RenderEngine& re = SingletonManager::getRenderFactoryInstance().getRenderEngineInstance();
 			ShadowMapData & data = mLayer->getRenderEnv()->getShadowMapData();
-			for (int index = 0; index < mNumShadowMap; ++index)
+			float near = mReferenceCamera->getNearPlane();
+			float far = mReferenceCamera->getFarPlane();
+			float const range = far - near;
+			float const ratio = far / near;
+ 			for (int index = 0; index < mNumShadowMap; ++index)
 			{
 				Camera* shadowCamera = mFrameBuffers[index]->getViewport()->mCamera.get();
-				ShadowUtil::adjustShadowCamera(mReferenceCamera.get(), shadowCamera, -mLightDirection, static_cast<float>(index) / mNumShadowMap, (index + 1.0f) / mNumShadowMap);
+			
+				auto lambdaExp = [near, range, ratio, this](int i)->
+				float{
+					float p = i / static_cast<float>(this->mNumShadowMap);
+					float log = near * std::pow(ratio, p);
+					float uniform = near + range * p;
+					float x = this->mLambda * (log - uniform) + uniform;
+					return x;
+				};
+				data.mViewDistances[index] = lambdaExp(index + 1);
+
+
+				ShadowUtil::adjustShadowCamera(mReferenceCamera.get(), shadowCamera, -mLightDirection, lambdaExp(index), data.mViewDistances[index]);
+
+
+
 				data.mShadowMatrix[index] = shadowCamera->getViewProjMatrix();
 				mRenderTarget = mFrameBuffers[index];
 				mRenderTarget->clear(FrameBuffer::CBM_Depth | FrameBuffer::CBM_Color, Color(1, 1, 1, 1), 1.0, 0);
@@ -153,11 +172,12 @@ namespace Air
 
 	private:
 		CameraPtr mReferenceCamera;
-		uint32_t mNumShadowMap{ 1 };
+		uint32_t mNumShadowMap{ 3 };
 		TexturePtr mShadowMapsDepth;
 		TexturePtr mShadowMaps;
 		std::vector<FrameBufferPtr> mFrameBuffers;
 		float3 mLightDirection{ 1, 1, 1 };
+		float mLambda{ 0.8f };
 	};
 
 	ForwardRenderingLayer::ForwardRenderingLayer(RenderPipeline* pipeline)

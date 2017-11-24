@@ -27,4 +27,9 @@ float3 calcPrefilteredEnvVec(float3 normal, float3 view)
 	return -reflect(view, normal);
 }
 
+float calcESM(float occluder, float len, float esm_scale_factor)
+{
+	return saturate(exp(occluder - esm_scale_factor * len));
+}
+
 #endif

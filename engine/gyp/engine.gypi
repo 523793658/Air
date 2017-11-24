@@ -98,6 +98,7 @@
 				"../rendersystem/include/Material.hpp",
 				"../rendersystem/include/MaterialInterface.hpp",
 				"../rendersystem/include/RHIDefinitions.hpp",
+				"../rendersystem/include/DeferredLightingLayer.hpp",
 				
 				"../rendersystem/src/RenderSettings.cpp",
 				"../rendersystem/src/RenderFactory.cpp",
@@ -140,6 +141,7 @@
 				"../rendersystem/src/SceneVisibility.cpp",
 				"../rendersystem/src/Material.cpp",
 				"../rendersystem/src/MaterialInterface.cpp",
+				"../rendersystem/src/DeferredLightingLayer.cpp",
 				
 				"../scene_manager/include/SceneManager.hpp",
 				"../scene_manager/include/SceneObject.hpp",

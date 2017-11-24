@@ -58,8 +58,8 @@ float3 calcEnvDiffuse(float3 prefiltered_env, float3 diffuseColor)
 	return prefiltered_env * diffuseColor;
 }
 
-#define REFLECTION_CAPTURE_ROUGHEST_MIP 1
-#define REFLECTION_CAPTURE_ROUGHNESS_MIP_SCALE 1.2
+#define REFLECTION_CAPTURE_ROUGHEST_MIP 3
+#define REFLECTION_CAPTURE_ROUGHNESS_MIP_SCALE 1.15
 
 float calcPrefilteredEnvMip(float roughness, int num_mip)
 {
@@ -109,7 +109,7 @@ float4 standardSurfaceShading(SurfaceOutputStandard input)
 
 	GBuffer.metallic = input.metallic;
 
-	GBuffer.specularColor = lerp(0.08 * input.localSpecular.xxx, input.localSpecular, GBuffer.metallic.xxx);
+	GBuffer.specularColor = lerp(0.08 * input.localSpecular.xxx, input.localSpecular, GBuffer.metallic);
 
 	GBuffer.diffuseColor = input.baseColor - input.baseColor * GBuffer.metallic;
 
@@ -129,9 +129,14 @@ float4 standardSurfaceShading(SurfaceOutputStandard input)
 	FLightAccumulator lightAccumulator = (FLightAccumulator)0;
 	float surfaceAttenuation = 1.0;        //ÒõÓ°µÈµÄÏ÷¼õ
 	int index = step(u_ViewDistanceClip.x, input.viewPosition.z) + step(u_ViewDistanceClip.y, input.viewPosition.z) + step(u_ViewDistanceClip.z, input.viewPosition.z) + step(u_ViewDistanceClip.w, input.viewPosition.z);
+	float4 shadowProPos = mul(input.worldPosition, u_ShadowMatrix[index]);
+	float2 texcoord0 = shadowProPos.xy / shadowProPos.w;
+	texcoord0.y *= -1;
+	float3 texCoord = float3(texcoord0 * 0.5 + 0.5, index);
 
-	float4 shadowProPos = mul(input.worldPosition, u_ShadowMatrix[0]);
-	float shadow = step(u_ShadowMap.Sample(s_BilinearSampler, float3(shadowProPos.xy / shadowProPos.w, 0)).r, shadowProPos.z / shadowProPos.w + 0.0001);
+
+	float shadow = step(shadowProPos.z / shadowProPos.w - 0.001, u_ShadowMap.Sample(s_ShadowSampler, texCoord).r);
+
 	surfaceAttenuation = shadow;
 	lightAccumulatorAdd(lightAccumulator, surfaceLighting, (1.0 / PI), u_DirLightColor * (NoL * surfaceAttenuation), false);
 
@@ -139,9 +144,8 @@ float4 standardSurfaceShading(SurfaceOutputStandard input)
 	float3 specularContribution = pBPrefilteredSpecularIBL(GBuffer.specularColor, GBuffer.roughness, N, V);
 
 	lightAccumulatorAdd(lightAccumulator, nonSpecularContribution + specularContribution, nonSpecularContribution, u_AmbientCubemapColor, false);
-	float4 proPos = mul(float4(input.worldPosition.xyz, 1.0), u_ViewProjMatrix);
-	return float4(shadow, shadow, shadow, 1.0);
-	//return lightAccumulatorGetResult(lightAccumulator);
+	
+	return lightAccumulatorGetResult(lightAccumulator);
 }
 
 
