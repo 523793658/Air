@@ -1,25 +1,8 @@
-#include "basic/include/Basic.h"
-#include "basic/include/ResIdentifier.h"
-
-#ifdef AIR_PLATFORM_WINDOWS
-	#include <windows.h>
-#ifdef AIR_PLATFORM_WINDOWS_RUMTIME
-	#include "Thread.h"
-#endif
-
-#else
-#include "Thread.h"
-#include <cerrno>
-#include <cstdlib>
-#include <cwchar>
-#include <clocale>
-#endif
-
-#include <vector>
-#include <algorithm>
-#include <boost/assert.hpp>
-
+#include "basic/include/Config.h"
 #include "basic/include/Util.h"
+#include "basic/include/ResIdentifier.h"
+#include "HAL/PlatformInclude.h"
+#include <vector>
 
 namespace Air 
 {
@@ -31,7 +14,7 @@ namespace Air
 	std::string& convert(std::string& strDest, std::wstring const & wstrSrc)
 	{
 #if defined AIR_PLATFORM_WINDOWS
-		int const mbs_len = WideCharToMultiByte(CP_ACP, 0, wstrSrc.c_str(), static_cast<int>(wstrSrc.size()), nullptr, 0, nullptr, nullptr);
+		int const mbs_len = PlatformString::WideCharToMultiByte(wstrSrc.c_str(), static_cast<int>(wstrSrc.size()), nullptr, 0);
 		std::vector<char> tmp(mbs_len + 1);
 		WideCharToMultiByte(CP_ACP, 0, wstrSrc.c_str(), static_cast<int>(wstrSrc.size()), &tmp[0], mbs_len, nullptr, nullptr);
 #endif

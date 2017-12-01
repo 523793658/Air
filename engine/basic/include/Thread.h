@@ -561,6 +561,21 @@ namespace Air
 	private:
 		std::shared_ptr<thread_pool_common_data_t> data_;
 	};
+
+	class Runable
+	{
+	public:
+		virtual bool init()
+		{
+			return true;
+		}
+
+		virtual uint32_t run() = 0;
+
+		virtual void stop(){}
+
+		virtual void exit(){}
+	};
 }
 
 #endif

@@ -15,7 +15,9 @@ namespace Air
 
 		double getElapsedMin() const;
 
-		double getCurrentTime() const;
+		static double getCurrentTime();
+
+		static uint32_t getCPUCycles();
 
 	private:
 		double mStartTime;

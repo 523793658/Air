@@ -177,6 +177,9 @@ namespace Air
 		uint32_t mCSBlockSizeY{ 0 };
 		uint32_t mCSBlockSizeZ{ 0 };
 	};
+
+
+
 }
 
 #endif

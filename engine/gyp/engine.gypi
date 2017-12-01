@@ -9,12 +9,14 @@
 			],
 			'variables': {
 				'outputSubDir': '',
+				'shaderPath' : "../rendersystem/shader",
 			},
 			"type": "shared_library",
 			"include_dirs":[
 				"../../external/boost",
 				"../core/include",
 				"../",
+				"../basic",
 				"../../external/dxsdk/Include",
 			],
 			"includes":[
@@ -99,6 +101,10 @@
 				"../rendersystem/include/MaterialInterface.hpp",
 				"../rendersystem/include/RHIDefinitions.hpp",
 				"../rendersystem/include/DeferredLightingLayer.hpp",
+				"../rendersystem/include/DeferredRenderEnvironment.hpp",
+				"../rendersystem/include/ShaderCompiler.hpp",
+				"../rendersystem/include/VertexFactory.hpp",
+				"../rendersystem/include/UniformBuffer.hpp",
 				
 				"../rendersystem/src/RenderSettings.cpp",
 				"../rendersystem/src/RenderFactory.cpp",
@@ -142,6 +148,20 @@
 				"../rendersystem/src/Material.cpp",
 				"../rendersystem/src/MaterialInterface.cpp",
 				"../rendersystem/src/DeferredLightingLayer.cpp",
+				"../rendersystem/src/DeferredRenderEnvironment.cpp",
+				"../rendersystem/src/ShaderCompiler.cpp",
+				"../rendersystem/src/VertexFactory.cpp",
+				"../rendersystem/src/UniformBuffer.cpp",
+				
+				
+				"../rendersystem/shaderCore/ShaderCore.cpp",
+				"../rendersystem/shaderCore/ShaderCore.hpp",
+				"../rendersystem/shaderCore/ShaderFormat.hpp",
+				"../rendersystem/shaderCore/ShaderFormat.cpp",
+				"../rendersystem/shaderCore/ShaderFormatModule.cpp",
+				"../rendersystem/shaderCore/ShaderFormatModule.hpp",
+				"../rendersystem/shaderCore/Shader.hpp",
+				"../rendersystem/shaderCore/Shader.cpp",
 				
 				"../scene_manager/include/SceneManager.hpp",
 				"../scene_manager/include/SceneObject.hpp",
@@ -171,6 +191,35 @@
 				"../component/src/PrimitiveComponent.cpp",
 				"../component/src/StaticMeshRenderer.cpp",
 				"../component/src/SkinMeshRenderer.cpp",
+				
+				"<(shaderPath)/simpleforward.asd",
+				"<(shaderPath)/skyBox.asd",
+				"<(shaderPath)/toneMap.asd",
+				"<(shaderPath)/Luminance.asd",
+				"<(shaderPath)/simplest.asd",
+				
+				
+				"<(shaderPath)/shadingModels.hlsl",
+				"<(shaderPath)/brdf.hlsl",
+				"<(shaderPath)/common.hlsl",
+				"<(shaderPath)/skyBox.hlsl",
+				"<(shaderPath)/util.hlsl",
+				"<(shaderPath)/toneMap.hlsl",
+				"<(shaderPath)/Luminance.hlsl",
+				"<(shaderPath)/shadowPCF.hlsl",
+				"<(shaderPath)/pixelShaderMain.hlsl",
+				"<(shaderPath)/vertexShaderMain.hlsl",
+				"<(shaderPath)/DeferredLightingCommon.hlsl",
+				"<(shaderPath)/DeferredShadingCommon.hlsl",
+				"<(shaderPath)/BasePassPixelShader.hlsl",
+				"<(shaderPath)/PixelShaderOutputCommon.hlsl",
+				"<(shaderPath)/MaterialTemplate.hlsl",
+				"<(shaderPath)/LocalVertexFactoryCommon.hlsl",
+				"<(shaderPath)/LocalVertexFactory.hlsl",
+				"<(shaderPath)/Definitions.hlsl",
+				"<(shaderPath)/VertexFactoryCommon.hlsl",
+				"<(shaderPath)/BasePassCommon.hlsl",
+				"<(shaderPath)/LightAccumulator.hlsl",
 			],
 			"conditions":[
 				[

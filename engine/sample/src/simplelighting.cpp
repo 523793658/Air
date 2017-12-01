@@ -408,7 +408,7 @@ namespace Sample
 
 			AmbientLightSourcePtr ambient_light = MakeSharedPtr<AmbientLightSource>();
 			SceneObjectPtr ambientLightObject = MakeSharedPtr<SceneObject>(SceneObject::SOA_LightSource);
-			ambient_light->setColor(float3(1.0f, 1.0f, 1.0f) * 0.01f);
+			ambient_light->setColor(float3(1.0f, 1.0f, 1.0f) * 1.0f);
 			ambient_light->setSkyLightTexC(c_cube_map);
 			ambient_light->setSkyLightTexY(y_cube_map);
 			ambientLightObject->setCustomData(ambient_light);
@@ -430,7 +430,11 @@ namespace Sample
 				{
 					//½ğÊôĞÔXÖá
 					//´Ö²Ú¶ÈZÖá
-					mSpheres[i * spheres_column + j] = MakeSharedPtr<SphereObject>(float3(1.0f, 1.0f, 1.0f), float3(1.0f, 1.0f, 1.0f), static_cast<float>(i)/ (spheres_row-1.0f), static_cast<float>(j) / (spheres_column - 1.0f));
+
+					float4 & diff = diff_parametes[i * spheres_column + j];
+					float4 & spec = spec_parameters[i * spheres_column + j];
+
+					mSpheres[i * spheres_column + j] = MakeSharedPtr<SphereObject>(float3(diff.x(), diff.y(), diff.z()), float3(spec.x(), spec.y(), spec.z()), 1.0f - glossiness_parametes[i * spheres_column + j], 0.0f);
 					mSpheres[i * spheres_column + j]->setLocalMatrix(MathLib::translation(1.1f*(-static_cast<float>(spheres_column / 2) + j + 0.5f),
 						0.0f,
 						1.1f * (-static_cast<float>(spheres_row / 2) + i + 0.5f)));
@@ -453,7 +457,7 @@ namespace Sample
 			*effect->getParameterByName("u_SkyBoxCcubeTex") = c_cube_map;
 			*effect->getParameterByName("u_IntegratedBRDFTex") = integratedBRDFTex;
 			terrain->bindEffect(effect);
-			terrain->setMaterial(MakeSharedPtr<RenderMaterial>(float3(1.0f, 1.0f, 1.0f), float3(1.0f, 1.0f, 1.0f), 1.0f, 0.0f));
+			terrain->setMaterial(MakeSharedPtr<RenderMaterial>(float3(1.0f, 1.0f, 1.0f) * 0.3, float3(1.0f, 1.0f, 1.0f) * 0.3, 1.0f, 0.0f));
 			mTerrainBlock->setRenderable(terrain);
 			mTerrainBlock->setLocalMatrix(MathLib::scaling(float3(50, 50, 50)) * MathLib::to_matrix(MathLib::rotation_axis(float3(1, 0, 0), -PI / 2))* MathLib::translation(float3(0, -1, 0)));
 			mTerrainBlock->addToSceneManager();

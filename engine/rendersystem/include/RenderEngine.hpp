@@ -5,6 +5,7 @@
 #include "rendersystem/include/RenderDeviceCaps.hpp"
 #include "rendersystem/include/RenderSettings.hpp"
 #include "rendersystem/include/RenderEnvironment.hpp"
+#include "rendersystem/include/RHIDefinitions.hpp"
 
 namespace Air
 {
@@ -145,7 +146,7 @@ namespace Air
 	};
 
 
-
+	std::string legacyShaderPlatformToShaderFormat(EShaderPlatform platform);
 
 }
 

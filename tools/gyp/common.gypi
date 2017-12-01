@@ -29,7 +29,7 @@
 						'TreatWChar_tAsBuiltInType': 'true',  							#将WChar_t视为内置类型
 						'WarningLevel': 'Level4',										#警告等级
 						'ProgramDataBaseFileName': '$(OutDir)\\$(TargetName).pdb', #程序数据库文件名
-						'PreprocessorDefinitions': [],      #预处理器定义
+						'PreprocessorDefinitions': ["AIR_PLATFORM_WINDOWS"],      #预处理器定义
 						'RuntimeTypeInfo': 'true',      							# /GR-
 					},
 					'Link': {

@@ -32,6 +32,8 @@ namespace Air
 		std::shared_ptr<void> removeGloobalResource(std::string const & name);
 
 		std::shared_ptr<void> getGlobalResource(std::string const & name);
+
+		RenderEnvironment* getRenderEnvironment();
 	private:
 		void postProcess(bool skip);
 
@@ -50,6 +52,8 @@ namespace Air
 		std::vector<FrameBufferPtr> mFrameBuffers;
 
 		std::unordered_map<std::string, std::shared_ptr<void>> mGlobalResource;
+
+		class RenderEnvironment* mRenderEnvironment;
 	};
 
 

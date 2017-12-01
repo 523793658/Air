@@ -1,12 +1,9 @@
 #ifndef _UTIL_H_
 #define _UTIL_H_
+#include "HAL/CoreTypes.h"
 #include "basic/include/PreDeclare.h"
-#include <string>
-#include <basic/include/cpp17.h>
-#include "boost/assert.hpp"
-#include <boost/functional/hash.hpp>
-
-
+#include <memory>
+#include "boost/functional/hash.hpp"
 
 
 #define AIR_UNUSED(x) (void)(x)
@@ -191,11 +188,6 @@ namespace Air
 #define CT_HASH(x) (CTHashImpl(x, 0))
 #endif // AIR_COMPILER_MSVC
 #else
-#if defined(KLAYGE_COMPILER_MSVC)
-#define FORCEINLINE __forceinline
-#else
-#define FORCEINLINE inline
-#endif
 
 	FORCEINLINE size_t _Hash(const char(&str)[1])
 	{

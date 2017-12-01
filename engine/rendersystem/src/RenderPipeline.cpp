@@ -24,6 +24,13 @@ namespace Air
 	RenderPipeline::RenderPipeline()
 	{
 		mPostProcessChain = MakeSharedPtr<PostProcessChain>();
+
+
+	}
+
+	RenderEnvironment* RenderPipeline::getRenderEnvironment()
+	{
+		return mRenderEnvironment;
 	}
 
 

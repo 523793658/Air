@@ -279,4 +279,27 @@ namespace Air
 		}
 	}
 
+	static std::string NAME_PCD3D_SM5("PCD3D_SM5");
+	static std::string NAME_PCD3D_SM4("PCD3D_SM4");
+	static std::string NAME_GLSL_150("GLSL_150");
+	static std::string NAME_GLSL_430("GLSL_430");
+
+	std::string legacyShaderPlatformToShaderFormat(EShaderPlatform platform)
+	{
+		switch (platform)
+		{
+		case SP_PCD3D_SM5:
+			return NAME_PCD3D_SM5;
+		case SP_OPENGL_SM4:
+			return NAME_GLSL_150;
+		case SP_PCD3D_SM4:
+			return NAME_PCD3D_SM4;
+		case SP_OPENGL_SM5:
+			return NAME_GLSL_430;
+		default:
+			BOOST_ASSERT(false);
+			break;
+		}
+	}
+
 }

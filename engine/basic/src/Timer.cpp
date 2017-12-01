@@ -31,9 +31,15 @@ namespace Air
 		return std::chrono::duration<double>::min().count();
 	}
 
-	double Timer::getCurrentTime() const
+	double Timer::getCurrentTime()
 	{
 		std::chrono::high_resolution_clock::time_point const tp = std::chrono::high_resolution_clock::now();
 		return std::chrono::duration_cast<std::chrono::duration<double>>(tp.time_since_epoch()).count();
+	}
+
+	uint32_t Timer::getCPUCycles()
+	{
+		std::chrono::high_resolution_clock::time_point const tp = std::chrono::high_resolution_clock::now();
+		return std::chrono::duration_cast<std::chrono::duration<uint32_t>>(tp.time_since_epoch()).count();
 	}
 }

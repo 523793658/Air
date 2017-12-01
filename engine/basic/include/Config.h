@@ -150,13 +150,7 @@
 #define AIR_TS_LIBRARY_FILESYSTEM_SUPPORT
 
 
-#	if AIR_COMPILER_VERSION >= 140
-#		define AIR_CPP11_CORE_CONSTEXPR_SUPPORT
-#		define AIR_CXX11_CORE_NOEXCEPT_SUPPORT
-#		define AIR_TS_LIBRARY_FILESYSTEM_V3_SUPPORT
-#	else
-#		define AIR_TS_LIBRARY_FILESYSTEM_V2_SUPPORT
-#	endif
+
 #	pragma warning(disable: 4251) // STL classes are not dllexport.
 #	pragma warning(disable: 4275) // Derived from non dllexport classes.
 #	pragma warning(disable: 4503) // Some decorated name in boost are very long.
@@ -178,7 +172,6 @@
 
 
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
-#	define AIR_PLATFORM_WINDOWS
 #	define AIR_HAS_DECLSPEC
 #	if defined(_WIN64)
 #		define AIR_PLATFORM_WIN64
@@ -396,5 +389,7 @@
 #else
 #define AIR_IS_DEV_PLATFORM 0
 #endif
+
+#include "HAL/Platform.h"
 
 #endif

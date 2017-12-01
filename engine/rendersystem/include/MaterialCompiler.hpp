@@ -4,6 +4,11 @@
 #include "PreDeclare.h"
 namespace Air
 {
+	class Worker
+	{
+
+	};
+
 	class AIR_CORE_API MaterialCompiler
 	{
 	public:

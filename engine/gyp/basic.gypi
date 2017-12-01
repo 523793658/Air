@@ -7,6 +7,7 @@
 			"type": "static_library",
 			"include_dirs":[
 				"..",
+				"../basic",
 				"../../external/boost",
 			],
 			"includes":[
@@ -48,6 +49,60 @@
 				"../basic/include/Json.hpp",
 				"../basic/include/Date.hpp",
 				"../basic/include/ClassManager.hpp",
+				"../basic/include/PlatformProcess.h",
+				"../basic/include/PlatformMisc.h",
+				"../basic/include/PlatformProperties.h",
+				"../basic/include/Globals.hpp",
+				"../basic/include/ModuleManager.h",
+				"../basic/include/ITargetPlatformManagerModule.h",
+				"../basic/include/ModuleInterface.hpp",
+				
+				"../basic/HAL/CoreTypes.h",
+				"../basic/HAL/Platform.h",
+				"../basic/HAL/PlatformString.h",
+				"../basic/HAL/PlatformInclude.h",
+				"../basic/HAL/PlatformAtomics.h",
+				"../basic/HAL/FileSystem.h",
+				"../basic/HAL/PlatformFileSystem.h",
+
+				"../basic/Misc/CoreDefines.h",
+				"../basic/Misc/CoreMiscDefines.h",
+				"../basic/Misc/CoreMisc.hpp",
+				"../basic/Misc/GUID.hpp",
+				"../basic/Misc/GUID.cpp",
+				"../basic/Misc/CoreMisc.cpp",
+				
+				"../basic/serialization/Archive.cpp",
+				"../basic/serialization/Archive.hpp",
+
+				"../basic/GenericPlatform/GenericPlatformMisc.h",
+				"../basic/GenericPlatform/GenericPlatformProcess.h",
+				"../basic/GenericPlatform/GenericPlatformProperties.h",
+				"../basic/GenericPlatform/GenericPlatformProcess.cpp",
+				"../basic/GenericPlatform/GenericPlatformMisc.cpp",
+				"../basic/GenericPlatform/GenericPlatform.h",
+				"../basic/GenericPlatform/GenericPlatformString.h",
+				"../basic/GenericPlatform/GenericPlatformAtomics.h",
+				"../basic/GenericPlatform/GenericPlatformFile.h",
+				"../basic/GenericPlatform/GenericPlatformFile.cpp",
+				"../basic/GenericPlatform/GenericPlatformFileSystem.cpp",
+				"../basic/GenericPlatform/GenericPlatformFileSystem.hpp",
+				
+				
+				"../basic/Windows/WindowsPlatform.h",
+				"../basic/Windows/WindowsPlatformMisc.h",
+				"../basic/Windows/WindowsPlatformProcess.h",
+				"../basic/Windows/WindowsPlatformProperties.h",
+				"../basic/Windows/WindowsSystemInclude.h",
+				"../basic/Windows/WindowsPlatformProcess.cpp",
+				"../basic/Windows/WindowsPlatformMisc.cpp",
+				"../basic/Windows/WindowsHWrapper.h",
+				"../basic/Windows/MinWindows.h",
+				"../basic/Windows/WindowsPlatformString.h",
+				"../basic/Windows/WindowsPlatformAtomics.h",
+				"../basic/Windows/WindowsPlatformFile.h",
+				"../basic/Windows/WindowsPlatformFile.cpp",
+				
 				
 				"../basic/src/Thread.cpp",
 				"../basic/src/CPP11.cpp",
@@ -77,6 +132,9 @@
 				"../basic/src/Json.cpp",
 				"../basic/src/Date.cpp",
 				"../basic/src/ClassManager.cpp",
+				"../basic/src/Globals.cpp",
+				"../basic/src/ModuleManager.cpp",
+				"../basic/src/TargetPlatformManagerModule.cpp",
 			],
 			"conditions":[
 				[
