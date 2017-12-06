@@ -19,7 +19,7 @@ bool FileSystemGeneric::createDirectory(const wchar_t* fileName, bool tree)
 	}
 }
 
-Air::Archive* FileSystemGeneric::createFileWriter(const wchar_t* filename, uint32_t writeflags = 0)
+Air::Archive* FileSystemGeneric::createFileWriter(const wchar_t* filename, uint32_t writeflags)
 {
 	filesystem::path path(filename);
 	if (filesystem::exists(path))

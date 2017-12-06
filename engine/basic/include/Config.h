@@ -16,10 +16,17 @@
 #define AIR_DO_JOIN(X, Y) AIR_DO_JOIN2(X, Y)
 #define AIR_DO_JOIN2(X, Y) X##Y
 
+
+
+
+
 #if defined(__clang__)
 #if __cplusplus < 201402L
 #error	"-std=c++14 must be turned on"
 #endif
+
+
+
 
 #define AIR_COMPILER_CLANG
 #define AIR_COMPILER_NAME	clang
@@ -140,6 +147,14 @@
 #	else
 #		error "Unsupported compiler version. Please install vc12 or up."
 #	endif
+
+#if AIR_COMPILER_VERSION >= 140
+#	define	AIR_CPP11_CORE_CONSTEXPR_SUPPORT			1
+#	define	AIR_CXX11_CORE_NOEXCEPT_SUPPORT				1
+#	define	AIR_TS_LIBRARY_FILESYSTEM_V3_SUPPORT		1
+#else
+#	define	AIR_TS_LIBRARY_FILESYSTEM_V2_SUPPORT		1
+#endif
 
 #if _MSVC_LANG > 201402
 #define AIR_CXX17_LIBRARY_ANY_SUPPORT
@@ -390,6 +405,23 @@
 #define AIR_IS_DEV_PLATFORM 0
 #endif
 
-#include "HAL/Platform.h"
+
+#ifdef AIR_CXX11_CORE_NOEXCEPT_SUPPORT
+#	define AIR_NOEXCEPT noexcept
+#	define AIR_NOEXCPET_IF(predicate) noexcept((predicate))
+#	define AIR_NOEXCPET_EXPR(expression) noexcept((expression))
+#else
+#	define	AIR_NOEXCEPT throw()
+#	define	AIR_NOEXCPET_IF(predicate)
+#	define	KLAYGE_NOEXCEPT_EXPR(expression) false
+#endif
+
+
+#define FORCEINLINE		__forceinline
+#define FORCENOINLINE	__declspec(noinline)
+
+#if !defined(__clang__) || defined(_MSC_VER)
+#define ASSUME(expr)	__assume(expr)
+#endif
 
 #endif

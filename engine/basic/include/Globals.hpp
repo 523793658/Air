@@ -9,8 +9,10 @@ namespace Air
 
 extern bool GIsGameThreadIdInitialized;
 
-uint32_t GGameThreadId = 0;
-uint32_t GRenderThreadId = 0;
+extern uint32_t GGameThreadId;
+extern uint32_t GRenderThreadId;
+
+extern bool GIsBuildMachine;
 
 
 FORCEINLINE bool isInGameThread()

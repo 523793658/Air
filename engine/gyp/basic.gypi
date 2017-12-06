@@ -56,6 +56,9 @@
 				"../basic/include/ModuleManager.h",
 				"../basic/include/ITargetPlatformManagerModule.h",
 				"../basic/include/ModuleInterface.hpp",
+				"../basic/include/StringView.hpp",
+				"../basic/include/STLVector.hpp",
+				"../basic/include/STLUnorderMap.hpp",
 				
 				"../basic/HAL/CoreTypes.h",
 				"../basic/HAL/Platform.h",
@@ -70,6 +73,8 @@
 				"../basic/Misc/CoreMisc.hpp",
 				"../basic/Misc/GUID.hpp",
 				"../basic/Misc/GUID.cpp",
+				"../basic/Misc/CommandLine.cpp",
+				"../basic/Misc/CommandLine.hpp",
 				"../basic/Misc/CoreMisc.cpp",
 				
 				"../basic/serialization/Archive.cpp",
@@ -135,6 +140,8 @@
 				"../basic/src/Globals.cpp",
 				"../basic/src/ModuleManager.cpp",
 				"../basic/src/TargetPlatformManagerModule.cpp",
+				"../basic/src/STLVector.cpp",
+				"../basic/src/STLUnorderMap.cpp",
 			],
 			"conditions":[
 				[

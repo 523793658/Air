@@ -162,6 +162,7 @@
 				"../rendersystem/shaderCore/ShaderFormatModule.hpp",
 				"../rendersystem/shaderCore/Shader.hpp",
 				"../rendersystem/shaderCore/Shader.cpp",
+				"../rendersystem/shaderCore/ShaderPipelineCompiler.cpp",
 				
 				"../scene_manager/include/SceneManager.hpp",
 				"../scene_manager/include/SceneObject.hpp",

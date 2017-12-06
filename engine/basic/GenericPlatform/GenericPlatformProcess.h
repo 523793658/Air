@@ -2,6 +2,7 @@
 #define _GenericPlatformProcess_H_
 #pragma once
 #include "HAL/CoreTypes.h"
+#include "basic/include/StringView.hpp"
 namespace Air
 {
 
@@ -74,6 +75,10 @@ namespace Air
 
 		static const std::string_view shaderDir();
 		static void setShaderDir(const std::string_view path);
+
+		static ProcHandle createProc(std::string const & url, std::string const & params, bool launchDetached, bool launchHidden, bool launchReallyHidden, uint32_t* outProcessId, int32_t priorityModifier, std::string  const & optionalWorkingDirecoty, void* pipeWriteChild, void * pipeReadChild = nullptr);
+
+		static const std::string getModulesDirectory();
 	};
 }
 

@@ -1,10 +1,9 @@
 #ifndef _UTIL_H_
 #define _UTIL_H_
-#include "HAL/CoreTypes.h"
-#include "basic/include/PreDeclare.h"
+#include "basic/include/Basic.h"
 #include <memory>
 #include "boost/functional/hash.hpp"
-
+#include "basic/include/StringView.hpp"
 
 #define AIR_UNUSED(x) (void)(x)
 
@@ -20,9 +19,6 @@
 
 namespace Air
 {
-
-
-
 	template<typename T, typename... Args>
 	inline std::unique_ptr<T> MakeUniquePtrHelper(std::false_type, Args&&... args)
 	{
@@ -131,7 +127,7 @@ namespace Air
 #endif
 	size_t constexpr LeftMoveC(size_t v, size_t n)
 	{
-		return (v >>(SIZEBIT - n)) | (v << n);
+		return (v >> (SIZEBIT - n)) | (v << n);
 	}
 	size_t constexpr CTHashKV(size_t k1)
 	{

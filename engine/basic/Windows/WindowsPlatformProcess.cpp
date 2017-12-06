@@ -9,6 +9,10 @@
 namespace Air
 {
 
+	std::vector<std::string> WindowsPlatformProcess::mDllDirectoryStack;
+
+	std::vector<std::string> WindowsPlatformProcess::mDllDirectoies;
+		
 	namespace ProcessConstants
 	{
 		uint32_t WIN_STD_INPUT_HANDLE = STD_INPUT_HANDLE;
@@ -90,5 +94,80 @@ namespace Air
 			}
 			TerminateProcess(handle.get(), 0);
 		}
+	}
+	ProcHandle WindowsPlatformProcess::createProc(std::string const & url, std::string const & params, bool launchDetached, bool launchHidden, bool launchReallyHidden, uint32_t* outProcessId, int32_t priorityModifier, std::string const & optionalWorkingDirecoty, void* pipeWriteChild, void * pipeReadChild /* = nullptr */)
+	{
+		SECURITY_ATTRIBUTES attr;
+		attr.nLength = sizeof(SECURITY_ATTRIBUTES);
+		attr.lpSecurityDescriptor = NULL;
+		attr.bInheritHandle = true;
+		uint32_t createFlags = NORMAL_PRIORITY_CLASS;
+		if (priorityModifier < 0)
+		{
+			createFlags = (priorityModifier == -1) ? BELOW_NORMAL_PRIORITY_CLASS : IDLE_PRIORITY_CLASS;
+		}
+		else if(priorityModifier > 0)
+		{
+			createFlags = (priorityModifier == 1)
+				? ABOVE_NORMAL_PRIORITY_CLASS : HIGH_PRIORITY_CLASS;
+		}
+		if (launchDetached)
+		{
+			createFlags |= DETACHED_PROCESS;
+		}
+		uint32_t dwFlags = 0;
+		uint16_t showWindowFlags = SW_HIDE;
+		if (launchReallyHidden)
+		{
+			dwFlags = STARTF_USESHOWWINDOW;
+		}
+		else if(launchHidden)
+		{
+			dwFlags = STARTF_USESHOWWINDOW;
+			showWindowFlags = SW_SHOWMINNOACTIVE;
+		}
+		if (pipeWriteChild != nullptr || pipeReadChild != nullptr)
+		{
+			dwFlags |= STARTF_USESTDHANDLES;
+		}
+		STARTUPINFOA startupInfo = {
+			sizeof(STARTUPINFOA),
+			NULL, NULL, NULL,
+			(::DWORD)CW_USEDEFAULT,
+			(::DWORD)CW_USEDEFAULT,
+			(::DWORD)CW_USEDEFAULT,
+			(::DWORD)CW_USEDEFAULT,
+			(::DWORD)0, (::DWORD)0, (::DWORD)0,
+			(::DWORD)dwFlags,
+			showWindowFlags,
+			0, NULL,
+			HANDLE(pipeReadChild),
+			HANDLE(pipeWriteChild),
+			HANDLE(pipeWriteChild)
+		};
+		std::string commandLine = "\"" + url + "\" " + params;
+		char* commandLineChar = (char*)((commandLine.size() + 1) * sizeof(char));
+		memcpy(commandLineChar, commandLine.c_str(), commandLine.size() * sizeof(char));
+		PROCESS_INFORMATION procInfo;
+
+		if (!CreateProcessA(NULL, commandLineChar, &attr, &attr, true, (::DWORD)createFlags, NULL, optionalWorkingDirecoty.c_str(), &startupInfo, &procInfo))
+		{
+			if (outProcessId != nullptr)
+			{
+				*outProcessId = 0;
+			}
+			return ProcHandle();
+		}
+		if (outProcessId != nullptr)
+		{
+			*outProcessId = procInfo.dwProcessId;
+		}
+		::CloseHandle(procInfo.hThread);
+		return ProcHandle(procInfo.hProcess);
+	}
+
+	void WindowsPlatformProcess::addDllDirectory(std::string directory)
+	{
+		mDllDirectoies.push_back(directory);
 	}
 }

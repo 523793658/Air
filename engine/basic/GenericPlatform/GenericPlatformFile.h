@@ -23,6 +23,8 @@ public:
 	virtual IFileHandle* openWrite(const wchar_t* fileName, bool bAppend = false, bool bAllowRead = false) = 0;
 
 	virtual bool setReadOnly(const wchar_t* filename, bool bNeedReadOnlyValue) = 0;
+
+	virtual bool fileExist(std::string const &);
 };
 
 

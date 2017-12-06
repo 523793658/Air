@@ -7,11 +7,26 @@ namespace Air
 class ShaderPipelineType
 {
 public:
+	enum class EShaderTypeForDynamicCast : uint32_t
+	{
+		STDC_Global,
+		STDC_Material,
+		STDC_MeshMaterial
+	};
 
-	FORCEINLINE std::wstring getName() const;
+	FORCEINLINE wchar_t const * getName() const
+	{
+		return mName;
+	}
 	
-	
-
+private:
+	const wchar_t* mName;
+	std::string mTypeName;
+	const wchar_t* mSourceFilename;
+	const wchar_t* mFunctionName;
+	uint32_t mFrequency;
+	uint32_t mHashIndex;
+	EShaderTypeForDynamicCast mShaderTypeForDynamicCast;
 
 };
 

@@ -57,4 +57,14 @@ namespace Air
 			Generic_ShaderDir = "";
 		}
 	}
+
+	const std::string GenericPlatFormProcess::getModulesDirectory()
+	{
+		char buf[MAX_PATH];
+		::GetModuleFileNameA(nullptr, buf, sizeof(buf));
+		std::string mExePath = buf;
+		mExePath = mExePath.substr(0, mExePath.rfind("\\"));
+		return mExePath;
+	}
+
 }

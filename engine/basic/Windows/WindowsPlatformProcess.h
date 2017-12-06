@@ -3,6 +3,7 @@
 #pragma once
 #include "GenericPlatform/GenericPlatformProcess.h"
 #include "Windows/WindowsSystemInclude.h"
+#include "basic/include/STLVector.hpp"
 
 
 namespace Air
@@ -41,6 +42,14 @@ namespace Air
 		static void closeProc(ProcHandle& handle);
 
 		static void terminateProc(ProcHandle & handle, bool killTree  = false);
+
+		static ProcHandle createProc(std::string const & url, std::string const & params, bool launchDetached, bool launchHidden, bool launchReallyHidden, uint32_t* outProcessId, int32_t priorityModifier, std::string const & optionalWorkingDirecoty, void* pipeWriteChild, void * pipeReadChild = nullptr);
+
+		static void addDllDirectory(std::string directory);
+
+	private:
+		static std::vector<std::string> mDllDirectoryStack;
+		static std::vector<std::string> mDllDirectoies;
 	};
 
 	typedef WindowsPlatformProcess PlatformProcess;

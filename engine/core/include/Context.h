@@ -13,7 +13,6 @@
 #else
 #	define AIR_CORE_API	AIR_SYMBOL_IMPORT
 #endif
-
 #include <vector>
 #include <string>
 #include <unordered_map>

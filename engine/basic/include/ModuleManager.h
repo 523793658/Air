@@ -2,9 +2,29 @@
 #define _ModuleManager_H_
 #pragma once
 #include "basic/include/ITargetPlatformManagerModule.h"
+#include "basic/include/STLUnorderMap.hpp"
 #include <vector>
 namespace Air
 {
+	class ModuleInfo
+	{
+	public:
+		std::string mOriginalFileName;
+		std::string mFileName;
+		void* mHandle;
+		std::shared_ptr<IModuleInterface> mModule;
+		bool mWasUnloadedAtShutdown;
+		int32_t mLoadOrder;
+		static int32_t mCurrentLoadOrder;
+	public:
+		ModuleInfo()
+			:mHandle(nullptr), mWasUnloadedAtShutdown(false), mLoadOrder(mCurrentLoadOrder++)
+		{}
+	};
+
+	typedef std::shared_ptr<ModuleInfo> ModuleInfoPtr;
+
+
 	class IModuleInterface;
 	class ModuleManager
 	{
@@ -14,7 +34,7 @@ namespace Air
 
 	public:
 
-		bool isModuleLoaded(const std::string_view name);
+		bool isModuleLoaded(const std::string& name);
 
 		std::shared_ptr<IModuleInterface> loadModule(const std::string  name, bool wasReloaded = false);
 
@@ -46,11 +66,11 @@ namespace Air
 		void findModules(const wchar_t* wildcardWithoutExtension, std::vector<std::string>& outModules) const;
 
 		template<typename TModuleInterface>
-		static TModuleInterface& getModuleChecked(const std::string_view moduleName)
+		static TModuleInterface& getModuleChecked(const std::string& moduleName)
 		{
 			ModuleManager& moduleManager = ModuleManager::get();
 			BOOST_ASSERT(moduleManager.isModuleLoaded(moduleName));
-			return (TModuleInterface)(*moduleManager.getModule(moduleName));
+			return (TModuleInterface&)(*moduleManager.getModule(moduleName));
 		}
 
 		template<typename TModuleInterface>
@@ -63,6 +83,13 @@ namespace Air
 			}
 			return getModuleChecked<TModuleInterface>(moduleName);
 		}
+		void addBinariesDirectory(const std::string inDirectory, bool isGameDirectory);
+	private:
+		std::vector<std::string> mGameBinariesDirectories;
+		std::vector<std::string> mEngineBinariesDirectories;
+		std::unordered_map<std::string, ModuleInfoPtr> mModules;
+	private:
+		ModuleInfoPtr findModule(std::string inModuleName);
 
 	};
 

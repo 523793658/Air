@@ -9,7 +9,8 @@
 #include <array>
 #include "basic/include/Math.hpp"
 #include "basic/include/Color.hpp"
-
+#include "basic/include/StringView.hpp"
+#include <stdint.h>
 
 
 

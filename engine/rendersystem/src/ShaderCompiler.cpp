@@ -15,16 +15,17 @@
 #include "rendersystem/shaderCore/Shader.hpp"
 #include "HAL/PlatformAtomics.h"
 #include "Misc/GUID.hpp"
+#include "Misc/CommandLine.hpp"
 #include "HAL/FileSystem.h"
-#include "rendersystem/shaderCore/ShaderFormat.hpp"
 #include "serialization/Archive.hpp"
+#include "rendersystem/shaderCore/ShaderFormat.hpp"
 #include "rendersystem/shaderCore/ShaderFormatModule.hpp"
-#if defined(AIR_TS_LIBRARY_FILESYSTEM_V3_SUPPORT)
-#include <experimental/filesystem>
-#elif defined(AIR_TS_LIBRARY_FILESYSTEM_V2_SUPPORT)
-#include <filesystem>
-#endif
+#include "basic/include/STLUnorderMap.hpp"
+#include "HAL/PlatformFileSystem.h"
+#include "GenericPlatform/GenericPlatformFile.h"
 using namespace std::experimental;
+
+extern bool GIsBuildMachine;
 
 namespace Air
 {
@@ -35,6 +36,8 @@ namespace Air
 	const int32_t ShaderCompileWorkerSingleJobHeader = 'S';
 
 	const int32_t ShaderCompileWorkerPipelineJobHeader = 'P';
+
+#define DEBUG_SHADERCOMPILEWORKER 0
 
 
 	extern bool compileShaderPipeline(const IShaderFormat* compiler, std::string format, ShaderPipelineCompileJob* pipelineJob, const std::string_view dir);
@@ -64,6 +67,7 @@ namespace Air
 				}
 			}
 		}
+		return results;
 	}
 
 	static inline void getFormatVersionMap(std::unordered_map<std::string, uint16_t>& outFormatVersionMap)
@@ -102,6 +106,10 @@ namespace Air
 				outQueuedSingleJobs.push_back(singleJob);
 			}
 		}
+	}
+	static void doReadTaskResults(const std::vector<ShaderCommonCompileJob*>& queuedJobs, Archive& outputFile)
+	{
+
 	}
 
 	static bool doWriteTasks(const std::vector<ShaderCommonCompileJob*>& queuedJobs, Archive& transferFile)
@@ -251,6 +259,98 @@ namespace Air
 		return 0;
 	}
 
+	bool ShaderCompileThreadRunable::launchWorkersIfNeeded()
+	{
+		const double currentTime = Timer::getCurrentTime();
+		const bool checkForWorkerRunning = (currentTime - mLastCheckForWorkersTime > 0.1f);
+		bool abandonWorkers = false;
+		if (checkForWorkerRunning)
+		{
+			mLastCheckForWorkersTime = currentTime;
+		}
+		for (int32_t workerIndex = 0; workerIndex < mWorkerInfos.size(); ++workerIndex)
+		{
+			ShaderCompileWorkerInfo& currentWorkerInfo = *mWorkerInfos[workerIndex];
+			if (currentWorkerInfo.mQueuedJobs.size() == 0)
+			{
+				if (currentWorkerInfo.mWorkerProcess.isValid() && !ShaderCompilingManager::isShaderCompilerWorkderRunning(currentWorkerInfo.mWorkerProcess))
+				{
+					PlatformProcess::closeProc(currentWorkerInfo.mWorkerProcess);
+					currentWorkerInfo.mWorkerProcess = ProcHandle();
+				}
+				continue;
+			}
+			if (!currentWorkerInfo.mWorkerProcess.isValid() || (checkForWorkerRunning && !ShaderCompilingManager::isShaderCompilerWorkderRunning(currentWorkerInfo.mWorkerProcess)))
+			{
+				bool launchAgain = true;
+				if (currentWorkerInfo.mWorkerProcess.isValid())
+				{
+					PlatformProcess::closeProc(currentWorkerInfo.mWorkerProcess);
+					currentWorkerInfo.mWorkerProcess = ProcHandle();
+					if (currentWorkerInfo.mLaunchedWorker)
+					{
+						const std::string workingDirectory = mManager->mAbsoluteShaderBaseWorkingDirectory + boost::lexical_cast<std::string>(workerIndex) + "/";
+						const std::string outputFileNameAndPath = workingDirectory + "WorkerOutputOnly.out";
+						if (PlatformFileSystem::get().getPlatformFile().fileExist(outputFileNameAndPath))
+						{
+							launchAgain = false;
+						}
+						else
+						{
+							abandonWorkers = true;
+							break;
+						}
+					}
+				}
+				if (launchAgain)
+				{
+					std::string workingDirectory = mManager->mShaderBaseWorkingDirectory + boost::lexical_cast<std::string>(workerIndex) + "/";
+					std::string inputFileName = "WorkerInputOnly.in";
+					std::string outputFileName = "WorkerOutputOnly.out";
+					currentWorkerInfo.mWorkerProcess = mManager->launchWorker(workingDirectory, mManager->mProcessId, workerIndex, inputFileName, outputFileName);
+					currentWorkerInfo.mLaunchedWorker = true;
+				}
+			}
+		}
+		return abandonWorkers;
+	}
+
+
+	void ShaderCompileThreadRunable::readAvailableResult()
+	{
+		for (int32_t workerIndex = 0; workerIndex < mWorkerInfos.size(); ++workerIndex)
+		{
+			ShaderCompileWorkerInfo& currentWorkerInfo = *mWorkerInfos[workerIndex];
+			if (currentWorkerInfo.mQueuedJobs.size() > 0)
+			{
+				const std::string workingDirectory = mManager->mAbsoluteShaderBaseWorkingDirectory + boost::lexical_cast<std::string>(workerIndex) + "/";
+				const std::string InputFileName = "WorkderInputOnly.in";
+				const std::string outputFileNameAndPath = workingDirectory + "WorkerOutputOnly.out";
+				if (PlatformFileSystem::get().getPlatformFile().fileExist(outputFileNameAndPath))
+				{
+					Archive* outputFilePtr = IFileSystem::get().createFileReader(outputFileNameAndPath, FILEREAD_Silent);
+					if (outputFilePtr)
+					{
+						Archive& outputFile = *outputFilePtr;
+						BOOST_ASSERT(!currentWorkerInfo.mComplete);
+						doReadTaskResults(currentWorkerInfo.mQueuedJobs, outputFile);
+						delete outputFilePtr;
+						bool deletedOutput = IFileSystem::get().deleteFile(outputFileNameAndPath, true, true);
+						int32_t retryCount = 0;
+						while (!deletedOutput && retryCount < 200)
+						{
+							PlatformProcess::sleep(0.01f);
+							deletedOutput = IFileSystem::get().deleteFile(outputFileNameAndPath, true, true);
+							retryCount++;
+						}
+						BOOST_ASSERT(deletedOutput, "failed to delete");
+						currentWorkerInfo.mComplete = true;
+					}
+				}
+			}
+		}
+	}
+
 	void ShaderCompileThreadRunable::writeNewTasks()
 	{
 		for (int32_t workerIndex = 0; workerIndex < mWorkerInfos.size(); ++workerIndex)
@@ -259,13 +359,13 @@ namespace Air
 			if (!currentWorkerInfo.mIssuedTasksToWorker && currentWorkerInfo.mQueuedJobs.size() > 0)
 			{
 				currentWorkerInfo.mIssuedTasksToWorker = true;
-				const std::wstring workingDirectory = mManager->mAbsoluteShaderBaseWorkingDirectory + boost::lexical_cast<std::wstring>(workerIndex);
+				const std::string workingDirectory = mManager->mAbsoluteShaderBaseWorkingDirectory + boost::lexical_cast<std::string>(workerIndex);
 				filesystem::path path;
 				do 
 				{
 					Guid guid;
 					PlatformMisc::createGuid(guid);
-					path = workingDirectory + guid.toWString();
+					path = workingDirectory + guid.toString();
 
 				} while (filesystem::exists(path));
 				Archive* transferFile = nullptr;
@@ -291,16 +391,16 @@ namespace Air
 				{
 					uint64_t totalDiskSpace = 0;
 					uint64_t freeDiskSpace = 0;
-					PlatformMisc::getDiskTotalAndFreeSpace(path.c_str(), totalDiskSpace, freeDiskSpace);
+					PlatformMisc::getDiskTotalAndFreeSpace(path.generic_string(), totalDiskSpace, freeDiskSpace);
 				}
 				delete transferFile;
 
-				std::wstring propertransferFileName = workingDirectory + L"/WorkerInputOnly.in";
-				if (!IFileSystem::get().move(propertransferFileName.c_str(), path.c_str()))
+				std::string propertransferFileName = workingDirectory + "/WorkerInputOnly.in";
+				if (!IFileSystem::get().move(propertransferFileName.c_str(), path.string().c_str()))
 				{
 					uint64_t TotalDiskSpace = 0;
 					uint64_t freeDiskSpace = 0;
-					PlatformMisc::getDiskTotalAndFreeSpace(path.c_str(), TotalDiskSpace, freeDiskSpace);
+					PlatformMisc::getDiskTotalAndFreeSpace(path.generic_string(), TotalDiskSpace, freeDiskSpace);
 				}
 			}
 		}
@@ -553,6 +653,12 @@ namespace Air
 		return 0;
 	}
 
+	bool ShaderCompileXGEThreadRunnable::isSupported()
+	{
+		return false;
+	}
+
+
 	ShaderCompilingManager::ShaderCompilingManager():
 		mCompilingDuringGame(false),
 		mNumOutstandingJobs(0),
@@ -561,7 +667,7 @@ namespace Air
 #elif defined(AIR_PLATFORM_LINUX)
 		mShaderCompileWorkerName(TEXT("../../bin/Linux/ShaderCompileWorker"))
 #else
-		mShaderCompileWorkerName(L"../../bin/x64/ShaderCompileWorker.exe"),
+		mShaderCompileWorkerName("../../bin/x64/ShaderCompileWorker.exe"),
 #endif
 		mSuppressedShaderPlatforms(0)
 	{
@@ -612,5 +718,35 @@ namespace Air
 		mThread->startThread();
 	}
 
+	bool ShaderCompilingManager::isShaderCompilerWorkderRunning(ProcHandle& workerHandle)
+	{
+		return PlatformProcess::isProcRunning(workerHandle);
+	}
 
+	ProcHandle ShaderCompilingManager::launchWorker(std::string & workingDirectory, uint32_t inProcessId, uint32_t threadId, const std::string & workerInputFile, const std::string & workderOuputFile)
+	{
+		std::string workerAbsoluteDirectory = IFileSystem::get().convertToAbsolutePathForExternalAppForWrite(workingDirectory);
+		std::string workerParameters = "\"" + workerAbsoluteDirectory + "/\" " + boost::lexical_cast<std::string>(inProcessId) + " " + boost::lexical_cast<std::string>(threadId) + " " + workerInputFile + " " + workderOuputFile;
+		workerParameters += " -communicatethroughfile";
+		if (GIsBuildMachine)
+		{
+			workerParameters += " -buildmachine ";
+		}
+		workerParameters += CommandLine::getSubprocessCommandline();
+		int32_t priorityModifier = -1;
+		if (DEBUG_SHADERCOMPILEWORKER)
+		{
+			const std::string & workerParametersText = workerParameters;
+		}
+		else
+		{
+			uint32_t workerId = 0;
+			ProcHandle workerHandle = PlatformProcess::createProc(mShaderCompileWorkerName, workerParameters, true, false, false, &workerId, priorityModifier, NULL, NULL);
+			if (!workerHandle.isValid())
+			{
+				BOOST_ASSERT(false, "couldn't launch compiler process");
+			}
+			return workerHandle;
+		}
+	}
 }

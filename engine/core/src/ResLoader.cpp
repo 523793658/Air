@@ -97,7 +97,7 @@ namespace Air
 
 	}
 
-	std::wstring ResLoader::getAbsPath(std::wstring const & path)
+	std::string ResLoader::getAbsPath(std::string const & path)
 	{
 		using namespace std::experimental;
 		filesystem::path new_path(path);
@@ -125,15 +125,15 @@ namespace Air
 #endif
 				if (!filesystem::exists(full_path))
 				{
-					return L"";
+					return "";
 				}
 #else
-				return L""
+				return ""
 #endif
 			}
 			new_path = full_path;
 		}
-		std::wstring ret = new_path.wstring();
+		std::string ret = new_path.string();
 #if defined AIR_PLATFORM_WINDOWS
 		std::replace(ret.begin(), ret.end(), '\\', '/');
 #endif
@@ -141,9 +141,9 @@ namespace Air
 	}
 
 
-	std::wstring ResLoader::getRealPath(std::wstring const & path)
+	std::string ResLoader::getRealPath(std::string const & path)
 	{
-		std::wstring abs_path = this->getAbsPath(path);
+		std::string abs_path = this->getAbsPath(path);
 		if (!abs_path.empty() && (abs_path[abs_path.length() - 1] != '/'))
 		{
 			abs_path.push_back('/');

@@ -303,13 +303,13 @@ namespace Air
 
 		float mProcessGameThreadTargetTime;
 
-		std::wstring ShaderBaseWorkingDirectory;
+		std::string mShaderBaseWorkingDirectory;
 
-		std::wstring mAbsoluteShaderBaseWorkingDirectory;
+		std::string mAbsoluteShaderBaseWorkingDirectory;
 
-		std::wstring mAbsoluteShaderDebugInfoDirectory;
+		std::string mAbsoluteShaderDebugInfoDirectory;
 
-		std::wstring mShaderCompileWorkerName;
+		std::string mShaderCompileWorkerName;
 
 		bool mFallBackToDirectCompiles;
 
@@ -319,6 +319,10 @@ namespace Air
 
 	public:
 		ShaderCompilingManager();
+
+		static bool isShaderCompilerWorkderRunning(ProcHandle& workerHandle);
+
+		ProcHandle launchWorker(std::string & workingDirectory, uint32_t inProcessId, uint32_t threadId, const std::string & workerInputFile, const std::string & workderOuputFile);
 	};
 
 

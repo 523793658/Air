@@ -3,7 +3,7 @@
 #pragma once
 
 #include "HAL/CoreTypes.h"
-
+#include "basic/serialization/Archive.hpp"
 #if defined(AIR_TS_LIBRARY_FILESYSTEM_V3_SUPPORT)
 #include <experimental/filesystem>
 #elif defined(AIR_TS_LIBRARY_FILESYSTEM_V2_SUPPORT)
@@ -56,9 +56,15 @@ public:
 
 	virtual Air::Archive* createFileWriter(const wchar_t* fileName, uint32_t writeflags = 0) = 0;
 
+	virtual Air::Archive* createFileReader(std::string const &, uint32_t flags) = 0 ;
+
 	virtual bool createDirectory(const wchar_t* fileName, bool) = 0;
 
-	virtual bool move(const wchar_t* dst, const wchar_t* src, bool replace = true, bool evenIfReadOnly = false, bool attributes = false, bool bDonotRetryOnError = false);
+	virtual bool deleteFile(std::string const &, bool requireExists = false, bool evenReadOnly = false, bool quiet = false) = 0;
+
+	virtual bool move(const char* dst, const char* src, bool replace = true, bool evenIfReadOnly = false, bool attributes = false, bool bDonotRetryOnError = false);
+
+	virtual std::string convertToAbsolutePathForExternalAppForWrite(std::string const & absolutePath);
 };
 
 

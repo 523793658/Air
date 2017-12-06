@@ -68,7 +68,7 @@ namespace Air
 		void addPath(std::string const & path);
 		void delPath(std::string const & path);
 
-		std::wstring getAbsPath(std::wstring const & path);
+		std::string getAbsPath(std::string const & path);
 
 		ResIdentifierPtr open(std::string const & name);
 		std::string locate(std::string const & name);
@@ -93,7 +93,7 @@ namespace Air
 			return std::static_pointer_cast<T>(this->aSyncQuery(res_desc));
 		}
 	private:
-		std::wstring getRealPath(std::wstring const & path);
+		std::string getRealPath(std::string const & path);
 		void loadingThreadFunc();
 		void removeUnrefResources();
 		std::shared_ptr<void> findMatchLoadedResource(ResLoadingDescPtr const & res_desc);

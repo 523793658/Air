@@ -32,6 +32,7 @@ struct ShaderTarget
 		uint32_t targetPlatform = target.mPlatform;
 		file << targetFrequency;
 		file << targetPlatform;
+		return file;
 	}
 };
 
@@ -61,6 +62,7 @@ public:
 			mDefinitions.emplace(it);
 		}
 	}
+	friend Archive & operator << (Archive& ar, ShaderCompilerDefinitions const & defin);
 
 private:
 	std::unordered_map<std::string, std::string> mDefinitions;
@@ -160,6 +162,7 @@ struct ShaderCompilerEnvironment
 		mDefinitions.merge(other.mDefinitions);
 		mRenderTargetOutputFormatsMap.insert(other.mRenderTargetOutputFormatsMap.begin(), other.mRenderTargetOutputFormatsMap.end());
 	}
+	friend Archive& operator << (Archive & ar, ShaderCompilerEnvironment const & env);
 private:
 	ShaderCompilerDefinitions mDefinitions;
 };

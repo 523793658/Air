@@ -22,11 +22,7 @@ namespace Air
 
 		virtual Archive& operator << (std::wstring_view);
 
-		friend Archive& operator << (Archive& ar, uint32_t value);
-
 		virtual Archive& operator << (int32_t value);
-
-		virtual Archive& operator << (const std::unordered_map<std::string, uint16_t> & lhs);
 	};
 
 }

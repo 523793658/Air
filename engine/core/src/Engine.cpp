@@ -18,16 +18,6 @@
 #include "core/include/ResourcePlugin.h"
 
 #include <memory>
-
-#ifdef AIR_PLATFORM_WINDOWS
-#include <windows.h>
-#if defined(KLAYGE_PLATFORM_WINDOWS_DESKTOP)
-#if (_WIN32_WINNT >= _WIN32_WINNT_WINBLUE)
-#include <VersionHelpers.h>
-#endif
-#endif
-#endif
-
 #include <mutex>
 
 

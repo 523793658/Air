@@ -3,6 +3,7 @@
 #include "Windows/WindowsPlatformProcess.h"
 #include "Windows/WindowsHWrapper.h"
 #include "basic/include/ErrorHanding.hpp"
+#include "HAL/FileSystem.h"
 #include <time.h>
 #include <mmsyscom.h>
 #include <rpcsal.h>
@@ -34,5 +35,13 @@ namespace Air
 	void WindowsPlatformMisc::createGuid(struct Guid& result)
 	{
 		Verify(CoCreateGuid((GUID*)&result) == S_OK);
+	}
+
+	bool WindowsPlatformMisc::getDiskTotalAndFreeSpace(std::string const & inPath, uint64_t & totalNumberOfBytes, uint64_t& numberOfFreeBytes)
+	{
+		bool success = false;
+		filesystem::path path(inPath);
+		success = !!::GetDiskFreeSpaceEx(path.c_str(), nullptr, reinterpret_cast<ULARGE_INTEGER*>(&totalNumberOfBytes), reinterpret_cast<ULARGE_INTEGER*>(&numberOfFreeBytes));
+		return success;
 	}
 }

@@ -13,6 +13,8 @@ namespace Air
 		static bool isDebuggerPresent();
 
 		static void createGuid(struct Guid& result);
+
+		static bool getDiskTotalAndFreeSpace(std::string const &, uint64_t & totalNumberOfBytes, uint64_t& numberOfFreeBytes);
 	};
 
 

@@ -18,6 +18,8 @@
 
 namespace Air
 {
+	float near = 1.0f;
+
 	class HelperPass : public RenderLayerPass
 	{
 	protected:
@@ -92,7 +94,7 @@ namespace Air
 
 			mFrameBuffers.resize(mNumShadowMap);
 			ShadowMapData & data = mLayer->getRenderEnv()->getShadowMapData();
-			float near = mReferenceCamera->getNearPlane();
+			float near = 1.0f;//mReferenceCamera->getNearPlane();
 			float far = mReferenceCamera->getFarPlane();
 			data.mViewDistances = float4::getMaxVector();
 			float const range = far - near;

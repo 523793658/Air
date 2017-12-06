@@ -43,20 +43,6 @@
 #endif
 
 
-#if defined(KLAYGE_CXX17_LIBRARY_STRING_VIEW_SUPPORT)
-#include <string_view>
-#else
-#include <boost/utility/string_view.hpp>
-namespace std
-{
-	using boost::basic_string_view;
-	using boost::string_view;
-	using boost::wstring_view;
-}
-
-#endif
-
-
 #if !defined(TEXT)
 #define TEXT_PASTE(x) L ## x
 #define TEXT(x) TEXT_PASTE(x)

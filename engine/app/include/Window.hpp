@@ -2,7 +2,7 @@
 #define _Air_Window_H_
 #pragma once
 #include "core/include/PreDeclare.h"
-
+#include "HAL/Platform.h"
 #include "rendersystem/include/RenderSettings.hpp"
 
 #if defined(AIR_COMPILER_MSVC)
@@ -11,7 +11,6 @@
 #pragma warning(disable: 4915)
 #elif defined(AIR_COMPILER_GCC)
 #endif
-
 #include <boost/signals2.hpp>
 
 #if defined(AIR_COMPILER_MSVC)
@@ -19,12 +18,6 @@
 #elif defined(AIR_COMPILER_GCC)
 
 #endif
-
-#if defined AIR_PLATFORM_WINDOWS_DESKTOP
-
-#include <windows.h>
-#endif
-
 #include <string.h>
 #include "basic/include/Math.hpp"
 namespace Air
