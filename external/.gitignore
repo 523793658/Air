@@ -4,3 +4,4 @@ test_build/
 *.fxo
 *.pdb
 *.ilk
+mono/

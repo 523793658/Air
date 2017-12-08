@@ -12,8 +12,15 @@ namespace Air
 		GameObject(std::string name);
 		void addComponent(std::string className);
 		void addComponent(AType type);
+
+		bool isInitialized() const 
+		{
+			return mInitialized;
+		}
 	private:
 		std::vector<ComponentBasePtr> mComponents;
+
+		bool mInitialized{ false };
 	};
 
 

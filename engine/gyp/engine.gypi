@@ -38,6 +38,8 @@
 				"../core/include/Type.hpp",
 				"../core/include/SingletonManager.hpp",
 				"../core/include/World.hpp",
+				"../core/include/EngineType.hpp",
+				"../core/include/ContentStream.hpp",
 
 				
 				"../core/src/Engine.cpp",
@@ -54,6 +56,7 @@
 				"../core/src/ComponentBase.cpp",
 				"../core/src/SingletonManager.cpp",
 				"../core/src/World.cpp",
+				"../core/src/ContentStream.cpp",
 
 				
 				"../rendersystem/include/RenderFactory.h",
@@ -99,6 +102,8 @@
 				"../rendersystem/include/MaterialInterface.hpp",
 				"../rendersystem/include/RHIDefinitions.hpp",
 				"../rendersystem/include/DeferredLightingLayer.hpp",
+				"../rendersystem/include/StaticMesh.hpp",
+				"../rendersystem/include/StaticMeshRenderResource.hpp",
 				
 				"../rendersystem/src/RenderSettings.cpp",
 				"../rendersystem/src/RenderFactory.cpp",
@@ -142,6 +147,8 @@
 				"../rendersystem/src/Material.cpp",
 				"../rendersystem/src/MaterialInterface.cpp",
 				"../rendersystem/src/DeferredLightingLayer.cpp",
+				"../rendersystem/src/StaticMesh.cpp",
+				"../rendersystem/src/StaticMeshRenderResource.cpp",
 				
 				"../scene_manager/include/SceneManager.hpp",
 				"../scene_manager/include/SceneObject.hpp",
@@ -163,14 +170,21 @@
 				"../app/src/WindowWin.cpp",
 				"../app/src/App3D.cpp",
 				
-				"../component/include/StaticMeshRenderer.hpp",
+				"../component/include/StaticMeshComponent.hpp",
 				"../component/include/PrimitiveComponent.hpp",
-				"../component/include/SkinMeshRenderer.hpp",
+				"../component/include/SkinMeshComponent.hpp",
 				
 				
 				"../component/src/PrimitiveComponent.cpp",
-				"../component/src/StaticMeshRenderer.cpp",
-				"../component/src/SkinMeshRenderer.cpp",
+				"../component/src/StaticMeshComponent.cpp",
+				"../component/src/SkinMeshComponent.cpp",
+				
+				
+				"../script_engine/src/ScriptEngine.cpp",
+				"../script_engine/src/ScriptEngineFactory.cpp",
+				
+				"../script_engine/include/ScriptEngine.hpp",
+				"../script_engine/include/ScriptEngineFactory.hpp",
 			],
 			"conditions":[
 				[

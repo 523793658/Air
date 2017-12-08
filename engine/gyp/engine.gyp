@@ -14,6 +14,7 @@
 				"SampleCreateWindow",
 				"SampleRenderOneBall",
 				"InputEngineMsg",
+				"ScriptEngineMono",
 			],
 			'sources':
 			[
@@ -43,6 +44,7 @@
 		'scene_manager_octree.gypi',
 		'resource_plugin_fbx.gypi',
 		"input_engine_msg.gypi",
+		"script_engine_mono.gypi",
 	],
 	
 }
