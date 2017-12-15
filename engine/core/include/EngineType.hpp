@@ -4,6 +4,19 @@
 namespace Air
 {
 
+	namespace EWorldType
+	{
+		enum Type
+		{
+			None,
+			Game,
+			Editor,
+			PIE,
+			EditorPreview,
+			GamePreview,
+			Inactive
+		};
+	}
 
 enum class ETeleportType
 {

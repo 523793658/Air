@@ -191,11 +191,6 @@ namespace Air
 #define CT_HASH(x) (CTHashImpl(x, 0))
 #endif // AIR_COMPILER_MSVC
 #else
-#if defined(KLAYGE_COMPILER_MSVC)
-#define FORCEINLINE __forceinline
-#else
-#define FORCEINLINE inline
-#endif
 
 	FORCEINLINE size_t _Hash(const char(&str)[1])
 	{

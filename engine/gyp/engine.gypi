@@ -40,6 +40,7 @@
 				"../core/include/World.hpp",
 				"../core/include/EngineType.hpp",
 				"../core/include/ContentStream.hpp",
+				"../core/include/Level.hpp",
 
 				
 				"../core/src/Engine.cpp",
@@ -57,6 +58,7 @@
 				"../core/src/SingletonManager.cpp",
 				"../core/src/World.cpp",
 				"../core/src/ContentStream.cpp",
+				"../core/src/Level.cpp",
 
 				
 				"../rendersystem/include/RenderFactory.h",
@@ -173,11 +175,13 @@
 				"../component/include/StaticMeshComponent.hpp",
 				"../component/include/PrimitiveComponent.hpp",
 				"../component/include/SkinMeshComponent.hpp",
+				"../component/include/TransformComponent.hpp",
 				
 				
 				"../component/src/PrimitiveComponent.cpp",
 				"../component/src/StaticMeshComponent.cpp",
 				"../component/src/SkinMeshComponent.cpp",
+				"../component/src/TransformComponent.cpp",
 				
 				
 				"../script_engine/src/ScriptEngine.cpp",

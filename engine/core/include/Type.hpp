@@ -1,7 +1,7 @@
 #ifndef _Type_H_
 #define _Type_H_
 #pragma once
- 
+#include "Context.h"
 
 
 namespace Air
