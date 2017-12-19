@@ -397,4 +397,10 @@
 #define AIR_IS_DEV_PLATFORM 0
 #endif
 
+#if defined(AIR_COMPILER_MSVC)
+#define FORCEINLINE __forceinline
+#else
+#define FORCEINLINE inline
+#endif
+
 #endif

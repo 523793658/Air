@@ -12,6 +12,7 @@
         <parameter type="float4x4" name="u_ViewProjMatrixInv"/>
         <parameter type="float4x4" name="u_ViewProjMatrix" />
         <parameter type="float4x4" name="u_ViewMatrix" />
+        <parameter type="float2" name="u_ShadowTexSizeInv"/>
     </cbuffer>
 
 
@@ -34,12 +35,12 @@
         <state name="address_w" value="clamp"/>
     </parameter>
 
-    <parameter type="SamplerComparisonState" name="s_ShadowSampler">
+    <parameter type="SamplerState" name="s_ShadowSampler">
         <state name="filtering" value="min_mag_linear_mip_point"/>
-        <state name="address_u" value="clamp"/>
-        <state name="address_v" value="clamp"/>
-        <state name="address_w" value="clamp"/>
-        <state name="cmp_func" value="greater"/>
+        <state name="address_u" value="border"/>
+        <state name="address_v" value="border"/>
+        <state name="address_w" value="border"/>
+        <state name="border_clr" r="1.0" g="1.0" b="1.0" a="1.0" />
     </parameter>
   
     
@@ -88,9 +89,6 @@ PS_OUTPUT simplestPS(PS_INPUT input)
 #else
     output.color = float4(1.0, 0.0, 0.0, 1.0);
 #endif
-	
-    //output.color.rgb = mul(mul(float4(input.vWorldPos, 1.0), u_ViewProjMatrix), u_ViewProjMatrixInv).rgb;
-    
     return output;
 }
 		]]>

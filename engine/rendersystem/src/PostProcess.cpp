@@ -82,7 +82,7 @@ namespace Air
 
 	PostProcessChain::PostProcessChain()
 	{
-		mRenderable = SimpleMeshFactory::createStaticQuat(1.0f);
+		mRenderable = SimpleMeshFactory::createStaticQuat(1.f);
 	}
 
 	void PostProcessChain::loadCfg(XMLNodePtr root)

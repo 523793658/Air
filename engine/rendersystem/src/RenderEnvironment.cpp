@@ -3,6 +3,7 @@
 #include "Engine.h"
 #include "app/include/App3D.hpp"
 #include "Camera.hpp"
+#include "rendersystem/include/Texture.hpp"
 #include "rendersystem/include/Light.hpp"
 #include "rendersystem/include/RenderEnvironment.hpp"
 
@@ -77,7 +78,12 @@ namespace Air
 		{
 			*b->second->getParameterByName("u_ShadowMatrix") = mShadowMapData.mShadowMatrix;
 			*b->second->getParameterByName("u_ViewDistanceClip") = mShadowMapData.mViewDistances;
+			mShadowMapData.mTextureSizeInv.x() = 1.0f / mShadowMapData.mShadowMap->getWidth();
+			mShadowMapData.mTextureSizeInv.y() = 1.0f / mShadowMapData.mShadowMap->getHeight();
+
+			*b->second->getParameterByName("u_ShadowTexSizeInv") = mShadowMapData.mTextureSizeInv;
 		}
+
 	}
 
 	void RenderEnvironment::update()

@@ -1,4 +1,5 @@
 #include "Context.h"
+#include "ContentStream.hpp"
 #include "component/include/PrimitiveComponent.hpp"
 
 namespace Air
@@ -33,7 +34,11 @@ namespace Air
 		return 0;
 	}
 
-
+	void PrimitiveComponent::onRegister()
+	{
+		ComponentBase::onRegister();
+		IStreamingManager::get().notifyPrimitiveUpdated(this);
+	}
 
 
 

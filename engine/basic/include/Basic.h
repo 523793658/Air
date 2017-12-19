@@ -5,10 +5,13 @@
 
 #include "basic/include/Config.h"
 #include "basic/include/Types.h"
+#include "basic/include/Object.hpp"
+
 #include "basic/include/PreDeclare.h"
 #include <array>
 #include "basic/include/Math.hpp"
 #include "basic/include/Color.hpp"
+
 
 
 

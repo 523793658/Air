@@ -43,7 +43,8 @@ void tonemappingVS(float4 pos : POSITION,
 float4 toneMapPS(float3 v_Texcoord : TEXCOORD0) : SV_Target
 {
 	float3 color = toneMap(u_SceneTex.SampleLevel(s_LinearSampler, v_Texcoord.xy, 0).rgb, 0.0f, v_Texcoord.z);
-	return float4(u_SceneTex.SampleLevel(s_LinearSampler, v_Texcoord.xy, 0).rgb, 1.0);
+
+	return float4(pow(color, 1/2.2), 1.0);
 }
 
 

@@ -13,6 +13,7 @@ namespace Air
 		TexturePtr mShadowMap;
 		std::vector<float4x4> mShadowMatrix;
 		float4 mViewDistances;
+		float2 mTextureSizeInv;
 	};
 
 	class AIR_CORE_API RenderEnvironment : boost::noncopyable, public EventTable

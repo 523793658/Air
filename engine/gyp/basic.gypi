@@ -48,6 +48,12 @@
 				"../basic/include/Json.hpp",
 				"../basic/include/Date.hpp",
 				"../basic/include/ClassManager.hpp",
+				"../basic/include/ObjectBase.hpp",
+				"../basic/include/ObjectBaseUtility.hpp",
+				"../basic/include/Object.hpp",
+				"../basic/include/ObjectMacros.hpp",
+				"../basic/include/EngineBaseType.hpp",
+				"../basic/include/TickTaskManagerInterface.hpp",
 				
 				"../basic/src/Thread.cpp",
 				"../basic/src/CPP11.cpp",
@@ -77,6 +83,13 @@
 				"../basic/src/Json.cpp",
 				"../basic/src/Date.cpp",
 				"../basic/src/ClassManager.cpp",
+				"../basic/src/ObjectBase.cpp",
+				"../basic/src/Object.cpp",
+				"../basic/src/ObjectBaseUtility.cpp",
+				"../basic/src/ObjectMacros.cpp",
+				"../basic/src/EngineBaseType.cpp",
+				"../basic/src/TickTaskManager.cpp",
+				"../basic/src/TickTaskManagerInterface.cpp",
 			],
 			"conditions":[
 				[

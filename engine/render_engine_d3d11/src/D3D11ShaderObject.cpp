@@ -1079,7 +1079,9 @@ namespace Air
 					}
 					reflection->Release();
 				}
+#ifndef AIR_DEBUG
 				*code = this->stripDXBC(*code, D3DCOMPILER_STRIP_REFLECTION_DATA | D3DCOMPILER_STRIP_DEBUG_INFO | D3DCOMPILER_STRIP_TEST_BLOBS | D3DCOMPILER_STRIP_PRIVATE_DATA);
+#endif
 			}
 		}
 		if (code->empty())

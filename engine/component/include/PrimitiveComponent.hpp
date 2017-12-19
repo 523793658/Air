@@ -8,6 +8,7 @@ namespace Air
 
 	class AIR_CORE_API PrimitiveComponent : public ComponentBase
 	{
+	public:
 		virtual void setMaterial(int32_t elementIndex, class MaterialInterface* material);
 
 		virtual class MaterialInstanceDynamic* createAndSetMaterialInstanceDynamic(int32_t elementIndex);
@@ -31,6 +32,10 @@ namespace Air
 		virtual float4x4 getRenderMatrix() const;
 
 		virtual int32_t getNumMaterials() const;
+
+		virtual void onRegister() override;
+
+		virtual void onUnRegister() override;
 	public:
 		static int32_t mCurrentTag;
 
