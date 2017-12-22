@@ -11,6 +11,8 @@ namespace Air
 	public:
 		std::vector<GameObject*> mActors;
 		World* mOwningWorld;
+		bool mIsVisible;
+		class TickTaskLevel*	mTickTaskLevel;
 	};
 }
 

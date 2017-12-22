@@ -1,20 +1,96 @@
 #include "basic/include/EngineBaseType.hpp"
 #include <set>
 #include <boost/assert.hpp>
+#include "core/include/World.hpp"
+#include "core/include/Level.hpp"
 #include "basic/include/TickTaskManagerInterface.hpp"
 namespace Air
 {
+	struct TickContext
+	{
+		float mDeltaSeconds;
+		ELevelTick	mTickType;
+		ETickingGroup		mTickGroup;
+		World*				mWorld;
+		TickContext(float inDeltaSeconds = 0.0f, ELevelTick inTickType = ELT_All, ETickingGroup tickGroup = TG_PrePhysics)
+			:mDeltaSeconds(inDeltaSeconds),
+			mTickType(inTickType),
+			mTickGroup(tickGroup),
+			mWorld(nullptr)
+		{
+		}
+		TickContext(const TickContext& In)
+			: mDeltaSeconds(In.mDeltaSeconds),
+			mTickType(In.mTickType),
+			mTickGroup(In.mTickGroup),
+			mWorld(In.mWorld)
+		{
+		}
+
+		void operator = (const TickContext& rhs)
+		{
+			mDeltaSeconds = rhs.mDeltaSeconds;
+			mTickGroup = rhs.mTickGroup;
+			mTickType = rhs.mTickType;
+			mWorld = rhs.mWorld;
+		}
+	};
+
+	class TickTaskSequencer
+	{
+		class DispatchTickGroupTask
+		{
+			TickTaskSequencer & mTTS;
+			ETickingGroup		mWorldTickGroup;
+		public:
+			FORCEINLINE DispatchTickGroupTask(TickTaskSequencer& inTTS, ETickingGroup inWorldTickGroup)
+				:mTTS(inTTS),
+				mWorldTickGroup(inWorldTickGroup)
+			{
+
+			}
+		};
+	public:
+		static TickTaskSequencer& get()
+		{
+			static TickTaskSequencer mSingletonInstance;
+			return mSingletonInstance;
+		}
+		void startFrame();
+
+		void setupAddTickTaskCompletionParallel(int32_t NumTicks);
+	};
+
 	class TickTaskManager : public TickTaskManagerInterface
 	{
+	private:
+	public:
+
 		static TickTaskManager& get()
 		{
-			static TickTaskManager mSingletonInstance;
-			return mSingletonInstance;
+			//static TickTaskManager mSingletonInstance;
+			//return mSingletonInstance;
 		}
 
 		virtual TickTaskLevel* allocateTickTaskLevel()
 		{
 			return new TickTaskLevel;
+		}
+
+		void fillLevelList(const std::vector<Level*>& levels)
+		{
+			if (!mContext.mWorld->getActiveLevelCollection() || mContext.mWorld->getActiveLevelCollection()->getType() == LevelCollectionType::DynamicSourceLevels)
+			{
+				mLevelList.push_back(mContext.mWorld->mTickTaskLevel);
+			}
+			for (int32_t levelIndex = 0; levelIndex < levels.size(); ++levelIndex)
+			{
+				Level* level = levels[levelIndex];
+				if (level->mIsVisible)
+				{
+					mLevelList.push_back(level->mTickTaskLevel);
+				}
+			}
 		}
 
 		virtual void freeTickTaskLevel(TickTaskLevel* tickTaskLevel)
@@ -24,8 +100,49 @@ namespace Air
 
 		virtual void startFrame(World* inWorld, float deltaSeconds, ELevelTick tickType, const std::vector<Level*>& LevelsToTick)
 		{
-
+			mContext.mTickGroup = ETickingGroup(0);
+			mContext.mDeltaSeconds = deltaSeconds;
+			mContext.mTickType = tickType;
+			mContext.mWorld = inWorld;
+			mTickNewlySpawned = true;
+			mTickTaskSequencer.startFrame();
+			fillLevelList(LevelsToTick);
+			int32_t numWorkerThread = 0;
+			bool bConcurrentQueue = false;
+			if (!bConcurrentQueue)
+			{
+				int32_t totalTickFunctions = 0;
+				for (int32_t levelIndex = 0; levelIndex < mLevelList.size(); ++levelIndex)
+				{
+					totalTickFunctions += mLevelList[levelIndex]->startFrame(mContext);
+				}
+				for (int32_t levelIndex = 0; levelIndex < mLevelList.size(); ++levelIndex)
+				{
+					mLevelList[levelIndex]->queueAllTicks();
+				}
+			}
+			else
+			{
+				for (int32_t levelIndex = 0; levelIndex < mLevelList.size(); ++levelIndex)
+				{
+					mLevelList[levelIndex]->startFrameParallel(mContext, mAllTickFunctions);
+				}
+				TickTaskSequencer& tts = TickTaskSequencer::get();
+				tts.setupAddTickTaskCompletionParallel(mAllTickFunctions.size());
+				for (int32_t levelIndex = 0; levelIndex < mLevelList.size(); levelIndex++)
+				{
+					//mLevelList[levelIndex]->reser
+				}
+			}
 		}
+
+	private:
+		TickContext		mContext;
+
+		float			mTickNewlySpawned;
+		TickTaskSequencer&		mTickTaskSequencer;
+		std::vector<TickTaskLevel*> mLevelList;
+		std::vector<TickFunction*> mAllTickFunctions;
 	};
 
 	class TickTaskLevel
@@ -129,6 +246,15 @@ namespace Air
 			{
 				mAllDisabledTickFunctions.emplace(tickFunction);
 			}
+		}
+		int32_t startFrame(const TickContext& context);
+		void queueAllTicks();
+
+		void startFrameParallel(const TickContext& context, std::vector<TickFunction*>& allTickFunctions);
+
+		void reserveTickFunctionCooldowns(int32_t numToReserve)
+		{
+			
 		}
 	private:
 		struct CoolingDownTickFunctionList
